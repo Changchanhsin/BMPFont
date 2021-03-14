@@ -254,36 +254,50 @@
     End Sub
 
     Private Sub importRAW(width As Integer, height As Integer, sizeW As Integer, sizeH As Integer)
-        Dim FS As New System.IO.FileStream(txtImportFileName.Text, IO.FileMode.Open)
-        Dim Bw As New System.IO.BinaryReader(FS)
-        Dim readBs As Byte()
-        Dim bmp = New Bitmap(width, height)
-
-        createFont(width, height, sizeW, sizeH)
-        Dim grpMain As Graphics = Graphics.FromImage(picMain.Image)
-
-        FS.Seek(txtImportOffset.Text, IO.SeekOrigin.Begin)
-        Dim widthBytes As Integer = Int((width + 7) / 8)
         Try
-            For t = 0 To sizeH - 1
-                For l = 0 To sizeW - 1
-                    readBs = Bw.ReadBytes(widthBytes * height)
-                    For j = 0 To height - 1
-                        For i = 0 To widthBytes * 8 - 1
-                            If ((readBs(j * 2 + Int(i / 8)) >> (7 - (i Mod 8))) Mod 2) = 1 Then
-                                bmp.SetPixel(i, j, Color.Black)
-                            Else
-                                bmp.SetPixel(i, j, Color.White)
-                            End If
+            Dim FS As New System.IO.FileStream(txtImportFileName.Text, IO.FileMode.Open)
+
+            Dim Bw As New System.IO.BinaryReader(FS)
+            Dim readBs As Byte()
+            Dim bmp = New Bitmap(width, height)
+
+            createFont(width, height, sizeW, sizeH)
+            Dim grpMain As Graphics = Graphics.FromImage(picMain.Image)
+
+            FS.Seek(txtImportOffset.Text, IO.SeekOrigin.Begin)
+            Dim widthBytes As Integer = Int((width + 7) / 8)
+            cellWidth = width
+            cellHeight = height
+            codeWidth = sizeW
+            codeHeight = sizeH
+            codePage = 0
+            Try
+                For t = 0 To sizeH - 1
+                    For l = 0 To sizeW - 1
+                        readBs = Bw.ReadBytes(widthBytes * height)
+                        For j = 0 To height - 1
+                            For i = 0 To widthBytes * 8 - 1
+                                If ((readBs(j * widthBytes + Int(i / 8)) >> (7 - (i Mod 8))) Mod 2) = 1 Then
+                                    bmp.SetPixel(i, j, Color.Black)
+                                Else
+                                    bmp.SetPixel(i, j, Color.White)
+                                End If
+                            Next
                         Next
+                        grpMain.DrawImage(bmp, l * (width + 1), t * (height + 1))
                     Next
-                    grpMain.DrawImage(bmp, l * (width + 1), t * (height + 1))
                 Next
-            Next
-        Catch
-            picMain.Refresh()
+            Catch ex As Exception
+                MessageBox.Show("Error on open RAW file : " & ex.Message)
+                picMain.Refresh()
+                FS.Close()
+            End Try
             FS.Close()
+        Catch ex2 As Exception
+            MessageBox.Show("Error on open RAW file : " & ex2.Message)
+            Exit Sub
         End Try
+
     End Sub
 
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
@@ -336,4 +350,5 @@
         picEditor.BackgroundImage = bmpD
         picEditor.Anchor = AnchorStyles.Left Or AnchorStyles.Right Or AnchorStyles.Top Or AnchorStyles.Bottom
     End Sub
+
 End Class

@@ -70,6 +70,7 @@ Partial Class frmBMPFont
         '
         Me.SplitContainer1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.SplitContainer1.Location = New System.Drawing.Point(0, 0)
+        Me.SplitContainer1.Margin = New System.Windows.Forms.Padding(6, 6, 6, 6)
         Me.SplitContainer1.Name = "SplitContainer1"
         '
         'SplitContainer1.Panel1
@@ -98,8 +99,9 @@ Partial Class frmBMPFont
         Me.SplitContainer1.Panel2.Controls.Add(Me.txtNewHeight)
         Me.SplitContainer1.Panel2.Controls.Add(Me.txtNewWidth)
         Me.SplitContainer1.Panel2.Controls.Add(Me.btnCreate)
-        Me.SplitContainer1.Size = New System.Drawing.Size(806, 572)
-        Me.SplitContainer1.SplitterDistance = 539
+        Me.SplitContainer1.Size = New System.Drawing.Size(1612, 1144)
+        Me.SplitContainer1.SplitterDistance = 1078
+        Me.SplitContainer1.SplitterWidth = 8
         Me.SplitContainer1.TabIndex = 0
         '
         'pnlH
@@ -107,16 +109,18 @@ Partial Class frmBMPFont
         Me.pnlH.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.pnlH.Controls.Add(Me.picH)
-        Me.pnlH.Location = New System.Drawing.Point(13, 0)
+        Me.pnlH.Location = New System.Drawing.Point(26, 0)
+        Me.pnlH.Margin = New System.Windows.Forms.Padding(6, 6, 6, 6)
         Me.pnlH.Name = "pnlH"
-        Me.pnlH.Size = New System.Drawing.Size(523, 13)
+        Me.pnlH.Size = New System.Drawing.Size(1046, 26)
         Me.pnlH.TabIndex = 5
         '
         'picH
         '
         Me.picH.Location = New System.Drawing.Point(0, 0)
+        Me.picH.Margin = New System.Windows.Forms.Padding(6, 6, 6, 6)
         Me.picH.Name = "picH"
-        Me.picH.Size = New System.Drawing.Size(125, 15)
+        Me.picH.Size = New System.Drawing.Size(250, 30)
         Me.picH.TabIndex = 0
         Me.picH.TabStop = False
         '
@@ -125,16 +129,18 @@ Partial Class frmBMPFont
         Me.pnlV.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.pnlV.Controls.Add(Me.picV)
-        Me.pnlV.Location = New System.Drawing.Point(0, 13)
+        Me.pnlV.Location = New System.Drawing.Point(0, 26)
+        Me.pnlV.Margin = New System.Windows.Forms.Padding(6, 6, 6, 6)
         Me.pnlV.Name = "pnlV"
-        Me.pnlV.Size = New System.Drawing.Size(13, 559)
+        Me.pnlV.Size = New System.Drawing.Size(26, 1118)
         Me.pnlV.TabIndex = 4
         '
         'picV
         '
         Me.picV.Location = New System.Drawing.Point(0, 0)
+        Me.picV.Margin = New System.Windows.Forms.Padding(6, 6, 6, 6)
         Me.picV.Name = "picV"
-        Me.picV.Size = New System.Drawing.Size(13, 145)
+        Me.picV.Size = New System.Drawing.Size(26, 290)
         Me.picV.TabIndex = 0
         Me.picV.TabStop = False
         '
@@ -145,17 +151,19 @@ Partial Class frmBMPFont
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.pnlMain.AutoScroll = True
         Me.pnlMain.Controls.Add(Me.picMain)
-        Me.pnlMain.Location = New System.Drawing.Point(13, 13)
+        Me.pnlMain.Location = New System.Drawing.Point(26, 26)
+        Me.pnlMain.Margin = New System.Windows.Forms.Padding(6, 6, 6, 6)
         Me.pnlMain.Name = "pnlMain"
-        Me.pnlMain.Size = New System.Drawing.Size(523, 559)
+        Me.pnlMain.Size = New System.Drawing.Size(1046, 1118)
         Me.pnlMain.TabIndex = 3
         '
         'picMain
         '
         Me.picMain.Cursor = System.Windows.Forms.Cursors.Default
         Me.picMain.Location = New System.Drawing.Point(0, 0)
+        Me.picMain.Margin = New System.Windows.Forms.Padding(6, 6, 6, 6)
         Me.picMain.Name = "picMain"
-        Me.picMain.Size = New System.Drawing.Size(15, 15)
+        Me.picMain.Size = New System.Drawing.Size(30, 30)
         Me.picMain.TabIndex = 0
         Me.picMain.TabStop = False
         '
@@ -163,73 +171,82 @@ Partial Class frmBMPFont
         '
         Me.picHead.AccessibleRole = System.Windows.Forms.AccessibleRole.Clock
         Me.picHead.Location = New System.Drawing.Point(0, 0)
+        Me.picHead.Margin = New System.Windows.Forms.Padding(6, 6, 6, 6)
         Me.picHead.Name = "picHead"
-        Me.picHead.Size = New System.Drawing.Size(13, 13)
+        Me.picHead.Size = New System.Drawing.Size(26, 26)
         Me.picHead.TabIndex = 0
         Me.picHead.TabStop = False
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(240, 10)
+        Me.Button1.Location = New System.Drawing.Point(480, 20)
+        Me.Button1.Margin = New System.Windows.Forms.Padding(6, 6, 6, 6)
         Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(47, 23)
+        Me.Button1.Size = New System.Drawing.Size(94, 46)
         Me.Button1.TabIndex = 13
         Me.Button1.Text = "Big5"
         Me.Button1.UseVisualStyleBackColor = True
         '
         'txtImportOffset
         '
-        Me.txtImportOffset.Location = New System.Drawing.Point(151, 87)
+        Me.txtImportOffset.Location = New System.Drawing.Point(302, 174)
+        Me.txtImportOffset.Margin = New System.Windows.Forms.Padding(6, 6, 6, 6)
         Me.txtImportOffset.Name = "txtImportOffset"
-        Me.txtImportOffset.Size = New System.Drawing.Size(83, 21)
+        Me.txtImportOffset.Size = New System.Drawing.Size(162, 35)
         Me.txtImportOffset.TabIndex = 11
         Me.txtImportOffset.Text = "0"
         '
         'txtImportSizeH
         '
-        Me.txtImportSizeH.Location = New System.Drawing.Point(114, 87)
+        Me.txtImportSizeH.Location = New System.Drawing.Point(228, 174)
+        Me.txtImportSizeH.Margin = New System.Windows.Forms.Padding(6, 6, 6, 6)
         Me.txtImportSizeH.Name = "txtImportSizeH"
-        Me.txtImportSizeH.Size = New System.Drawing.Size(31, 21)
+        Me.txtImportSizeH.Size = New System.Drawing.Size(58, 35)
         Me.txtImportSizeH.TabIndex = 11
         Me.txtImportSizeH.Text = "256"
         '
         'txtImportSizeW
         '
-        Me.txtImportSizeW.Location = New System.Drawing.Point(77, 87)
+        Me.txtImportSizeW.Location = New System.Drawing.Point(154, 174)
+        Me.txtImportSizeW.Margin = New System.Windows.Forms.Padding(6, 6, 6, 6)
         Me.txtImportSizeW.Name = "txtImportSizeW"
-        Me.txtImportSizeW.Size = New System.Drawing.Size(31, 21)
+        Me.txtImportSizeW.Size = New System.Drawing.Size(58, 35)
         Me.txtImportSizeW.TabIndex = 12
         Me.txtImportSizeW.Text = "256"
         '
         'txtImportHeight
         '
-        Me.txtImportHeight.Location = New System.Drawing.Point(40, 87)
+        Me.txtImportHeight.Location = New System.Drawing.Point(80, 174)
+        Me.txtImportHeight.Margin = New System.Windows.Forms.Padding(6, 6, 6, 6)
         Me.txtImportHeight.Name = "txtImportHeight"
-        Me.txtImportHeight.Size = New System.Drawing.Size(31, 21)
+        Me.txtImportHeight.Size = New System.Drawing.Size(58, 35)
         Me.txtImportHeight.TabIndex = 9
         Me.txtImportHeight.Text = "15"
         '
         'txtImportWidth
         '
-        Me.txtImportWidth.Location = New System.Drawing.Point(3, 87)
+        Me.txtImportWidth.Location = New System.Drawing.Point(6, 174)
+        Me.txtImportWidth.Margin = New System.Windows.Forms.Padding(6, 6, 6, 6)
         Me.txtImportWidth.Name = "txtImportWidth"
-        Me.txtImportWidth.Size = New System.Drawing.Size(31, 21)
+        Me.txtImportWidth.Size = New System.Drawing.Size(58, 35)
         Me.txtImportWidth.TabIndex = 10
         Me.txtImportWidth.Text = "16"
         '
         'txtImportFileName
         '
-        Me.txtImportFileName.Location = New System.Drawing.Point(3, 114)
+        Me.txtImportFileName.Location = New System.Drawing.Point(6, 228)
+        Me.txtImportFileName.Margin = New System.Windows.Forms.Padding(6, 6, 6, 6)
         Me.txtImportFileName.Name = "txtImportFileName"
-        Me.txtImportFileName.Size = New System.Drawing.Size(231, 21)
+        Me.txtImportFileName.Size = New System.Drawing.Size(458, 35)
         Me.txtImportFileName.TabIndex = 8
         Me.txtImportFileName.Text = "Y:\个人\张展新\设计\字体\Font\[AYUMI]N.FNT"
         '
         'btnImport
         '
-        Me.btnImport.Location = New System.Drawing.Point(159, 141)
+        Me.btnImport.Location = New System.Drawing.Point(318, 282)
+        Me.btnImport.Margin = New System.Windows.Forms.Padding(6, 6, 6, 6)
         Me.btnImport.Name = "btnImport"
-        Me.btnImport.Size = New System.Drawing.Size(75, 23)
+        Me.btnImport.Size = New System.Drawing.Size(150, 46)
         Me.btnImport.TabIndex = 7
         Me.btnImport.Text = "Import"
         Me.btnImport.UseVisualStyleBackColor = True
@@ -241,74 +258,83 @@ Partial Class frmBMPFont
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.picEditor.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
         Me.picEditor.Cursor = System.Windows.Forms.Cursors.Default
-        Me.picEditor.Location = New System.Drawing.Point(4, 170)
+        Me.picEditor.Location = New System.Drawing.Point(8, 340)
+        Me.picEditor.Margin = New System.Windows.Forms.Padding(6, 6, 6, 6)
         Me.picEditor.Name = "picEditor"
-        Me.picEditor.Size = New System.Drawing.Size(256, 256)
+        Me.picEditor.Size = New System.Drawing.Size(508, 508)
         Me.picEditor.TabIndex = 6
         Me.picEditor.TabStop = False
         '
         'txtSaveImage
         '
-        Me.txtSaveImage.Location = New System.Drawing.Point(3, 39)
+        Me.txtSaveImage.Location = New System.Drawing.Point(6, 78)
+        Me.txtSaveImage.Margin = New System.Windows.Forms.Padding(6, 6, 6, 6)
         Me.txtSaveImage.Name = "txtSaveImage"
-        Me.txtSaveImage.Size = New System.Drawing.Size(142, 21)
+        Me.txtSaveImage.Size = New System.Drawing.Size(280, 35)
         Me.txtSaveImage.TabIndex = 5
         Me.txtSaveImage.Text = "256"
         '
         'picSave
         '
-        Me.picSave.Location = New System.Drawing.Point(114, 39)
+        Me.picSave.Location = New System.Drawing.Point(228, 78)
+        Me.picSave.Margin = New System.Windows.Forms.Padding(6, 6, 6, 6)
         Me.picSave.Name = "picSave"
-        Me.picSave.Size = New System.Drawing.Size(31, 23)
+        Me.picSave.Size = New System.Drawing.Size(62, 46)
         Me.picSave.TabIndex = 4
         Me.picSave.TabStop = False
         '
         'btnSave
         '
-        Me.btnSave.Location = New System.Drawing.Point(159, 39)
+        Me.btnSave.Location = New System.Drawing.Point(318, 78)
+        Me.btnSave.Margin = New System.Windows.Forms.Padding(6, 6, 6, 6)
         Me.btnSave.Name = "btnSave"
-        Me.btnSave.Size = New System.Drawing.Size(75, 23)
+        Me.btnSave.Size = New System.Drawing.Size(150, 46)
         Me.btnSave.TabIndex = 3
         Me.btnSave.Text = "Save PNG"
         Me.btnSave.UseVisualStyleBackColor = True
         '
         'txtNewSizeH
         '
-        Me.txtNewSizeH.Location = New System.Drawing.Point(114, 12)
+        Me.txtNewSizeH.Location = New System.Drawing.Point(228, 24)
+        Me.txtNewSizeH.Margin = New System.Windows.Forms.Padding(6, 6, 6, 6)
         Me.txtNewSizeH.Name = "txtNewSizeH"
-        Me.txtNewSizeH.Size = New System.Drawing.Size(31, 21)
+        Me.txtNewSizeH.Size = New System.Drawing.Size(58, 35)
         Me.txtNewSizeH.TabIndex = 2
         Me.txtNewSizeH.Text = "256"
         '
         'txtNewSizeW
         '
-        Me.txtNewSizeW.Location = New System.Drawing.Point(77, 12)
+        Me.txtNewSizeW.Location = New System.Drawing.Point(154, 24)
+        Me.txtNewSizeW.Margin = New System.Windows.Forms.Padding(6, 6, 6, 6)
         Me.txtNewSizeW.Name = "txtNewSizeW"
-        Me.txtNewSizeW.Size = New System.Drawing.Size(31, 21)
+        Me.txtNewSizeW.Size = New System.Drawing.Size(58, 35)
         Me.txtNewSizeW.TabIndex = 2
         Me.txtNewSizeW.Text = "256"
         '
         'txtNewHeight
         '
-        Me.txtNewHeight.Location = New System.Drawing.Point(40, 12)
+        Me.txtNewHeight.Location = New System.Drawing.Point(80, 24)
+        Me.txtNewHeight.Margin = New System.Windows.Forms.Padding(6, 6, 6, 6)
         Me.txtNewHeight.Name = "txtNewHeight"
-        Me.txtNewHeight.Size = New System.Drawing.Size(31, 21)
+        Me.txtNewHeight.Size = New System.Drawing.Size(58, 35)
         Me.txtNewHeight.TabIndex = 1
         Me.txtNewHeight.Text = "48"
         '
         'txtNewWidth
         '
-        Me.txtNewWidth.Location = New System.Drawing.Point(3, 12)
+        Me.txtNewWidth.Location = New System.Drawing.Point(6, 24)
+        Me.txtNewWidth.Margin = New System.Windows.Forms.Padding(6, 6, 6, 6)
         Me.txtNewWidth.Name = "txtNewWidth"
-        Me.txtNewWidth.Size = New System.Drawing.Size(31, 21)
+        Me.txtNewWidth.Size = New System.Drawing.Size(58, 35)
         Me.txtNewWidth.TabIndex = 1
         Me.txtNewWidth.Text = "48"
         '
         'btnCreate
         '
-        Me.btnCreate.Location = New System.Drawing.Point(159, 10)
+        Me.btnCreate.Location = New System.Drawing.Point(318, 20)
+        Me.btnCreate.Margin = New System.Windows.Forms.Padding(6, 6, 6, 6)
         Me.btnCreate.Name = "btnCreate"
-        Me.btnCreate.Size = New System.Drawing.Size(75, 23)
+        Me.btnCreate.Size = New System.Drawing.Size(150, 46)
         Me.btnCreate.TabIndex = 0
         Me.btnCreate.Text = "Create"
         Me.btnCreate.UseVisualStyleBackColor = True
@@ -327,10 +353,11 @@ Partial Class frmBMPFont
         '
         'frmBMPFont
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(12.0!, 24.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(806, 572)
+        Me.ClientSize = New System.Drawing.Size(1612, 1144)
         Me.Controls.Add(Me.SplitContainer1)
+        Me.Margin = New System.Windows.Forms.Padding(6, 6, 6, 6)
         Me.Name = "frmBMPFont"
         Me.Text = "BMP Font"
         Me.SplitContainer1.Panel1.ResumeLayout(False)
