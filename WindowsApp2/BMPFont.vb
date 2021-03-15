@@ -255,7 +255,7 @@
 
     Private Sub importRAW(width As Integer, height As Integer, sizeW As Integer, sizeH As Integer)
         Try
-            Dim FS As New System.IO.FileStream(txtImportFileName.Text, IO.FileMode.Open)
+            Dim FS As New System.IO.FileStream(txtImportFileName.Text, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
 
             Dim Bw As New System.IO.BinaryReader(FS)
             Dim readBs As Byte()
@@ -351,4 +351,7 @@
         picEditor.Anchor = AnchorStyles.Left Or AnchorStyles.Right Or AnchorStyles.Top Or AnchorStyles.Bottom
     End Sub
 
+    Private Sub txtImportFileName_TextChanged(sender As Object, e As EventArgs) Handles txtImportFileName.TextChanged
+
+    End Sub
 End Class
