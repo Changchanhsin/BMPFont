@@ -198,27 +198,22 @@
             codeWidth = sizeW
             codeHeight = sizeH
             codePage = 0
-            Try
-                For t = 0 To sizeH - 1
-                    For l = 0 To sizeW - 1
-                        readBs = Bw.ReadBytes(widthBytes * height)
-                        For j = 0 To height - 1
-                            For i = 0 To widthBytes * 8 - 1
-                                If ((readBs(j * widthBytes + Int(i / 8)) >> (7 - (i Mod 8))) Mod 2) = 1 Then
-                                    bmp.SetPixel(i, j, Color.Black)
-                                Else
-                                    bmp.SetPixel(i, j, Color.White)
-                                End If
-                            Next
+            For t = 0 To sizeH - 1
+                For l = 0 To sizeW - 1
+                    readBs = Bw.ReadBytes(widthBytes * height)
+                    For j = 0 To height - 1
+                        For i = 0 To widthBytes * 8 - 1
+                            If ((readBs(j * widthBytes + Int(i / 8)) >> (7 - (i Mod 8))) Mod 2) = 1 Then
+                                bmp.SetPixel(i, j, Color.Black)
+                            Else
+                                bmp.SetPixel(i, j, Color.White)
+                            End If
                         Next
-                        grpMain.DrawImage(bmp, l * (width + 1), t * (height + 1))
                     Next
+                    grpMain.DrawImage(bmp, l * (width + 1), t * (height + 1))
                 Next
-            Catch ex As Exception
-                MessageBox.Show("Error on open RAW file : " & ex.Message)
-                picMain.Refresh()
-                FS.Close()
-            End Try
+            Next
+
             FS.Close()
         Catch ex2 As Exception
             MessageBox.Show("Error on open RAW file : " & ex2.Message)
@@ -229,7 +224,7 @@
 
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
         importRAW(txtImportWidth.Text, txtImportHeight.Text, txtImportSizeW.Text, txtImportSizeH.Text)
-
+        resizeAll()
     End Sub
 
     Private Sub Button1_Click_1(sender As Object, e As EventArgs) Handles btnBIG5.Click
@@ -287,6 +282,7 @@
         pnlMain.Height = SplitContainer1.Panel1.Height - pnlMain.Top
         picEditor.Width = SplitContainer1.Panel2.Width - picEditor.Left * 2
         picEditor.Height = SplitContainer1.Panel2.Height - picEditor.Top - picEditor.Left
+        RedrawEditor()
     End Sub
 
     Private Sub frmBMPFont_Resize(sender As Object, e As EventArgs) Handles Me.Resize
@@ -309,5 +305,38 @@
         Dim l() = {&H40, &H7E, &H80, &HFC}
         Dim h() = {&H81, &H9F, &HE0, &HFC}
         createArray(932, txtNewWidth.Text, txtNewHeight.Text, l, h)
+    End Sub
+
+    Private Sub btnCopyCharImage_Click(sender As Object, e As EventArgs) Handles btnCopyCharImage.Click
+        If currCodeX = -1 Then
+            Exit Sub
+        End If
+        If picEditor.Width <= 1 Or picEditor.Height <= 1 Then
+            Exit Sub
+        End If
+
+        Dim bmp = New Bitmap(cellWidth, cellHeight)
+        Clipboard.SetImage(bmp)
+    End Sub
+
+    Private Sub btnPasteImage_Click(sender As Object, e As EventArgs) Handles btnPasteImage.Click
+        If currCodeX = -1 Then
+            Exit Sub
+        End If
+        If picEditor.Width <= 1 Or picEditor.Height <= 1 Then
+            Exit Sub
+        End If
+        Dim bmpClip = Clipboard.GetImage()
+        If bmpClip Is Nothing Then
+            Exit Sub
+        End If
+        Dim grpMain As Graphics = Graphics.FromImage(picMain.Image)
+        'Dim bmp = New Bitmap(Width, Height)
+        'Dim grp As Graphics = Graphics.FromImage(bmp)
+
+        'grp.DrawImage(bmpClip, 0, 0)
+
+        grpMain.DrawImage(bmpClip, currCodeX * (cellWidth + 1), currCodeY * (cellHeight + 1), cellWidth, cellHeight)
+        resizeAll()
     End Sub
 End Class

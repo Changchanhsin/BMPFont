@@ -54,6 +54,8 @@ Partial Class frmBMPFont
         Me.btnSJIS = New System.Windows.Forms.Button()
         Me.btnGB2312 = New System.Windows.Forms.Button()
         Me.btbGBK = New System.Windows.Forms.Button()
+        Me.btnCopyCharImage = New System.Windows.Forms.Button()
+        Me.btnPasteImage = New System.Windows.Forms.Button()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -85,6 +87,8 @@ Partial Class frmBMPFont
         '
         'SplitContainer1.Panel2
         '
+        Me.SplitContainer1.Panel2.Controls.Add(Me.btnPasteImage)
+        Me.SplitContainer1.Panel2.Controls.Add(Me.btnCopyCharImage)
         Me.SplitContainer1.Panel2.Controls.Add(Me.btbGBK)
         Me.SplitContainer1.Panel2.Controls.Add(Me.btnGB2312)
         Me.SplitContainer1.Panel2.Controls.Add(Me.btnSJIS)
@@ -265,10 +269,10 @@ Partial Class frmBMPFont
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.picEditor.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
         Me.picEditor.Cursor = System.Windows.Forms.Cursors.Default
-        Me.picEditor.Location = New System.Drawing.Point(4, 278)
+        Me.picEditor.Location = New System.Drawing.Point(4, 310)
         Me.picEditor.Margin = New System.Windows.Forms.Padding(4)
         Me.picEditor.Name = "picEditor"
-        Me.picEditor.Size = New System.Drawing.Size(303, 288)
+        Me.picEditor.Size = New System.Drawing.Size(303, 256)
         Me.picEditor.TabIndex = 6
         Me.picEditor.TabStop = False
         '
@@ -388,6 +392,26 @@ Partial Class frmBMPFont
         Me.btbGBK.Text = "GBK"
         Me.btbGBK.UseVisualStyleBackColor = True
         '
+        'btnCopyCharImage
+        '
+        Me.btnCopyCharImage.Location = New System.Drawing.Point(4, 273)
+        Me.btnCopyCharImage.Margin = New System.Windows.Forms.Padding(4)
+        Me.btnCopyCharImage.Name = "btnCopyCharImage"
+        Me.btnCopyCharImage.Size = New System.Drawing.Size(100, 29)
+        Me.btnCopyCharImage.TabIndex = 17
+        Me.btnCopyCharImage.Text = "Copy"
+        Me.btnCopyCharImage.UseVisualStyleBackColor = True
+        '
+        'btnPasteImage
+        '
+        Me.btnPasteImage.Location = New System.Drawing.Point(207, 273)
+        Me.btnPasteImage.Margin = New System.Windows.Forms.Padding(4)
+        Me.btnPasteImage.Name = "btnPasteImage"
+        Me.btnPasteImage.Size = New System.Drawing.Size(100, 29)
+        Me.btnPasteImage.TabIndex = 18
+        Me.btnPasteImage.Text = "Paste"
+        Me.btnPasteImage.UseVisualStyleBackColor = True
+        '
         'frmBMPFont
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 15.0!)
@@ -445,4 +469,6 @@ Partial Class frmBMPFont
     Friend WithEvents btbGBK As Button
     Friend WithEvents btnGB2312 As Button
     Friend WithEvents btnSJIS As Button
+    Friend WithEvents btnPasteImage As Button
+    Friend WithEvents btnCopyCharImage As Button
 End Class
