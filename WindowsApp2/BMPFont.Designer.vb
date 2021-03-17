@@ -332,7 +332,7 @@ Partial Class frmBMPFont
         Me.picEditor.Location = New System.Drawing.Point(4, 461)
         Me.picEditor.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.picEditor.Name = "picEditor"
-        Me.picEditor.Size = New System.Drawing.Size(410, 306)
+        Me.picEditor.Size = New System.Drawing.Size(406, 306)
         Me.picEditor.TabIndex = 6
         Me.picEditor.TabStop = False
         '

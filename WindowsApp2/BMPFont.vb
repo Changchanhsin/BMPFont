@@ -60,15 +60,26 @@
             Exit Sub
         End If
         Dim mFont As New Font("宋体", size)
-        Dim currChar(2) As Byte
+        Dim currChar(4) As Byte
         Dim unicodeString As String
         Dim bmp As New Bitmap(cellWidth, cellHeight)
         Dim grp As Graphics = Graphics.FromImage(bmp)
         Dim brs As New SolidBrush(Color.White)
         For i = 0 To codeHeight - 1
             For j = 0 To codeWidth - 1
-                currChar(0) = codeH(i)
-                currChar(1) = codeL(j)
+                If codePage = 1200 Then
+                    currChar(0) = &HFF
+                    currChar(1) = &HFE
+                    currChar(2) = codeH(i)
+                    currChar(3) = codeL(j)
+                ElseIf codePage = 1252 Then
+                    currChar(0) = codeH(i) * 8 + codeL(j)
+                    currChar(1) = 0
+                Else
+                    currChar(0) = codeH(i)
+                    currChar(1) = codeL(j)
+                    currChar(2) = 0
+                End If
                 unicodeString = System.Text.Encoding.GetEncoding(codePage).GetString(currChar)
 
                 'grpMain.DrawString(unicodeString, mFont, mBrush, j * (cellWidth + 1) + offset, i * (cellHeight + 1))
@@ -213,19 +224,19 @@
             Case "ASCII-7(0)"
                 l = {0, 15}
                 h = {0, 7}
-                c = 0
+                c = 1252
             Case "ASCII-8(0)"
                 l = {0, 15}
                 h = {0, 15}
-                c = 0
+                c = 1252
             Case "Unicode(0)"
                 l = {0, 255}
                 h = {0, 255}
-                c = 0
+                c = 1200
             Case "ISO/IEC13000BMP(0)"
                 l = {0, 255}
                 h = {0, 255}
-                c = 0
+                c = 1200
             Case "GB2312双字节(936)"
                 l = {&HA1, &HFE}
                 h = {&HA1, &HFE}
@@ -354,8 +365,8 @@
         grpD.DrawRectangle(New Pen(Color.Blue), currCellX * (cellWidth + 1) - 1, currCellY * (cellHeight + 1) - 1, cellWidth + 1, cellHeight + 1)
         currCellX = Int((e.X) / (cellWidth + 1))
         currCellY = Int((e.Y) / (cellHeight + 1))
-        lblCode.Text = "Code:" & Strings.Right("00" & Hex(codeH(currCellY)), 2) & Strings.Right("00" & Hex(codeL(currCellX)), 2)
-        lblColRow.Text = "Col:" & currCellX & "(" & Strings.Right("00" & Hex(currCellX), 2) & ");Row:" & currCellY & "(" & Strings.Right("00" & Hex(currCellY), 2) & ")"
+        lblCode.Text = "Codepage:" & codePage & " Code:" & Strings.Right("00" & Hex(codeH(currCellY)), 2) & Strings.Right("00" & Hex(codeL(currCellX)), 2)
+        lblColRow.Text = "Col:" & currCellX & "(" & Strings.Right("00" & Hex(currCellX), 2) & ") Row:" & currCellY & "(" & Strings.Right("00" & Hex(currCellY), 2) & ")"
         grpD.DrawRectangle(New Pen(Color.Red), currCellX * (cellWidth + 1) - 1, currCellY * (cellHeight + 1) - 1, cellWidth + 1, cellHeight + 1)
         picMain.Refresh()
         RedrawEditor()
