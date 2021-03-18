@@ -32,6 +32,7 @@ Partial Class frmBMPFont
         Me.pnlMain = New System.Windows.Forms.Panel()
         Me.picMain = New System.Windows.Forms.PictureBox()
         Me.picHead = New System.Windows.Forms.PictureBox()
+        Me.cboImportType = New System.Windows.Forms.ComboBox()
         Me.cboSaveFileType = New System.Windows.Forms.ComboBox()
         Me.cboCodepage = New System.Windows.Forms.ComboBox()
         Me.lblColRow = New System.Windows.Forms.Label()
@@ -88,6 +89,7 @@ Partial Class frmBMPFont
         '
         'SplitContainer1.Panel2
         '
+        Me.SplitContainer1.Panel2.Controls.Add(Me.cboImportType)
         Me.SplitContainer1.Panel2.Controls.Add(Me.cboSaveFileType)
         Me.SplitContainer1.Panel2.Controls.Add(Me.cboCodepage)
         Me.SplitContainer1.Panel2.Controls.Add(Me.lblColRow)
@@ -190,11 +192,21 @@ Partial Class frmBMPFont
         Me.picHead.TabIndex = 0
         Me.picHead.TabStop = False
         '
+        'cboImportType
+        '
+        Me.cboImportType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboImportType.FormattingEnabled = True
+        Me.cboImportType.Items.AddRange(New Object() {"RAW", ".FONT.PNG", ".HZCG6"})
+        Me.cboImportType.Location = New System.Drawing.Point(4, 311)
+        Me.cboImportType.Name = "cboImportType"
+        Me.cboImportType.Size = New System.Drawing.Size(229, 26)
+        Me.cboImportType.TabIndex = 24
+        '
         'cboSaveFileType
         '
         Me.cboSaveFileType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboSaveFileType.FormattingEnabled = True
-        Me.cboSaveFileType.Items.AddRange(New Object() {"PNG", "RAW", "HZ"})
+        Me.cboSaveFileType.Items.AddRange(New Object() {".FONT.PNG", "RAW", ".HZCG6"})
         Me.cboSaveFileType.Location = New System.Drawing.Point(223, 120)
         Me.cboSaveFileType.Name = "cboSaveFileType"
         Me.cboSaveFileType.Size = New System.Drawing.Size(209, 26)
@@ -213,7 +225,7 @@ Partial Class frmBMPFont
         'lblColRow
         '
         Me.lblColRow.AutoSize = True
-        Me.lblColRow.Location = New System.Drawing.Point(4, 434)
+        Me.lblColRow.Location = New System.Drawing.Point(4, 433)
         Me.lblColRow.Name = "lblColRow"
         Me.lblColRow.Size = New System.Drawing.Size(143, 18)
         Me.lblColRow.TabIndex = 21
@@ -263,7 +275,7 @@ Partial Class frmBMPFont
         Me.txtImportOffset.Location = New System.Drawing.Point(229, 233)
         Me.txtImportOffset.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtImportOffset.Name = "txtImportOffset"
-        Me.txtImportOffset.Size = New System.Drawing.Size(122, 28)
+        Me.txtImportOffset.Size = New System.Drawing.Size(202, 28)
         Me.txtImportOffset.TabIndex = 11
         Me.txtImportOffset.Text = "0"
         '
@@ -308,13 +320,13 @@ Partial Class frmBMPFont
         Me.txtImportFileName.Location = New System.Drawing.Point(7, 273)
         Me.txtImportFileName.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtImportFileName.Name = "txtImportFileName"
-        Me.txtImportFileName.Size = New System.Drawing.Size(345, 28)
+        Me.txtImportFileName.Size = New System.Drawing.Size(425, 28)
         Me.txtImportFileName.TabIndex = 8
         Me.txtImportFileName.Text = "C:\Users\张展新\Desktop\font\[AYUMI]N.FNT"
         '
         'btnImport
         '
-        Me.btnImport.Location = New System.Drawing.Point(241, 314)
+        Me.btnImport.Location = New System.Drawing.Point(242, 311)
         Me.btnImport.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnImport.Name = "btnImport"
         Me.btnImport.Size = New System.Drawing.Size(191, 35)
@@ -332,7 +344,7 @@ Partial Class frmBMPFont
         Me.picEditor.Location = New System.Drawing.Point(4, 461)
         Me.picEditor.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.picEditor.Name = "picEditor"
-        Me.picEditor.Size = New System.Drawing.Size(406, 306)
+        Me.picEditor.Size = New System.Drawing.Size(402, 306)
         Me.picEditor.TabIndex = 6
         Me.picEditor.TabStop = False
         '
@@ -482,4 +494,5 @@ Partial Class frmBMPFont
     Friend WithEvents lblCode As Label
     Friend WithEvents cboCodepage As ComboBox
     Friend WithEvents cboSaveFileType As ComboBox
+    Friend WithEvents cboImportType As ComboBox
 End Class

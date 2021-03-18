@@ -14,6 +14,8 @@
     Private bmpDigitalL(16) As Bitmap
     Private bmpDigitalS(16) As Bitmap
 
+    Dim bmpHead As New Bitmap(13, 13)
+
     Private Function in0255(v As Integer) As Integer
         If v < 0 Then
             in0255 = 0
@@ -91,6 +93,35 @@
         picMain.Refresh()
     End Sub
 
+    Private Sub drawHead(dt As Integer, x As Integer, y As Integer)
+        For i As Integer = 0 To 7
+            'If ((dt Mod 2) Xor ((x + i + y) Mod 2)) = 0 Then
+            '            If ((dt Mod 2)) = 0 Then
+            If ((dt >> (7 - i)) Mod 2) = 0 Then
+                bmpHead.SetPixel(x + i, y, Color.White)
+            Else
+                bmpHead.SetPixel(x + i, y, Color.Black)
+            End If
+        Next
+    End Sub
+
+    Private Sub printHead()
+        For i = 1 To 10
+            bmpHead.SetPixel(1, i, Color.Black)
+            bmpHead.SetPixel(10, i, Color.Black)
+            bmpHead.SetPixel(i, 1, Color.Black)
+            bmpHead.SetPixel(i, 10, Color.Black)
+        Next
+        drawHead(codePage / 256, 2, 2)
+        drawHead(codePage Mod 256, 2, 3)
+        drawHead(cellWidth, 2, 4)
+        drawHead(cellHeight, 2, 5)
+        drawHead(codeWidth, 2, 6)
+        drawHead(codeHeight, 2, 7)
+        drawHead(0, 2, 8)
+        drawHead(0, 2, 9)
+    End Sub
+
     Private Sub createArray(cp As Integer, width As Integer, height As Integer, codeLowRange() As Integer, codeHighRange() As Integer)
         Dim mapW(256) As Integer
         Dim mapH(256) As Integer
@@ -127,7 +158,6 @@
             End If
         Next
 
-        Dim bmpHead As New Bitmap(13, 13)
         Dim bmpV As New Bitmap(13, sizeH * (height + 1) + 1)
         Dim bmpH As New Bitmap(sizeW * (width + 1) + 1, 13)
         Dim bmpMain As New Bitmap(sizeW * (width + 1) + 1, sizeH * (height + 1) + 1)
@@ -142,6 +172,7 @@
         grpOutputHead.DrawLine(Pens.Blue, 0, 12, 12, 12)
         grpOutputHead.DrawLine(Pens.Blue, 12, 0, 12, 12)
         picHead.Image = bmpHead
+        printHead()
         picHead.Refresh()
 
         Dim grpOutputV As Graphics = Graphics.FromImage(bmpV)
@@ -272,14 +303,53 @@
 
     Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
         Select Case cboSaveFileType.Text
-            Case "PNG"
-                savePNG()
-            Case "HZ"
+            Case ".HZCG6"
 
+            Case "RAW"
+                saveRAW()
             Case Else
-
+                savePNG()
         End Select
     End Sub
+
+    Private Sub saveRAW()
+        Dim i, j, k, l
+        Dim c As Color
+        Dim d As Byte
+        Try
+            Dim bmp As Bitmap = picMain.Image
+
+            Dim FS As New System.IO.FileStream(txtSaveImage.Text, IO.FileMode.Create, IO.FileAccess.Write, IO.FileShare.Write)
+            Dim Bw As New System.IO.BinaryWriter(FS)
+
+            For j = 0 To codeHeight - 1
+                For i = 0 To codeWidth - 1
+                    For k = 0 To cellHeight - 1
+                        For l = 0 To cellWidth - 1
+                            c = bmp.GetPixel(i * (cellWidth + 1) + l, j * (cellHeight + 1) + k)
+                            If (c.R * 9 + c.G * 19 + c.B * 4 >> 5) < 128 And c.A > 128 Then
+                                d += (1 << (7 - (l Mod 8)))
+                            End If
+                            If ((l + 1) Mod 8) = 0 Then
+                                'write to file
+                                Bw.Write(d)
+                                d = 0
+                            End If
+                        Next
+                        If (cellWidth Mod 8) <> 0 Then
+                            'writetofile
+                            Bw.Write(d)
+                            d = 0
+                        End If
+                    Next
+                Next
+            Next
+            FS.Close()
+        Catch ex2 As Exception
+            MessageBox.Show("Error on save RAW file : " & ex2.Message)
+        End Try
+    End Sub
+
 
     Private Sub savePNG()
         picSave.Visible = False
@@ -294,7 +364,7 @@
         picSave.Image = bmpSave
         picSave.Refresh()
         Try
-            picSave.Image.Save(txtSaveImage.Text)
+            picSave.Image.Save(txtSaveImage.Text & ".FONT.PNG")
         Catch ex As Exception
 
         End Try
@@ -327,7 +397,7 @@
                 For l = 0 To sizeW - 1
                     readBs = Bw.ReadBytes(widthBytes * height)
                     For j = 0 To height - 1
-                        For i = 0 To widthBytes * 8 - 1
+                        For i = 0 To width - 1 'widthBytes * 8 - 1
                             If ((readBs(j * widthBytes + Int(i / 8)) >> (7 - (i Mod 8))) Mod 2) = 1 Then
                                 bmp.SetPixel(i, j, Color.Black)
                             Else
@@ -350,7 +420,15 @@
     End Sub
 
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
-        importRAW(txtImportWidth.Text, txtImportHeight.Text, txtImportSizeW.Text, txtImportSizeH.Text)
+        Select Case cboImportType.Text
+            Case ".FONT.PNG"
+                savePNG()
+            Case ".HZCG6"
+
+            Case Else
+                importRAW(txtImportWidth.Text, txtImportHeight.Text, txtImportSizeW.Text, txtImportSizeH.Text)
+        End Select
+
         resizeAll()
     End Sub
 
@@ -359,6 +437,9 @@
             Exit Sub
         End If
         If (cellHeight <= 0) Then
+            Exit Sub
+        End If
+        If e.X < 0 Or e.Y < 0 Or e.X >= picMain.Width Or e.Y >= picMain.Height Then
             Exit Sub
         End If
         Dim grpD = Graphics.FromImage(picMain.Image)
@@ -411,6 +492,7 @@
         resizeAll()
         cboCodepage.SelectedIndex = 0
         cboSaveFileType.SelectedIndex = 0
+        cboImportType.SelectedIndex = 0
     End Sub
 
     Private Sub resizeAll()
@@ -427,6 +509,7 @@
         btnImport.Width = SplitContainer1.Panel2.Width - btnImport.Left - border
         btnCopyCharImage.Width = SplitContainer1.Panel2.Width - btnCopyCharImage.Left - border
         btnPasteImage.Width = SplitContainer1.Panel2.Width - btnPasteImage.Left - border
+        txtImportFileName.Width = SplitContainer1.Panel2.Width - txtImportFileName.Left - border
     End Sub
 
     Private Sub frmBMPFont_Resize(sender As Object, e As EventArgs) Handles Me.Resize
