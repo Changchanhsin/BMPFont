@@ -32,10 +32,14 @@ Partial Class frmBMPFont
         Me.pnlMain = New System.Windows.Forms.Panel()
         Me.picMain = New System.Windows.Forms.PictureBox()
         Me.picHead = New System.Windows.Forms.PictureBox()
+        Me.btnScale = New System.Windows.Forms.Button()
+        Me.txtScale = New System.Windows.Forms.TextBox()
         Me.cboImportType = New System.Windows.Forms.ComboBox()
         Me.cboSaveFileType = New System.Windows.Forms.ComboBox()
         Me.cboCodepage = New System.Windows.Forms.ComboBox()
+        Me.lblCursor = New System.Windows.Forms.Label()
         Me.lblColRow = New System.Windows.Forms.Label()
+        Me.lblInfo = New System.Windows.Forms.Label()
         Me.lblCode = New System.Windows.Forms.Label()
         Me.btnPasteImage = New System.Windows.Forms.Button()
         Me.btnCopyCharImage = New System.Windows.Forms.Button()
@@ -58,10 +62,6 @@ Partial Class frmBMPFont
         Me.btnCreate = New System.Windows.Forms.Button()
         Me.iml35 = New System.Windows.Forms.ImageList(Me.components)
         Me.iml57 = New System.Windows.Forms.ImageList(Me.components)
-        Me.txtScale = New System.Windows.Forms.TextBox()
-        Me.btnScale = New System.Windows.Forms.Button()
-        Me.lblInfo = New System.Windows.Forms.Label()
-        Me.lblCursor = New System.Windows.Forms.Label()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -200,6 +200,25 @@ Partial Class frmBMPFont
         Me.picHead.TabIndex = 0
         Me.picHead.TabStop = False
         '
+        'btnScale
+        '
+        Me.btnScale.Location = New System.Drawing.Point(241, 314)
+        Me.btnScale.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnScale.Name = "btnScale"
+        Me.btnScale.Size = New System.Drawing.Size(191, 35)
+        Me.btnScale.TabIndex = 26
+        Me.btnScale.Text = "Scale up/down"
+        Me.btnScale.UseVisualStyleBackColor = True
+        '
+        'txtScale
+        '
+        Me.txtScale.Location = New System.Drawing.Point(7, 314)
+        Me.txtScale.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtScale.Name = "txtScale"
+        Me.txtScale.Size = New System.Drawing.Size(226, 28)
+        Me.txtScale.TabIndex = 25
+        Me.txtScale.Text = "100%"
+        '
         'cboImportType
         '
         Me.cboImportType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
@@ -224,11 +243,20 @@ Partial Class frmBMPFont
         '
         Me.cboCodepage.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboCodepage.FormattingEnabled = True
-        Me.cboCodepage.Items.AddRange(New Object() {"Unknown(0)", "ASCII-7(0)", "ASCII-8(0)", "Unicode(0)", "ISO/IEC13000BMP(0)", "GB2312双字节(936)", "GBK双字节(936)", "GB18030双字节(936)", "Big-5(950)", "Shift-JIS(932)"})
+        Me.cboCodepage.Items.AddRange(New Object() {"Unknown(0)", "ASCII-7(1252)", "ASCII-8(1252)", "UnicodeUCS16(1200)", "ISO/IEC13000BMP(1200)", "GB2312双字节(936)", "GBK双字节(936)", "GB18030单字节(936)", "GB18030双字节(936)", "Big-5双字节(950)", "Big-5单字节(950)", "Shift-JIS双字节(932)", "Shift-JIS单字节(932)"})
         Me.cboCodepage.Location = New System.Drawing.Point(226, 6)
         Me.cboCodepage.Name = "cboCodepage"
         Me.cboCodepage.Size = New System.Drawing.Size(209, 26)
         Me.cboCodepage.TabIndex = 22
+        '
+        'lblCursor
+        '
+        Me.lblCursor.AutoSize = True
+        Me.lblCursor.Location = New System.Drawing.Point(13, 433)
+        Me.lblCursor.Name = "lblCursor"
+        Me.lblCursor.Size = New System.Drawing.Size(71, 18)
+        Me.lblCursor.TabIndex = 21
+        Me.lblCursor.Text = "Cursor:"
         '
         'lblColRow
         '
@@ -238,6 +266,15 @@ Partial Class frmBMPFont
         Me.lblColRow.Size = New System.Drawing.Size(53, 18)
         Me.lblColRow.TabIndex = 21
         Me.lblColRow.Text = "Edit:"
+        '
+        'lblInfo
+        '
+        Me.lblInfo.AutoSize = True
+        Me.lblInfo.Location = New System.Drawing.Point(13, 371)
+        Me.lblInfo.Name = "lblInfo"
+        Me.lblInfo.Size = New System.Drawing.Size(44, 18)
+        Me.lblInfo.TabIndex = 21
+        Me.lblInfo.Text = "Info"
         '
         'lblCode
         '
@@ -352,7 +389,7 @@ Partial Class frmBMPFont
         Me.picEditor.Location = New System.Drawing.Point(7, 460)
         Me.picEditor.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.picEditor.Name = "picEditor"
-        Me.picEditor.Size = New System.Drawing.Size(402, 306)
+        Me.picEditor.Size = New System.Drawing.Size(398, 306)
         Me.picEditor.TabIndex = 6
         Me.picEditor.TabStop = False
         '
@@ -441,43 +478,6 @@ Partial Class frmBMPFont
         Me.iml57.ImageStream = CType(resources.GetObject("iml57.ImageStream"), System.Windows.Forms.ImageListStreamer)
         Me.iml57.TransparentColor = System.Drawing.Color.Transparent
         Me.iml57.Images.SetKeyName(0, "5x7.png")
-        '
-        'txtScale
-        '
-        Me.txtScale.Location = New System.Drawing.Point(7, 314)
-        Me.txtScale.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.txtScale.Name = "txtScale"
-        Me.txtScale.Size = New System.Drawing.Size(226, 28)
-        Me.txtScale.TabIndex = 25
-        Me.txtScale.Text = "100%"
-        '
-        'btnScale
-        '
-        Me.btnScale.Location = New System.Drawing.Point(241, 314)
-        Me.btnScale.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnScale.Name = "btnScale"
-        Me.btnScale.Size = New System.Drawing.Size(191, 35)
-        Me.btnScale.TabIndex = 26
-        Me.btnScale.Text = "Scale up/down"
-        Me.btnScale.UseVisualStyleBackColor = True
-        '
-        'lblInfo
-        '
-        Me.lblInfo.AutoSize = True
-        Me.lblInfo.Location = New System.Drawing.Point(13, 371)
-        Me.lblInfo.Name = "lblInfo"
-        Me.lblInfo.Size = New System.Drawing.Size(53, 22)
-        Me.lblInfo.TabIndex = 21
-        Me.lblInfo.Text = "Info"
-        '
-        'lblCursor
-        '
-        Me.lblCursor.AutoSize = True
-        Me.lblCursor.Location = New System.Drawing.Point(13, 433)
-        Me.lblCursor.Name = "lblCursor"
-        Me.lblCursor.Size = New System.Drawing.Size(71, 18)
-        Me.lblCursor.TabIndex = 21
-        Me.lblCursor.Text = "Cursor:"
         '
         'frmBMPFont
         '

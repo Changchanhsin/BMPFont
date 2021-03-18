@@ -1,10 +1,11 @@
 ﻿Public Class frmBMPFont
     Private fontName As String = ""
-    Private codePage As Integer = 0 '0=raw/unicode;932=shift_jis;936=gb2312;950=big5;0/20217=ascii
+    Private codePage As Integer = 0 '0=raw/unknown;1200=usc;932=shift_jis;936=gb2312;950=big5;1252=ascii
     Private codeL(256) As Integer
     Private codeH(256) As Integer
     Private codeLowRange() As Integer
     Private codeHighRange() As Integer
+    Private codeLength As Integer = 2
 
     Private cellWidth As Integer = 0
     Private cellHeight As Integer = 0
@@ -30,14 +31,14 @@
     End Function
 
     Private Sub initGraphicResource()
-        Dim grpTemp As Graphics
+        Dim grp As Graphics
         For i = 0 To 15
             bmpDigitalL(i) = New Bitmap(5, 7)
-            grpTemp = Graphics.FromImage(bmpDigitalL(i))
-            grpTemp.DrawImage(iml57.Images(0), 0 - i * 5, 0)
+            grp = Graphics.FromImage(bmpDigitalL(i))
+            grp.DrawImage(iml57.Images(0), 0 - i * 5, 0)
             bmpDigitalS(i) = New Bitmap(3, 5)
-            grpTemp = Graphics.FromImage(bmpDigitalS(i))
-            grpTemp.DrawImage(iml35.Images(0), 0 - i * 3, 0)
+            grp = Graphics.FromImage(bmpDigitalS(i))
+            grp.DrawImage(iml35.Images(0), 0 - i * 3, 0)
         Next
     End Sub
 
@@ -49,47 +50,41 @@
         Dim mBrush As New SolidBrush(Color.LightPink)
         Dim size As Integer
         Dim offset As Integer
-        If (cellWidth >= 16) Then
+        If (cellHeight >= 16) Then
             size = 12
             offset = -3
-        ElseIf (cellWidth >= 14) Then
+        ElseIf (cellHeight >= 14) Then
             size = 11
             offset = -3
-        ElseIf (cellWidth >= 13) Then
+        ElseIf (cellHeight >= 13) Then
             size = 10
             offset = -3
-        ElseIf (cellWidth >= 12) Then
+        ElseIf (cellHeight >= 12) Then
             size = 9
             offset = -2
         Else
             Exit Sub
         End If
         Dim mFont As New Font("宋体", size)
-        Dim currChar(4) As Byte
+        Dim currChar(2) As Byte
         Dim unicodeString As String
         Dim bmp As New Bitmap(cellWidth, cellHeight)
         Dim grp As Graphics = Graphics.FromImage(bmp)
         Dim brs As New SolidBrush(Color.White)
         For i = 0 To codeHeight - 1
             For j = 0 To codeWidth - 1
-                If codePage = 1200 Then
-                    currChar(0) = &HFF
-                    currChar(1) = &HFE
-                    currChar(2) = codeH(i)
-                    currChar(3) = codeL(j)
-                ElseIf codePage = 1252 Then
-                    currChar(0) = codeH(i) * 8 + codeL(j)
-                    currChar(1) = 0
+                If codeLength = 2 Then
+                    currChar(0) = codeH(j)
+                    currChar(1) = codeL(i)
                 Else
-                    currChar(0) = codeH(i)
-                    currChar(1) = codeL(j)
-                    currChar(2) = 0
+                    currChar(0) = codeH(i) * 16 + codeL(j)
+                    currChar(1) = 0
                 End If
                 unicodeString = System.Text.Encoding.GetEncoding(codePage).GetString(currChar)
 
                 'grpMain.DrawString(unicodeString, mFont, mBrush, j * (cellWidth + 1) + offset, i * (cellHeight + 1))
                 grp.FillRectangle(brs, 0, 0, cellWidth, cellHeight)
-                grp.DrawString(unicodeString, mFont, mBrush, offset, 0)
+                grp.DrawString(unicodeString.Substring(0, 1), mFont, mBrush, offset, 0)
                 grpMain.DrawImage(bmp, j * (cellWidth + 1), i * (cellHeight + 1))
             Next
         Next
@@ -187,16 +182,24 @@
             If mapW(i) = 1 Then
                 grpOutputH.DrawLine(Pens.Blue, iCount * (width + 1) - 1, 0, iCount * (width + 1) - 1, 12)
                 If (width >= 18) Then
-                    grpOutputH.DrawImage(bmpDigitalL(Int(i / 16)), 2 + iCount * (width + 1), 3)
+                    If codeLength = 2 Then
+                        grpOutputH.DrawImage(bmpDigitalL(Int(i / 16)), 2 + iCount * (width + 1), 3)
+                    End If
                     grpOutputH.DrawImage(bmpDigitalL(i Mod 16), 10 + iCount * (width + 1), 3)
                 ElseIf (width >= 16) Then
-                    grpOutputH.DrawImage(bmpDigitalL(Int(i / 16)), 2 + iCount * (width + 1), 3)
+                    If codeLength = 2 Then
+                        grpOutputH.DrawImage(bmpDigitalL(Int(i / 16)), 2 + iCount * (width + 1), 3)
+                    End If
                     grpOutputH.DrawImage(bmpDigitalL(i Mod 16), 8 + iCount * (width + 1), 3)
-                ElseIf (width >= 8) Then
-                    grpOutputH.DrawImage(bmpDigitalS(Int(i / 16)), 1 + iCount * (width + 1), 3)
+                    ElseIf (width >= 8) Then
+                    If codeLength = 2 Then
+                        grpOutputH.DrawImage(bmpDigitalS(Int(i / 16)), 1 + iCount * (width + 1), 3)
+                    End If
                     grpOutputH.DrawImage(bmpDigitalS(i Mod 16), 5 + iCount * (width + 1), 3)
-                ElseIf (width >= 6) Then
-                    grpOutputH.DrawImage(bmpDigitalS(Int(i / 16)), 2 + iCount * (width + 1), 0)
+                    ElseIf (width >= 6) Then
+                    If codeLength = 2 Then
+                        grpOutputH.DrawImage(bmpDigitalS(Int(i / 16)), 2 + iCount * (width + 1), 0)
+                    End If
                     grpOutputH.DrawImage(bmpDigitalS(i Mod 16), 2 + iCount * (width + 1), 6)
                 End If
                 grpOutputMain.DrawLine(Pens.Blue, iCount * (width + 1) - 1, 0, iCount * (width + 1) - 1, sizeH * (height + 1) - 1)
@@ -211,19 +214,27 @@
             If mapH(i) = 1 Then
                 grpOutputV.DrawLine(Pens.Blue, 0, iCount * (height + 1) - 1, 12, iCount * (height + 1) - 1)
                 If (height >= 18) Then
-                    grpOutputV.DrawImage(bmpDigitalL(Int(i / 16)), 5, 2 + iCount * (height + 1))
+                    If codeLength = 2 Then
+                        grpOutputV.DrawImage(bmpDigitalL(Int(i / 16)), 5, 2 + iCount * (height + 1))
+                    End If
                     grpOutputV.DrawImage(bmpDigitalL(i Mod 16), 5, 10 + iCount * (height + 1))
                 ElseIf (height >= 10) Then
-                    grpOutputV.DrawImage(bmpDigitalL(Int(i / 16)), 0, 2 + iCount * (height + 1))
+                    If codeLength = 2 Then
+                        grpOutputV.DrawImage(bmpDigitalL(Int(i / 16)), 0, 2 + iCount * (height + 1))
+                    End If
                     grpOutputV.DrawImage(bmpDigitalL(i Mod 16), 6, 2 + iCount * (height + 1))
                 ElseIf (height >= 8) Then
-                    grpOutputV.DrawImage(bmpDigitalS(Int(i / 16)), 2, 2 + iCount * (height + 1))
+                    If codeLength = 2 Then
+                        grpOutputV.DrawImage(bmpDigitalS(Int(i / 16)), 2, 2 + iCount * (height + 1))
+                    End If
                     grpOutputV.DrawImage(bmpDigitalS(i Mod 16), 6, 2 + iCount * (height + 1))
                 ElseIf (height >= 6) Then
-                    grpOutputV.DrawImage(bmpDigitalS(Int(i / 16)), 2, 1 + iCount * (height + 1))
+                    If codeLength = 2 Then
+                        grpOutputV.DrawImage(bmpDigitalS(Int(i / 16)), 2, 1 + iCount * (height + 1))
+                    End If
                     grpOutputV.DrawImage(bmpDigitalS(i Mod 16), 6, 1 + iCount * (height + 1))
-                End If
-                grpOutputMain.DrawLine(Pens.Blue, 0, iCount * (height + 1) - 1, sizeW * (width + 1) - 1, iCount * (height + 1) - 1)
+                    End If
+                    grpOutputMain.DrawLine(Pens.Blue, 0, iCount * (height + 1) - 1, sizeW * (width + 1) - 1, iCount * (height + 1) - 1)
                 iCount = iCount + 1
             End If
         Next
@@ -259,50 +270,71 @@
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles btnCreate.Click
 
         Select Case cboCodepage.SelectedItem
-            Case "Unknown(0)"
-                codeLowRange = {0, in0255(txtNewSizeW.Text - 1)}
-                codeHighRange = {0, in0255(txtNewSizeH.Text - 1)}
-                codePage = 0
-            Case "ASCII-7(0)"
+            Case "ASCII-7(1252)"
                 codeLowRange = {0, 15}
                 codeHighRange = {0, 7}
                 codePage = 1252
-            Case "ASCII-8(0)"
+                codeLength = 1
+            Case "ASCII-8(1252)"
                 codeLowRange = {0, 15}
                 codeHighRange = {0, 15}
                 codePage = 1252
-            Case "Unicode(0)"
+                codeLength = 1
+            Case "Unicode(1200)"
                 codeLowRange = {0, 255}
                 codeHighRange = {0, 255}
                 codePage = 1200
-            Case "ISO/IEC13000BMP(0)"
+                codeLength = 2
+            Case "ISO/IEC13000BMP(1200)"
                 codeLowRange = {0, 255}
                 codeHighRange = {0, 255}
                 codePage = 1200
+                codeLength = 2
             Case "GB2312双字节(936)"
                 codeLowRange = {&HA1, &HFE}
                 codeHighRange = {&HA1, &HFE}
                 codePage = 936
+                codeLength = 2
             Case "GBK双字节(936)"
                 codeLowRange = {&H40, &H7E, &H80, &HFE}
                 codeHighRange = {&H81, &HFE}
                 codePage = 936
+                codeLength = 2
             Case "GB18030双字节(936)"
                 codeLowRange = {&H40, &H7E, &H80, &HFE}
                 codeHighRange = {&H81, &HFE}
                 codePage = 936
-            Case "Big-5(950)"
+                codeLength = 2
+            Case "GB18030单字节(936)"
+                codeLowRange = {0, 15}
+                codeHighRange = {0, 15}
+                codePage = 936
+                codeLength = 1
+            Case "Big-5双字节(950)"
                 codeLowRange = {&H40, &H7E, &HA1, &HFE}
                 codeHighRange = {&H81, &HFE}
                 codePage = 950
-            Case "Shift-JIS(932)"
+                codeLength = 2
+            Case "Big-5单字节(950)"
+                codeLowRange = {0, 15}
+                codeHighRange = {0, 15}
+                codePage = 950
+                codeLength = 1
+            Case "Shift-JIS双字节(932)"
                 codeLowRange = {&H40, &H7E, &H80, &HFC}
                 codeHighRange = {&H81, &H9F, &HE0, &HFC}
                 codePage = 932
+                codeLength = 2
+            Case "Shift-JIS单字节(932)"
+                codeLowRange = {0, 15}
+                codeHighRange = {0, 15}
+                codePage = 932
+                codeLength = 1
             Case Else
                 codeLowRange = {0, in0255(txtNewSizeW.Text - 1)}
                 codeHighRange = {0, in0255(txtNewSizeH.Text - 1)}
                 codePage = 0
+                codeLength = 2
         End Select
         createArray(codePage, txtNewWidth.Text, txtNewHeight.Text)
     End Sub
@@ -699,4 +731,5 @@
             btnCopyImage_Click(sender, e)
         End If
     End Sub
+
 End Class
