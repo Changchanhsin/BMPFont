@@ -58,6 +58,10 @@ Partial Class frmBMPFont
         Me.btnCreate = New System.Windows.Forms.Button()
         Me.iml35 = New System.Windows.Forms.ImageList(Me.components)
         Me.iml57 = New System.Windows.Forms.ImageList(Me.components)
+        Me.txtScale = New System.Windows.Forms.TextBox()
+        Me.btnScale = New System.Windows.Forms.Button()
+        Me.lblInfo = New System.Windows.Forms.Label()
+        Me.lblCursor = New System.Windows.Forms.Label()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -89,10 +93,14 @@ Partial Class frmBMPFont
         '
         'SplitContainer1.Panel2
         '
+        Me.SplitContainer1.Panel2.Controls.Add(Me.btnScale)
+        Me.SplitContainer1.Panel2.Controls.Add(Me.txtScale)
         Me.SplitContainer1.Panel2.Controls.Add(Me.cboImportType)
         Me.SplitContainer1.Panel2.Controls.Add(Me.cboSaveFileType)
         Me.SplitContainer1.Panel2.Controls.Add(Me.cboCodepage)
+        Me.SplitContainer1.Panel2.Controls.Add(Me.lblCursor)
         Me.SplitContainer1.Panel2.Controls.Add(Me.lblColRow)
+        Me.SplitContainer1.Panel2.Controls.Add(Me.lblInfo)
         Me.SplitContainer1.Panel2.Controls.Add(Me.lblCode)
         Me.SplitContainer1.Panel2.Controls.Add(Me.btnPasteImage)
         Me.SplitContainer1.Panel2.Controls.Add(Me.btnCopyCharImage)
@@ -197,9 +205,9 @@ Partial Class frmBMPFont
         Me.cboImportType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboImportType.FormattingEnabled = True
         Me.cboImportType.Items.AddRange(New Object() {"RAW", ".FONT.PNG", ".HZCG6"})
-        Me.cboImportType.Location = New System.Drawing.Point(4, 311)
+        Me.cboImportType.Location = New System.Drawing.Point(7, 261)
         Me.cboImportType.Name = "cboImportType"
-        Me.cboImportType.Size = New System.Drawing.Size(229, 26)
+        Me.cboImportType.Size = New System.Drawing.Size(226, 26)
         Me.cboImportType.TabIndex = 24
         '
         'cboSaveFileType
@@ -207,7 +215,7 @@ Partial Class frmBMPFont
         Me.cboSaveFileType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboSaveFileType.FormattingEnabled = True
         Me.cboSaveFileType.Items.AddRange(New Object() {".FONT.PNG", "RAW", ".HZCG6"})
-        Me.cboSaveFileType.Location = New System.Drawing.Point(223, 120)
+        Me.cboSaveFileType.Location = New System.Drawing.Point(226, 91)
         Me.cboSaveFileType.Name = "cboSaveFileType"
         Me.cboSaveFileType.Size = New System.Drawing.Size(209, 26)
         Me.cboSaveFileType.TabIndex = 23
@@ -217,7 +225,7 @@ Partial Class frmBMPFont
         Me.cboCodepage.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboCodepage.FormattingEnabled = True
         Me.cboCodepage.Items.AddRange(New Object() {"Unknown(0)", "ASCII-7(0)", "ASCII-8(0)", "Unicode(0)", "ISO/IEC13000BMP(0)", "GB2312双字节(936)", "GBK双字节(936)", "GB18030双字节(936)", "Big-5(950)", "Shift-JIS(932)"})
-        Me.cboCodepage.Location = New System.Drawing.Point(223, 19)
+        Me.cboCodepage.Location = New System.Drawing.Point(226, 6)
         Me.cboCodepage.Name = "cboCodepage"
         Me.cboCodepage.Size = New System.Drawing.Size(209, 26)
         Me.cboCodepage.TabIndex = 22
@@ -225,24 +233,24 @@ Partial Class frmBMPFont
         'lblColRow
         '
         Me.lblColRow.AutoSize = True
-        Me.lblColRow.Location = New System.Drawing.Point(4, 433)
+        Me.lblColRow.Location = New System.Drawing.Point(13, 415)
         Me.lblColRow.Name = "lblColRow"
-        Me.lblColRow.Size = New System.Drawing.Size(143, 18)
+        Me.lblColRow.Size = New System.Drawing.Size(53, 18)
         Me.lblColRow.TabIndex = 21
-        Me.lblColRow.Text = "Col:      ;Row:"
+        Me.lblColRow.Text = "Edit:"
         '
         'lblCode
         '
         Me.lblCode.AutoSize = True
-        Me.lblCode.Location = New System.Drawing.Point(4, 416)
+        Me.lblCode.Location = New System.Drawing.Point(13, 393)
         Me.lblCode.Name = "lblCode"
-        Me.lblCode.Size = New System.Drawing.Size(53, 18)
+        Me.lblCode.Size = New System.Drawing.Size(44, 18)
         Me.lblCode.TabIndex = 21
-        Me.lblCode.Text = "Code:"
+        Me.lblCode.Text = "Code"
         '
         'btnPasteImage
         '
-        Me.btnPasteImage.Location = New System.Drawing.Point(240, 416)
+        Me.btnPasteImage.Location = New System.Drawing.Point(240, 415)
         Me.btnPasteImage.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnPasteImage.Name = "btnPasteImage"
         Me.btnPasteImage.Size = New System.Drawing.Size(191, 35)
@@ -262,7 +270,7 @@ Partial Class frmBMPFont
         '
         'btbInitCharactors
         '
-        Me.btbInitCharactors.Location = New System.Drawing.Point(60, 53)
+        Me.btbInitCharactors.Location = New System.Drawing.Point(63, 40)
         Me.btbInitCharactors.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btbInitCharactors.Name = "btbInitCharactors"
         Me.btbInitCharactors.Size = New System.Drawing.Size(173, 35)
@@ -272,7 +280,7 @@ Partial Class frmBMPFont
         '
         'txtImportOffset
         '
-        Me.txtImportOffset.Location = New System.Drawing.Point(229, 233)
+        Me.txtImportOffset.Location = New System.Drawing.Point(229, 180)
         Me.txtImportOffset.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtImportOffset.Name = "txtImportOffset"
         Me.txtImportOffset.Size = New System.Drawing.Size(202, 28)
@@ -281,7 +289,7 @@ Partial Class frmBMPFont
         '
         'txtImportSizeH
         '
-        Me.txtImportSizeH.Location = New System.Drawing.Point(174, 233)
+        Me.txtImportSizeH.Location = New System.Drawing.Point(174, 180)
         Me.txtImportSizeH.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtImportSizeH.Name = "txtImportSizeH"
         Me.txtImportSizeH.Size = New System.Drawing.Size(44, 28)
@@ -290,7 +298,7 @@ Partial Class frmBMPFont
         '
         'txtImportSizeW
         '
-        Me.txtImportSizeW.Location = New System.Drawing.Point(119, 233)
+        Me.txtImportSizeW.Location = New System.Drawing.Point(119, 180)
         Me.txtImportSizeW.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtImportSizeW.Name = "txtImportSizeW"
         Me.txtImportSizeW.Size = New System.Drawing.Size(44, 28)
@@ -299,7 +307,7 @@ Partial Class frmBMPFont
         '
         'txtImportHeight
         '
-        Me.txtImportHeight.Location = New System.Drawing.Point(63, 233)
+        Me.txtImportHeight.Location = New System.Drawing.Point(63, 180)
         Me.txtImportHeight.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtImportHeight.Name = "txtImportHeight"
         Me.txtImportHeight.Size = New System.Drawing.Size(44, 28)
@@ -308,7 +316,7 @@ Partial Class frmBMPFont
         '
         'txtImportWidth
         '
-        Me.txtImportWidth.Location = New System.Drawing.Point(7, 233)
+        Me.txtImportWidth.Location = New System.Drawing.Point(7, 180)
         Me.txtImportWidth.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtImportWidth.Name = "txtImportWidth"
         Me.txtImportWidth.Size = New System.Drawing.Size(44, 28)
@@ -317,7 +325,7 @@ Partial Class frmBMPFont
         '
         'txtImportFileName
         '
-        Me.txtImportFileName.Location = New System.Drawing.Point(7, 273)
+        Me.txtImportFileName.Location = New System.Drawing.Point(7, 218)
         Me.txtImportFileName.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtImportFileName.Name = "txtImportFileName"
         Me.txtImportFileName.Size = New System.Drawing.Size(425, 28)
@@ -326,7 +334,7 @@ Partial Class frmBMPFont
         '
         'btnImport
         '
-        Me.btnImport.Location = New System.Drawing.Point(242, 311)
+        Me.btnImport.Location = New System.Drawing.Point(240, 256)
         Me.btnImport.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnImport.Name = "btnImport"
         Me.btnImport.Size = New System.Drawing.Size(191, 35)
@@ -341,7 +349,7 @@ Partial Class frmBMPFont
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.picEditor.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
         Me.picEditor.Cursor = System.Windows.Forms.Cursors.Default
-        Me.picEditor.Location = New System.Drawing.Point(4, 461)
+        Me.picEditor.Location = New System.Drawing.Point(7, 460)
         Me.picEditor.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.picEditor.Name = "picEditor"
         Me.picEditor.Size = New System.Drawing.Size(402, 306)
@@ -350,7 +358,7 @@ Partial Class frmBMPFont
         '
         'txtSaveImage
         '
-        Me.txtSaveImage.Location = New System.Drawing.Point(4, 120)
+        Me.txtSaveImage.Location = New System.Drawing.Point(7, 91)
         Me.txtSaveImage.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtSaveImage.Name = "txtSaveImage"
         Me.txtSaveImage.Size = New System.Drawing.Size(211, 28)
@@ -359,7 +367,7 @@ Partial Class frmBMPFont
         '
         'picSave
         '
-        Me.picSave.Location = New System.Drawing.Point(171, 120)
+        Me.picSave.Location = New System.Drawing.Point(174, 91)
         Me.picSave.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.picSave.Name = "picSave"
         Me.picSave.Size = New System.Drawing.Size(46, 35)
@@ -368,7 +376,7 @@ Partial Class frmBMPFont
         '
         'btnSave
         '
-        Me.btnSave.Location = New System.Drawing.Point(241, 158)
+        Me.btnSave.Location = New System.Drawing.Point(244, 125)
         Me.btnSave.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnSave.Name = "btnSave"
         Me.btnSave.Size = New System.Drawing.Size(191, 35)
@@ -378,7 +386,7 @@ Partial Class frmBMPFont
         '
         'txtNewSizeH
         '
-        Me.txtNewSizeH.Location = New System.Drawing.Point(171, 18)
+        Me.txtNewSizeH.Location = New System.Drawing.Point(174, 5)
         Me.txtNewSizeH.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtNewSizeH.Name = "txtNewSizeH"
         Me.txtNewSizeH.Size = New System.Drawing.Size(44, 28)
@@ -387,7 +395,7 @@ Partial Class frmBMPFont
         '
         'txtNewSizeW
         '
-        Me.txtNewSizeW.Location = New System.Drawing.Point(116, 18)
+        Me.txtNewSizeW.Location = New System.Drawing.Point(119, 5)
         Me.txtNewSizeW.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtNewSizeW.Name = "txtNewSizeW"
         Me.txtNewSizeW.Size = New System.Drawing.Size(44, 28)
@@ -396,7 +404,7 @@ Partial Class frmBMPFont
         '
         'txtNewHeight
         '
-        Me.txtNewHeight.Location = New System.Drawing.Point(60, 18)
+        Me.txtNewHeight.Location = New System.Drawing.Point(63, 5)
         Me.txtNewHeight.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtNewHeight.Name = "txtNewHeight"
         Me.txtNewHeight.Size = New System.Drawing.Size(44, 28)
@@ -405,7 +413,7 @@ Partial Class frmBMPFont
         '
         'txtNewWidth
         '
-        Me.txtNewWidth.Location = New System.Drawing.Point(4, 18)
+        Me.txtNewWidth.Location = New System.Drawing.Point(7, 5)
         Me.txtNewWidth.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtNewWidth.Name = "txtNewWidth"
         Me.txtNewWidth.Size = New System.Drawing.Size(44, 28)
@@ -414,7 +422,7 @@ Partial Class frmBMPFont
         '
         'btnCreate
         '
-        Me.btnCreate.Location = New System.Drawing.Point(241, 53)
+        Me.btnCreate.Location = New System.Drawing.Point(244, 40)
         Me.btnCreate.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnCreate.Name = "btnCreate"
         Me.btnCreate.Size = New System.Drawing.Size(191, 35)
@@ -433,6 +441,43 @@ Partial Class frmBMPFont
         Me.iml57.ImageStream = CType(resources.GetObject("iml57.ImageStream"), System.Windows.Forms.ImageListStreamer)
         Me.iml57.TransparentColor = System.Drawing.Color.Transparent
         Me.iml57.Images.SetKeyName(0, "5x7.png")
+        '
+        'txtScale
+        '
+        Me.txtScale.Location = New System.Drawing.Point(7, 314)
+        Me.txtScale.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtScale.Name = "txtScale"
+        Me.txtScale.Size = New System.Drawing.Size(226, 28)
+        Me.txtScale.TabIndex = 25
+        Me.txtScale.Text = "100%"
+        '
+        'btnScale
+        '
+        Me.btnScale.Location = New System.Drawing.Point(241, 314)
+        Me.btnScale.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnScale.Name = "btnScale"
+        Me.btnScale.Size = New System.Drawing.Size(191, 35)
+        Me.btnScale.TabIndex = 26
+        Me.btnScale.Text = "Scale up/down"
+        Me.btnScale.UseVisualStyleBackColor = True
+        '
+        'lblInfo
+        '
+        Me.lblInfo.AutoSize = True
+        Me.lblInfo.Location = New System.Drawing.Point(13, 371)
+        Me.lblInfo.Name = "lblInfo"
+        Me.lblInfo.Size = New System.Drawing.Size(53, 22)
+        Me.lblInfo.TabIndex = 21
+        Me.lblInfo.Text = "Info"
+        '
+        'lblCursor
+        '
+        Me.lblCursor.AutoSize = True
+        Me.lblCursor.Location = New System.Drawing.Point(13, 433)
+        Me.lblCursor.Name = "lblCursor"
+        Me.lblCursor.Size = New System.Drawing.Size(71, 18)
+        Me.lblCursor.TabIndex = 21
+        Me.lblCursor.Text = "Cursor:"
         '
         'frmBMPFont
         '
@@ -495,4 +540,8 @@ Partial Class frmBMPFont
     Friend WithEvents cboCodepage As ComboBox
     Friend WithEvents cboSaveFileType As ComboBox
     Friend WithEvents cboImportType As ComboBox
+    Friend WithEvents btnScale As Button
+    Friend WithEvents txtScale As TextBox
+    Friend WithEvents lblInfo As Label
+    Friend WithEvents lblCursor As Label
 End Class
