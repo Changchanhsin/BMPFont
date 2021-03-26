@@ -3,6 +3,7 @@
     Private codePage As Integer = 0 '0=raw/unknown;1200=usc;932=shift_jis;936=gb2312;950=big5;1252=ascii
     Private codeL(256) As Integer
     Private codeH(256) As Integer
+    Private codeUltraHigh As Integer ' for ISO/IEC 10646 SMP, SIP, TIP
     Private codeLowRange() As Integer
     Private codeHighRange() As Integer
     Private codeLength As Integer = 2
@@ -19,6 +20,8 @@
 
     Private bmpHead As New Bitmap(13, 13)
     Private bmpClipboard As New Bitmap(1, 1)
+
+    Private hasEditorGrid As Boolean = True
 
     Private Function in0255(v As Integer) As Integer
         If v < 0 Then
@@ -47,26 +50,38 @@
             Exit Sub
         End If
         Dim grpMain As Graphics = Graphics.FromImage(picMain.Image)
-        Dim mBrush As New SolidBrush(Color.LightPink)
+        Dim mBrush As SolidBrush
         Dim size As Integer
         Dim offset As Integer
-        If (cellHeight >= 16) Then
-            size = 12
-            offset = -3
-        ElseIf (cellHeight >= 14) Then
-            size = 11
-            offset = -3
-        ElseIf (cellHeight >= 13) Then
-            size = 10
-            offset = -3
-        ElseIf (cellHeight >= 12) Then
-            size = 9
-            offset = -2
+
+        If chkBlack.Checked = False Then
+            mBrush = New SolidBrush(Color.LightPink)
         Else
-            Exit Sub
+            mBrush = New SolidBrush(Color.Black)
         End If
-        Dim mFont As New Font("宋体", size)
-        Dim currChar(2) As Byte
+        If chkMax.Checked = False Then
+            If (cellHeight >= 16) Then
+                size = 12
+                offset = -3
+            ElseIf (cellHeight >= 14) Then
+                size = 11
+                offset = -3
+            ElseIf (cellHeight >= 13) Then
+                size = 10
+                offset = -3
+            ElseIf (cellHeight >= 12) Then
+                size = 9
+                offset = -2
+            Else
+                Exit Sub
+            End If
+        Else
+            size = cellHeight / 3 * 2
+            offset = -size / 5
+        End If
+        Dim mFont As Font
+        mFont = New Font(txtFontName.Text, size)
+        Dim currChar(5) As Byte
         Dim unicodeString As String
         Dim bmp As New Bitmap(cellWidth, cellHeight)
         Dim grp As Graphics = Graphics.FromImage(bmp)
@@ -76,19 +91,34 @@
                 If codeLength = 2 Then
                     currChar(0) = codeH(j)
                     currChar(1) = codeL(i)
+                ElseIf codePage = 12000 Then ' convert 3bytes To utf8
+                    currChar(0) = &HF0
+                    currChar(1) = &H80 + (codeUltraHigh << 4) + (codeH(i) >> 4)
+                    currChar(2) = &H80 + ((codeH(i) And &HF) << 2) + (codeL(j) >> 6)
+                    currChar(3) = &H80 + (codeL(j) And &H3F)
+                    'currChar(0) = 0
+                    'currChar(1) = codeUltraHigh
+                    'currChar(2) = codeH(j)
+                    'currChar(3) = codeL(i)
                 Else
                     currChar(0) = codeH(i) * 16 + codeL(j)
                     currChar(1) = 0
                 End If
-                unicodeString = System.Text.Encoding.GetEncoding(codePage).GetString(currChar)
-
-                'grpMain.DrawString(unicodeString, mFont, mBrush, j * (cellWidth + 1) + offset, i * (cellHeight + 1))
+                If codePage = 12000 Then
+                    unicodeString = System.Text.Encoding.UTF8.GetString(currChar)
+                Else
+                    unicodeString = System.Text.Encoding.GetEncoding(codePage).GetString(currChar)
+                End If
                 grp.FillRectangle(brs, 0, 0, cellWidth, cellHeight)
-                grp.DrawString(unicodeString.Substring(0, 1), mFont, mBrush, offset, 0)
+                'grp.DrawString(unicodeString.Substring(0, 1), mFont, mBrush, offset, 0)
+                grp.DrawString(unicodeString, mFont, mBrush, offset, 0)
                 grpMain.DrawImage(bmp, j * (cellWidth + 1), i * (cellHeight + 1))
             Next
         Next
+        brs.Dispose()
+        mFont.Dispose()
         bmp.Dispose()
+        mBrush.Dispose()
         picMain.Refresh()
     End Sub
 
@@ -182,25 +212,33 @@
             If mapW(i) = 1 Then
                 grpOutputH.DrawLine(Pens.Blue, iCount * (width + 1) - 1, 0, iCount * (width + 1) - 1, 12)
                 If (width >= 18) Then
-                    If codeLength = 2 Then
+                    If codeLength >= 2 Then
                         grpOutputH.DrawImage(bmpDigitalL(Int(i / 16)), 2 + iCount * (width + 1), 3)
+                        grpOutputH.DrawImage(bmpDigitalL(i Mod 16), 10 + iCount * (width + 1), 3)
+                    Else
+                        grpOutputH.DrawImage(bmpDigitalL(i Mod 16), 2 + iCount * (width + 1), 3)
                     End If
-                    grpOutputH.DrawImage(bmpDigitalL(i Mod 16), 10 + iCount * (width + 1), 3)
                 ElseIf (width >= 16) Then
-                    If codeLength = 2 Then
+                    If codeLength >= 2 Then
                         grpOutputH.DrawImage(bmpDigitalL(Int(i / 16)), 2 + iCount * (width + 1), 3)
+                        grpOutputH.DrawImage(bmpDigitalL(i Mod 16), 8 + iCount * (width + 1), 3)
+                    Else
+                        grpOutputH.DrawImage(bmpDigitalL(i Mod 16), 2 + iCount * (width + 1), 3)
                     End If
-                    grpOutputH.DrawImage(bmpDigitalL(i Mod 16), 8 + iCount * (width + 1), 3)
-                    ElseIf (width >= 8) Then
-                    If codeLength = 2 Then
+                ElseIf (width >= 8) Then
+                    If codeLength >= 2 Then
                         grpOutputH.DrawImage(bmpDigitalS(Int(i / 16)), 1 + iCount * (width + 1), 3)
+                        grpOutputH.DrawImage(bmpDigitalS(i Mod 16), 5 + iCount * (width + 1), 3)
+                    Else
+                        grpOutputH.DrawImage(bmpDigitalL(i Mod 16), 1 + iCount * (width + 1), 3)
                     End If
-                    grpOutputH.DrawImage(bmpDigitalS(i Mod 16), 5 + iCount * (width + 1), 3)
-                    ElseIf (width >= 6) Then
-                    If codeLength = 2 Then
+                ElseIf (width >= 6) Then
+                    If codeLength >= 2 Then
                         grpOutputH.DrawImage(bmpDigitalS(Int(i / 16)), 2 + iCount * (width + 1), 0)
+                        grpOutputH.DrawImage(bmpDigitalS(i Mod 16), 2 + iCount * (width + 1), 6)
+                    Else
+                        grpOutputH.DrawImage(bmpDigitalS(i Mod 16), 2 + iCount * (width + 1), 4)
                     End If
-                    grpOutputH.DrawImage(bmpDigitalS(i Mod 16), 2 + iCount * (width + 1), 6)
                 End If
                 grpOutputMain.DrawLine(Pens.Blue, iCount * (width + 1) - 1, 0, iCount * (width + 1) - 1, sizeH * (height + 1) - 1)
                 iCount = iCount + 1
@@ -214,27 +252,29 @@
             If mapH(i) = 1 Then
                 grpOutputV.DrawLine(Pens.Blue, 0, iCount * (height + 1) - 1, 12, iCount * (height + 1) - 1)
                 If (height >= 18) Then
-                    If codeLength = 2 Then
+                    If codeLength >= 2 Then
                         grpOutputV.DrawImage(bmpDigitalL(Int(i / 16)), 5, 2 + iCount * (height + 1))
+                        grpOutputV.DrawImage(bmpDigitalL(i Mod 16), 5, 10 + iCount * (height + 1))
+                    Else
+                        grpOutputV.DrawImage(bmpDigitalL(i Mod 16), 5, 2 + iCount * (height + 1))
                     End If
-                    grpOutputV.DrawImage(bmpDigitalL(i Mod 16), 5, 10 + iCount * (height + 1))
                 ElseIf (height >= 10) Then
-                    If codeLength = 2 Then
+                    If codeLength >= 2 Then
                         grpOutputV.DrawImage(bmpDigitalL(Int(i / 16)), 0, 2 + iCount * (height + 1))
                     End If
                     grpOutputV.DrawImage(bmpDigitalL(i Mod 16), 6, 2 + iCount * (height + 1))
                 ElseIf (height >= 8) Then
-                    If codeLength = 2 Then
+                    If codeLength >= 2 Then
                         grpOutputV.DrawImage(bmpDigitalS(Int(i / 16)), 2, 2 + iCount * (height + 1))
                     End If
                     grpOutputV.DrawImage(bmpDigitalS(i Mod 16), 6, 2 + iCount * (height + 1))
                 ElseIf (height >= 6) Then
-                    If codeLength = 2 Then
+                    If codeLength >= 2 Then
                         grpOutputV.DrawImage(bmpDigitalS(Int(i / 16)), 2, 1 + iCount * (height + 1))
                     End If
                     grpOutputV.DrawImage(bmpDigitalS(i Mod 16), 6, 1 + iCount * (height + 1))
-                    End If
-                    grpOutputMain.DrawLine(Pens.Blue, 0, iCount * (height + 1) - 1, sizeW * (width + 1) - 1, iCount * (height + 1) - 1)
+                End If
+                grpOutputMain.DrawLine(Pens.Blue, 0, iCount * (height + 1) - 1, sizeW * (width + 1) - 1, iCount * (height + 1) - 1)
                 iCount = iCount + 1
             End If
         Next
@@ -264,10 +304,12 @@
         picMain.Width = sizeW * (width + 1)
         picMain.Height = sizeH * (height + 1)
         picMain.Refresh()
+        lblInfo.Text = "Cell:" & cellWidth & " x " & cellHeight
+        lblCode.Text = "Codepage:" & codePage
     End Sub
 
 
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles btnCreate.Click
+    Private Sub Create_Click(sender As Object, e As EventArgs) Handles btnCreate.Click
 
         Select Case cboCodepage.SelectedItem
             Case "ASCII-7(1252)"
@@ -285,11 +327,29 @@
                 codeHighRange = {0, 255}
                 codePage = 1200
                 codeLength = 2
-            Case "ISO/IEC13000BMP(1200)"
+            Case "ISO/IEC10646BMP(1200)"
                 codeLowRange = {0, 255}
                 codeHighRange = {0, 255}
                 codePage = 1200
                 codeLength = 2
+            Case "ISO/IEC10646SMP(65005)"
+                codeUltraHigh = 1
+                codeLowRange = {0, 255}
+                codeHighRange = {0, 255}
+                codePage = 12000
+                codeLength = 4
+            Case "ISO/IEC10646SIP(65005)"
+                codeUltraHigh = 2
+                codeLowRange = {0, 255}
+                codeHighRange = {0, 255}
+                codePage = 12000
+                codeLength = 4
+            Case "ISO/IEC10646TIP(65005)"
+                codeUltraHigh = 3
+                codeLowRange = {0, 255}
+                codeHighRange = {0, 255}
+                codePage = 12000
+                codeLength = 4
             Case "GB2312双字节(936)"
                 codeLowRange = {&HA1, &HFE}
                 codeHighRange = {&HA1, &HFE}
@@ -348,6 +408,8 @@
         Select Case cboSaveFileType.Text
             Case ".HZCG6"
 
+            Case ".CODE.PNG(多个)"
+                savePNGs()
             Case "RAW"
                 saveRAW()
             Case Else
@@ -393,6 +455,35 @@
         End Try
     End Sub
 
+    Private Sub savePNGs()
+        picSave.Visible = False
+        picSave.Width = cellWidth
+        picSave.Height = cellHeight
+        Dim srcSize As Rectangle
+        srcSize.Width = cellWidth
+        srcSize.Height = cellHeight
+        Dim bmpSave As New Bitmap(picSave.Width, picSave.Height)
+        Dim grpSave As Graphics = Graphics.FromImage(bmpSave)
+        For j = 0 To codeHeight - 1
+            For i = 0 To codeWidth - 1
+                srcSize.X = i * (cellWidth + 1)
+                srcSize.Y = j * (cellHeight + 1)
+                grpSave.DrawImage(picMain.Image, 0, 0, srcSize, GraphicsUnit.Pixel)
+                picSave.Image = bmpSave
+                Try
+                    picSave.Image.Save(txtSaveImage.Text & "." & codeH(j) & codeL(i) & ".FONT.PNG")
+                Catch ex As Exception
+
+                End Try
+            Next
+        Next
+        If Not IsNothing(picSave.Image) Then
+            picSave.Image.Dispose()
+        End If
+        picSave.Image = bmpSave
+        picSave.Refresh()
+        bmpSave.Dispose()
+    End Sub
 
     Private Sub savePNG()
         picSave.Visible = False
@@ -409,6 +500,7 @@
         End If
         picSave.Image = bmpSave
         picSave.Refresh()
+        bmpSave.Dispose()
         Try
             picSave.Image.Save(txtSaveImage.Text & ".FONT.PNG")
         Catch ex As Exception
@@ -521,7 +613,6 @@
         grpD.DrawRectangle(New Pen(Color.Blue), currCellX * (cellWidth + 1) - 1, currCellY * (cellHeight + 1) - 1, cellWidth + 1, cellHeight + 1)
         currCellX = Int((e.X) / (cellWidth + 1))
         currCellY = Int((e.Y) / (cellHeight + 1))
-        lblInfo.Text = "Cell:" & cellWidth & " x " & cellHeight
         lblCode.Text = "Codepage:" & codePage & " Code:" & Strings.Right("00" & Hex(codeH(currCellY)), 2) & Strings.Right("00" & Hex(codeL(currCellX)), 2)
         lblColRow.Text = "Edit: " & currCellX & "(" & Strings.Right("00" & Hex(currCellX), 2) & ") " & currCellY & "(" & Strings.Right("00" & Hex(currCellY), 2) & ")"
         grpD.DrawRectangle(New Pen(Color.Red), currCellX * (cellWidth + 1) - 1, currCellY * (cellHeight + 1) - 1, cellWidth + 1, cellHeight + 1)
@@ -529,14 +620,14 @@
         RedrawEditor()
     End Sub
 
-    Private Sub picEditor_Resize(sender As Object, e As EventArgs) Handles picEditor.Resize
+    Private Sub picEditor_Resize(sender As Object, e As EventArgs) Handles btn.Resize
         RedrawEditor()
     End Sub
     Private Sub RedrawEditor()
         If currCellX = -1 Then
             Exit Sub
         End If
-        If picEditor.Width <= 1 Or picEditor.Height <= 1 Then
+        If btn.Width <= 1 Or btn.Height <= 1 Then
             Exit Sub
         End If
         If (cellWidth <= 0) Then
@@ -549,23 +640,26 @@
 
         Dim bmp = New Bitmap(cellWidth, cellHeight)
         Dim grp = Graphics.FromImage(bmp)
-        Dim bmpD = New Bitmap(picEditor.Width, picEditor.Height)
+        Dim bmpD = New Bitmap(btn.Width, btn.Height)
         Dim grpD = Graphics.FromImage(bmpD)
 
         grp.DrawImage(picMain.Image, New RectangleF(0, 0, cellWidth, cellHeight), New RectangleF(currCellX * (cellWidth + 1), currCellY * (cellHeight + 1), cellWidth, cellHeight), GraphicsUnit.Pixel)
-        Dim a As Single = picEditor.Width / cellWidth
-        Dim b As Single = picEditor.Height / cellHeight
+        Dim a As Single = (btn.Width - 1) / cellWidth
+        Dim b As Single = (btn.Height - 1) / cellHeight
 
         For j = 0 To cellHeight - 1
             For i = 0 To cellWidth - 1
                 grpD.FillRectangle(New SolidBrush(bmp.GetPixel(i, j)), i * a, j * b, a, b)
+                If hasEditorGrid Then
+                    grpD.DrawRectangle(New Pen(Color.LightGray), i * a, j * b, a, b)
+                End If
             Next
         Next
         bmp.Dispose()
-        If Not IsNothing(picEditor.Image) Then
-            picEditor.BackgroundImage.Dispose()
+        If Not IsNothing(btn.Image) Then
+            btn.BackgroundImage.Dispose()
         End If
-        picEditor.BackgroundImage = bmpD
+        btn.BackgroundImage = bmpD
     End Sub
 
     Private Sub frmBMPFont_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -578,11 +672,11 @@
     End Sub
 
     Private Sub resizeAll()
-        Dim border = picEditor.Left
+        Dim border = btn.Left
         pnlMain.Width = SplitContainer1.Panel1.Width - pnlMain.Left
         pnlMain.Height = SplitContainer1.Panel1.Height - pnlMain.Top
-        picEditor.Width = SplitContainer1.Panel2.Width - border * 2
-        picEditor.Height = SplitContainer1.Panel2.Height - picEditor.Top - border
+        btn.Width = SplitContainer1.Panel2.Width - border * 2
+        btn.Height = SplitContainer1.Panel2.Height - btn.Top - border
         RedrawEditor()
         cboCodepage.Width = SplitContainer1.Panel2.Width - cboCodepage.Left - border
         cboSaveFileType.Width = SplitContainer1.Panel2.Width - cboSaveFileType.Left - border
@@ -603,7 +697,7 @@
         If currCellX = -1 Then
             Exit Sub
         End If
-        If picEditor.Width <= 1 Or picEditor.Height <= 1 Then
+        If btn.Width <= 1 Or btn.Height <= 1 Then
             Exit Sub
         End If
 
@@ -618,7 +712,7 @@
         If currCellX = -1 Then
             Exit Sub
         End If
-        If picEditor.Width <= 1 Or picEditor.Height <= 1 Then
+        If btn.Width <= 1 Or btn.Height <= 1 Then
             Exit Sub
         End If
         Dim bmpClip = Clipboard.GetImage()
@@ -637,19 +731,19 @@
         resizeAll()
     End Sub
 
-    Private Sub picEditor_MouseMove(sender As Object, e As MouseEventArgs) Handles picEditor.MouseMove
-        If picEditor.BackgroundImage Is Nothing Then
+    Private Sub picEditor_MouseMove(sender As Object, e As MouseEventArgs) Handles btn.MouseMove
+        If btn.BackgroundImage Is Nothing Then
             Exit Sub
         End If
-        If e.X < 0 Or e.Y < 0 Or e.X > picEditor.Width Or e.Y > picEditor.Height Then
+        If e.X < 0 Or e.Y < 0 Or e.X > btn.Width Or e.Y > btn.Height Then
             Exit Sub
         End If
-        Dim grpD As Graphics = Graphics.FromImage(picEditor.BackgroundImage)
+        Dim grpD As Graphics = Graphics.FromImage(btn.BackgroundImage)
         Dim bmpM As Bitmap = picMain.Image
         Dim grpM As Graphics = Graphics.FromImage(picMain.Image)
 
-        Dim a As Single = picEditor.Width / cellWidth
-        Dim b As Single = picEditor.Height / cellHeight
+        Dim a As Single = (btn.Width - 1) / cellWidth
+        Dim b As Single = (btn.Height - 1) / cellHeight
 
         Dim dotX As Integer = (e.X + a / 2) / a - 1
         Dim dotY As Integer = (e.Y + b / 2) / b - 1
@@ -657,16 +751,22 @@
         If e.Button = MouseButtons.Left Then
             grpD.FillRectangle(New SolidBrush(Color.Black), dotX * a, dotY * b, a, b)
             bmpM.SetPixel(currCellX * (cellWidth + 1) + dotX, currCellY * (cellHeight + 1) + dotY, Color.Black)
+            If hasEditorGrid Then
+                grpD.DrawRectangle(New Pen(Color.LightGray), dotX * a, dotY * b, a, b)
+            End If
         End If
         If e.Button = MouseButtons.Right Then
             grpD.FillRectangle(New SolidBrush(Color.White), dotX * a, dotY * b, a, b)
             bmpM.SetPixel(currCellX * (cellWidth + 1) + dotX, currCellY * (cellHeight + 1) + dotY, Color.White)
+            If hasEditorGrid Then
+                grpD.DrawRectangle(New Pen(Color.LightGray), dotX * a, dotY * b, a, b)
+            End If
         End If
         picMain.Refresh()
-        picEditor.Refresh()
+        btn.Refresh()
     End Sub
 
-    Private Sub picEditor_MouseClick(sender As Object, e As MouseEventArgs) Handles picEditor.MouseClick
+    Private Sub picEditor_MouseClick(sender As Object, e As MouseEventArgs) Handles btn.MouseClick
         picEditor_MouseMove(sender, e)
     End Sub
 
@@ -732,4 +832,11 @@
         End If
     End Sub
 
+    Private Sub OpenFolder_Click(sender As Object, e As EventArgs) Handles btnOpenFolder.Click
+        Process.Start("explorer.exe", Application.StartupPath)
+    End Sub
+
+    Private Sub Special_Click(sender As Object, e As EventArgs) Handles btnSpecial.Click
+        frmPrint.Show()
+    End Sub
 End Class
