@@ -108,8 +108,8 @@
         For i = 0 To codeHeight - 1
             For j = 0 To codeWidth - 1
                 If codeLength = 2 Then
-                    currChar(0) = codeH(j)
-                    currChar(1) = codeL(i)
+                    currChar(0) = codeH(i)
+                    currChar(1) = codeL(j)
                 ElseIf codePage = 12000 Then ' convert 3bytes To utf8
                     currChar(0) = &HF0
                     currChar(1) = &H80 + (codeUltraHigh << 4) + (codeH(i) >> 4)
@@ -550,6 +550,15 @@
             codeWidth = sizeW
             codeHeight = sizeH
             codePage = 0
+            Dim c1 As Color
+            Dim c0 As Color
+            If chkInverse.Checked = False Then
+                c1 = Color.Black
+                c0 = Color.White
+            Else
+                c1 = Color.White
+                c0 = Color.Black
+            End If
             printHead()
             Dim grpMain As Graphics = Graphics.FromImage(picMain.Image)
             For t = 0 To sizeH - 1
@@ -581,9 +590,9 @@
                         For i = 0 To width - 1 'widthBytes * 8 - 1
                             If (j * widthBytes + Int(i / 8)) < readBs.Length Then
                                 If ((readBs(j * widthBytes + Int(i / 8)) >> (7 - (i Mod 8))) Mod 2) = 1 Then
-                                    bmp.SetPixel(i, j, Color.Black)
+                                    bmp.SetPixel(i, j, c1)
                                 Else
-                                    bmp.SetPixel(i, j, Color.White)
+                                    bmp.SetPixel(i, j, c0)
                                 End If
                             End If
                         Next
@@ -834,7 +843,8 @@
         resizeAll()
     End Sub
 
-    Private Sub btnScale_Click(sender As Object, e As EventArgs) Handles btnScale.Click
+    Private Sub btnScale_Click(sender As Object, e As EventArgs) Handles btnScale.Click, btnMove.Click
+
         Dim rectNew As New Rectangle
         Dim rectOld As New Rectangle
         Dim scale As Integer
@@ -891,5 +901,52 @@
 
     Private Sub tabControl_SelectedIndexChanged(sender As Object, e As EventArgs) Handles tabControl.SelectedIndexChanged
         resizeTab()
+    End Sub
+
+    Private Sub btnInverseColor_Click(sender As Object, e As EventArgs) Handles btnInverseColor.Click
+        If IsNothing(picMain.Image) Then
+            Exit Sub
+        End If
+        Dim bmp As Bitmap = picMain.Image
+        Dim c As Color
+        Dim d As Color
+        For j = 0 To codeHeight - 1
+            For i = 0 To codeWidth - 1
+                For n = 0 To cellHeight - 1
+                    For m = 0 To cellWidth - 1
+                        c = bmp.GetPixel(i * (cellWidth + 1) + m, j * (cellHeight + 1) + n)
+                        d = Color.FromArgb(255 - c.R, 255 - c.G, 255 - c.B)
+                        bmp.SetPixel(i * (cellWidth + 1) + m, j * (cellHeight + 1) + n, d)
+                    Next
+                Next
+            Next
+        Next
+        picMain.Refresh()
+    End Sub
+
+    Private Sub btnToBlackWhite_Click(sender As Object, e As EventArgs) Handles btnToBlackWhite.Click
+        If IsNothing(picMain.Image) Then
+            Exit Sub
+        End If
+        Dim bmp As Bitmap = picMain.Image
+        Dim c As Color
+        Dim d As Color
+        For j = 0 To codeHeight - 1
+            For i = 0 To codeWidth - 1
+                For n = 0 To cellHeight - 1
+                    For m = 0 To cellWidth - 1
+                        c = bmp.GetPixel(i * (cellWidth + 1) + m, j * (cellHeight + 1) + n)
+                        If (c.R * 9 + c.G * 19 + c.B * 4 >> 5) < 128 And c.A > 128 Then
+                            d = Color.Black
+                        Else
+                            d = Color.White
+                        End If
+                        bmp.SetPixel(i * (cellWidth + 1) + m, j * (cellHeight + 1) + n, d)
+                    Next
+                Next
+            Next
+        Next
+        picMain.Refresh()
+
     End Sub
 End Class
