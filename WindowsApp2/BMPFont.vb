@@ -49,36 +49,55 @@
         If codePage < 0 Then
             Exit Sub
         End If
+        If IsNothing(picMain.Image) Then
+            Exit Sub
+        End If
         Dim grpMain As Graphics = Graphics.FromImage(picMain.Image)
         Dim mBrush As SolidBrush
         Dim size As Integer
         Dim offset As Integer
+        Dim offsetY As Integer
 
         If chkBlack.Checked = False Then
             mBrush = New SolidBrush(Color.LightPink)
         Else
             mBrush = New SolidBrush(Color.Black)
         End If
+        offsetY = 0
         If chkMax.Checked = False Then
-            If (cellHeight >= 16) Then
-                size = 12
-                offset = -3
-            ElseIf (cellHeight >= 14) Then
-                size = 11
-                offset = -3
-            ElseIf (cellHeight >= 13) Then
-                size = 10
-                offset = -3
-            ElseIf (cellHeight >= 12) Then
-                size = 9
-                offset = -2
-            Else
-                Exit Sub
+            If txtCharOffsetX.Text = "" Then
+                If (cellHeight >= 16) Then
+                    size = 12
+                    offset = -3
+                ElseIf (cellHeight >= 14) Then
+                    size = 11
+                    offset = -3
+                ElseIf (cellHeight >= 13) Then
+                    size = 10
+                    offset = -3
+                ElseIf (cellHeight >= 12) Then
+                    size = 9
+                    offset = -2
+                Else
+                    Exit Sub
+                End If
             End If
         Else
             size = cellHeight / 3 * 2
-            offset = -size / 5
+            If txtCharOffsetX.Text = "" Then
+                offset = -size / 5
+            End If
         End If
+        If txtCharOffsetX.Text <> "" Then
+            offset = Int(txtCharOffsetX.Text)
+        End If
+        If txtCharOffsetY.Text <> "" Then
+            offsetY = Int(txtCharOffsetY.Text)
+        End If
+        If txtCharSize.Text <> "" Then
+            size = Int(txtCharSize.Text)
+        End If
+
         Dim mFont As Font
         mFont = New Font(txtFontName.Text, size)
         Dim currChar(5) As Byte
@@ -111,7 +130,7 @@
                 End If
                 grp.FillRectangle(brs, 0, 0, cellWidth, cellHeight)
                 'grp.DrawString(unicodeString.Substring(0, 1), mFont, mBrush, offset, 0)
-                grp.DrawString(unicodeString, mFont, mBrush, offset, 0)
+                grp.DrawString(unicodeString, mFont, mBrush, offset, offsetY)
                 grpMain.DrawImage(bmp, j * (cellWidth + 1), i * (cellHeight + 1))
             Next
         Next
@@ -424,7 +443,7 @@
         Try
             Dim bmp As Bitmap = picMain.Image
 
-            Dim FS As New System.IO.FileStream(txtSaveImage.Text, IO.FileMode.Create, IO.FileAccess.Write, IO.FileShare.Write)
+            Dim FS As New System.IO.FileStream(txtSaveImagePath.Text & "\" & txtSaveImage.Text, IO.FileMode.Create, IO.FileAccess.Write, IO.FileShare.Write)
             Dim Bw As New System.IO.BinaryWriter(FS)
 
             For j = 0 To codeHeight - 1
@@ -471,7 +490,7 @@
                 grpSave.DrawImage(picMain.Image, 0, 0, srcSize, GraphicsUnit.Pixel)
                 picSave.Image = bmpSave
                 Try
-                    picSave.Image.Save(txtSaveImage.Text & "." & codeH(j) & codeL(i) & ".FONT.PNG")
+                    picSave.Image.Save(txtSaveImagePath.Text & "\" & txtSaveImage.Text & "." & codeH(j) & codeL(i) & ".FONT.PNG")
                 Catch ex As Exception
 
                 End Try
@@ -500,11 +519,12 @@
         End If
         picSave.Image = bmpSave
         picSave.Refresh()
-        bmpSave.Dispose()
         Try
-            picSave.Image.Save(txtSaveImage.Text & ".FONT.PNG")
+            Dim fn = txtSaveImagePath.Text & "\" & txtSaveImage.Text & ".FONT.PNG"
+            picSave.Image.Save(txtSaveImagePath.Text & "\" & txtSaveImage.Text & ".FONT.PNG")
+            bmpSave.Dispose()
         Catch ex As Exception
-
+            MessageBox.Show("error")
         End Try
     End Sub
 
@@ -620,14 +640,14 @@
         RedrawEditor()
     End Sub
 
-    Private Sub picEditor_Resize(sender As Object, e As EventArgs) Handles btn.Resize
+    Private Sub picEditor_Resize(sender As Object, e As EventArgs) Handles picEdit.Resize
         RedrawEditor()
     End Sub
     Private Sub RedrawEditor()
         If currCellX = -1 Then
             Exit Sub
         End If
-        If btn.Width <= 1 Or btn.Height <= 1 Then
+        If picEdit.Width <= 1 Or picEdit.Height <= 1 Then
             Exit Sub
         End If
         If (cellWidth <= 0) Then
@@ -640,12 +660,12 @@
 
         Dim bmp = New Bitmap(cellWidth, cellHeight)
         Dim grp = Graphics.FromImage(bmp)
-        Dim bmpD = New Bitmap(btn.Width, btn.Height)
+        Dim bmpD = New Bitmap(picEdit.Width, picEdit.Height)
         Dim grpD = Graphics.FromImage(bmpD)
 
         grp.DrawImage(picMain.Image, New RectangleF(0, 0, cellWidth, cellHeight), New RectangleF(currCellX * (cellWidth + 1), currCellY * (cellHeight + 1), cellWidth, cellHeight), GraphicsUnit.Pixel)
-        Dim a As Single = (btn.Width - 1) / cellWidth
-        Dim b As Single = (btn.Height - 1) / cellHeight
+        Dim a As Single = (picEdit.Width - 1) / cellWidth
+        Dim b As Single = (picEdit.Height - 1) / cellHeight
 
         For j = 0 To cellHeight - 1
             For i = 0 To cellWidth - 1
@@ -656,10 +676,19 @@
             Next
         Next
         bmp.Dispose()
-        If Not IsNothing(btn.Image) Then
-            btn.BackgroundImage.Dispose()
+        If Not IsNothing(picEdit.Image) Then
+            picEdit.BackgroundImage.Dispose()
         End If
-        btn.BackgroundImage = bmpD
+        picEdit.BackgroundImage = bmpD
+    End Sub
+
+    Private Sub getFontList()
+        Dim ff() As FontFamily
+        Dim installedFontCollection As New Drawing.Text.InstalledFontCollection()
+        ff = installedFontCollection.Families
+        For Each i In ff
+            txtFontName.Items.Add(i.Name)
+        Next
     End Sub
 
     Private Sub frmBMPFont_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -668,24 +697,44 @@
         cboCodepage.SelectedIndex = 0
         cboSaveFileType.SelectedIndex = 0
         cboImportType.SelectedIndex = 0
+        getFontList()
+        txtSaveImagePath.Text = Application.StartupPath
         Me.KeyPreview = True
     End Sub
 
+    Private Sub resizeTab()
+        Dim tab_maxwidth
+        'create
+        tab_maxwidth = tagCreate.Size.Width - picEdit.Left
+        cboCodepage.Width = tab_maxwidth - cboCodepage.Left
+        btnCreate.Width = tab_maxwidth - btnCreate.Left
+        txtFontName.Width = tab_maxwidth - txtFontName.Left
+        btnInitCharactors.Width = tab_maxwidth - btnInitCharactors.Left
+        ' open
+        tab_maxwidth = tagOpen.Size.Width - picEdit.Left
+        txtImportFileName.Width = tab_maxwidth - txtImportFileName.Left
+        cboImportType.Width = tab_maxwidth - cboImportType.Left
+        btnImport.Width = tab_maxwidth - btnImport.Left
+        ' save
+        tab_maxwidth = tagSave.Size.Width - picEdit.Left
+        txtSaveImagePath.Width = tab_maxwidth - txtSaveImagePath.Left
+        txtSaveImage.Width = tab_maxwidth - txtSaveImage.Left
+        cboSaveFileType.Width = tab_maxwidth - cboSaveFileType.Left
+        btnSave.Width = tab_maxwidth - btnSave.Left
+    End Sub
+
     Private Sub resizeAll()
-        Dim border = btn.Left
+        tabControl.Width = SplitContainer1.Panel2.Width
+
         pnlMain.Width = SplitContainer1.Panel1.Width - pnlMain.Left
         pnlMain.Height = SplitContainer1.Panel1.Height - pnlMain.Top
-        btn.Width = SplitContainer1.Panel2.Width - border * 2
-        btn.Height = SplitContainer1.Panel2.Height - btn.Top - border
+        picEdit.Width = SplitContainer1.Panel2.Width - picEdit.Left - picEdit.Left
+        picEdit.Height = SplitContainer1.Panel2.Height - picEdit.Top - picEdit.Left
         RedrawEditor()
-        cboCodepage.Width = SplitContainer1.Panel2.Width - cboCodepage.Left - border
-        cboSaveFileType.Width = SplitContainer1.Panel2.Width - cboSaveFileType.Left - border
-        btnCreate.Width = SplitContainer1.Panel2.Width - btnCreate.Left - border
-        btnSave.Width = SplitContainer1.Panel2.Width - btnSave.Left - border
-        btnImport.Width = SplitContainer1.Panel2.Width - btnImport.Left - border
-        btnCopyCharImage.Width = SplitContainer1.Panel2.Width - btnCopyCharImage.Left - border
-        btnPasteImage.Width = SplitContainer1.Panel2.Width - btnPasteImage.Left - border
-        txtImportFileName.Width = SplitContainer1.Panel2.Width - txtImportFileName.Left - border
+        resizeTab()
+        'edit
+        btnCopyCharImage.Width = SplitContainer1.Panel2.Width - btnCopyCharImage.Left
+        btnPasteImage.Width = SplitContainer1.Panel2.Width - btnPasteImage.Left
     End Sub
 
     Private Sub frmBMPFont_Resize(sender As Object, e As EventArgs) Handles Me.Resize
@@ -697,7 +746,7 @@
         If currCellX = -1 Then
             Exit Sub
         End If
-        If btn.Width <= 1 Or btn.Height <= 1 Then
+        If picEdit.Width <= 1 Or picEdit.Height <= 1 Then
             Exit Sub
         End If
 
@@ -712,7 +761,7 @@
         If currCellX = -1 Then
             Exit Sub
         End If
-        If btn.Width <= 1 Or btn.Height <= 1 Then
+        If picEdit.Width <= 1 Or picEdit.Height <= 1 Then
             Exit Sub
         End If
         Dim bmpClip = Clipboard.GetImage()
@@ -731,19 +780,19 @@
         resizeAll()
     End Sub
 
-    Private Sub picEditor_MouseMove(sender As Object, e As MouseEventArgs) Handles btn.MouseMove
-        If btn.BackgroundImage Is Nothing Then
+    Private Sub picEditor_MouseMove(sender As Object, e As MouseEventArgs) Handles picEdit.MouseMove
+        If picEdit.BackgroundImage Is Nothing Then
             Exit Sub
         End If
-        If e.X < 0 Or e.Y < 0 Or e.X > btn.Width Or e.Y > btn.Height Then
+        If e.X < 0 Or e.Y < 0 Or e.X > picEdit.Width Or e.Y > picEdit.Height Then
             Exit Sub
         End If
-        Dim grpD As Graphics = Graphics.FromImage(btn.BackgroundImage)
+        Dim grpD As Graphics = Graphics.FromImage(picEdit.BackgroundImage)
         Dim bmpM As Bitmap = picMain.Image
         Dim grpM As Graphics = Graphics.FromImage(picMain.Image)
 
-        Dim a As Single = (btn.Width - 1) / cellWidth
-        Dim b As Single = (btn.Height - 1) / cellHeight
+        Dim a As Single = (picEdit.Width - 1) / cellWidth
+        Dim b As Single = (picEdit.Height - 1) / cellHeight
 
         Dim dotX As Integer = (e.X + a / 2) / a - 1
         Dim dotY As Integer = (e.Y + b / 2) / b - 1
@@ -763,10 +812,10 @@
             End If
         End If
         picMain.Refresh()
-        btn.Refresh()
+        picEdit.Refresh()
     End Sub
 
-    Private Sub picEditor_MouseClick(sender As Object, e As MouseEventArgs) Handles btn.MouseClick
+    Private Sub picEditor_MouseClick(sender As Object, e As MouseEventArgs) Handles picEdit.MouseClick
         picEditor_MouseMove(sender, e)
     End Sub
 
@@ -777,7 +826,7 @@
         End If
     End Sub
 
-    Private Sub btbInitCharactors_Click(sender As Object, e As EventArgs) Handles btbInitCharactors.Click
+    Private Sub btnInitCharactors_Click(sender As Object, e As EventArgs) Handles btnInitCharactors.Click
         initCharactor()
     End Sub
 
@@ -838,5 +887,9 @@
 
     Private Sub Special_Click(sender As Object, e As EventArgs) Handles btnSpecial.Click
         frmPrint.Show()
+    End Sub
+
+    Private Sub tabControl_SelectedIndexChanged(sender As Object, e As EventArgs) Handles tabControl.SelectedIndexChanged
+        resizeTab()
     End Sub
 End Class
