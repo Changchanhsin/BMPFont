@@ -611,16 +611,12 @@
 
     End Sub
 
-    Private Sub importHZCG6()
-
-    End Sub
-
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
         Select Case cboImportType.Text
             Case ".FONT.PNG"
                 'importPNG()
             Case ".HZCG6"
-                importHZCG6()
+                'importHZCG6()
             Case Else
                 importRAW(txtImportWidth.Text, txtImportHeight.Text, txtImportSizeW.Text, txtImportSizeH.Text)
         End Select
@@ -758,12 +754,33 @@
         If picEdit.Width <= 1 Or picEdit.Height <= 1 Then
             Exit Sub
         End If
-
+        Dim s As String
+        Dim bmp As Bitmap
+        Dim c As Color
+        Dim d As Integer
         bmpClipboard.Dispose()
-        bmpClipboard = New Bitmap(cellWidth, cellHeight)
-        Dim grp = Graphics.FromImage(bmpClipboard)
-        grp.DrawImage(picMain.Image, New RectangleF(0, 0, cellWidth, cellHeight), New RectangleF(currCellX * (cellWidth + 1), currCellY * (cellHeight + 1), cellWidth, cellHeight), GraphicsUnit.Pixel)
-        Clipboard.SetImage(bmpClipboard)
+        Select Case cboCopyType.Text
+            Case "image"
+                bmpClipboard = New Bitmap(cellWidth, cellHeight)
+                Dim grp = Graphics.FromImage(bmpClipboard)
+                grp.DrawImage(picMain.Image, New RectangleF(0, 0, cellWidth, cellHeight), New RectangleF(currCellX * (cellWidth + 1), currCellY * (cellHeight + 1), cellWidth, cellHeight), GraphicsUnit.Pixel)
+                Clipboard.SetImage(bmpClipboard)
+            Case "BIN"
+                bmp = picMain.Image
+                s = ""
+                For j = 0 To cellHeight - 1
+                    For i = 0 To cellWidth - 1
+                        c = bmp.GetPixel(currCellX * (cellWidth + 1) + i, currCellY * (cellHeight + 1) + j)
+                        If (c.R * 9 + c.G * 19 + c.B * 4 >> 5) < 128 And c.A > 128 Then
+                            s = s & "1 "
+                        Else
+                            s = s & "0 "
+                        End If
+                    Next
+                    s = s & vbCrLf
+                Next
+                Clipboard.SetText(s)
+        End Select
     End Sub
 
     Private Sub btnPasteImage_Click(sender As Object, e As EventArgs) Handles btnPasteImage.Click
