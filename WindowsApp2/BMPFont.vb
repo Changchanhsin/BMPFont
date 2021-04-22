@@ -21,8 +21,6 @@
     Private bmpHead As New Bitmap(13, 13)
     Private bmpClipboard As New Bitmap(1, 1)
 
-    Private hasEditorGrid As Boolean = True
-
     Private Function in0255(v As Integer) As Integer
         If v < 0 Then
             in0255 = 0
@@ -662,24 +660,35 @@
             Exit Sub
         End If
 
-
         Dim bmp = New Bitmap(cellWidth, cellHeight)
         Dim grp = Graphics.FromImage(bmp)
         Dim bmpD = New Bitmap(picEdit.Width, picEdit.Height)
         Dim grpD = Graphics.FromImage(bmpD)
 
         grp.DrawImage(picMain.Image, New RectangleF(0, 0, cellWidth, cellHeight), New RectangleF(currCellX * (cellWidth + 1), currCellY * (cellHeight + 1), cellWidth, cellHeight), GraphicsUnit.Pixel)
+        grpD.FillRectangle(New SolidBrush(Color.White), 0, 0, picEdit.Width, picEdit.Height)
         Dim a As Single = (picEdit.Width - 1) / cellWidth
         Dim b As Single = (picEdit.Height - 1) / cellHeight
 
-        For j = 0 To cellHeight - 1
-            For i = 0 To cellWidth - 1
-                grpD.FillRectangle(New SolidBrush(bmp.GetPixel(i, j)), i * a, j * b, a, b)
-                If hasEditorGrid Then
-                    grpD.DrawRectangle(New Pen(Color.LightGray), i * a, j * b, a, b)
-                End If
+        If chkRound.Checked = False Then
+            For j = 0 To cellHeight - 1
+                For i = 0 To cellWidth - 1
+                    grpD.FillRectangle(New SolidBrush(bmp.GetPixel(i, j)), i * a, j * b, a, b)
+                    If chkGrid.checked = True Then
+                        grpD.DrawRectangle(New Pen(Color.LightGray), i * a, j * b, a, b)
+                    End If
+                Next
             Next
-        Next
+        Else
+            For j = 0 To cellHeight - 1
+                For i = 0 To cellWidth - 1
+                    grpD.FillEllipse(New SolidBrush(bmp.GetPixel(i, j)), i * a + 1, j * b + 1, a - 2, b - 2)
+                    If chkGrid.Checked = True Then
+                        grpD.DrawRectangle(New Pen(Color.LightGray), i * a, j * b, a, b)
+                    End If
+                Next
+            Next
+        End If
         bmp.Dispose()
         If Not IsNothing(picEdit.Image) Then
             picEdit.BackgroundImage.Dispose()
@@ -733,8 +742,10 @@
 
         pnlMain.Width = SplitContainer1.Panel1.Width - pnlMain.Left
         pnlMain.Height = SplitContainer1.Panel1.Height - pnlMain.Top
-        picEdit.Width = SplitContainer1.Panel2.Width - picEdit.Left - picEdit.Left
-        picEdit.Height = SplitContainer1.Panel2.Height - picEdit.Top - picEdit.Left
+        picEdit.Width = SplitContainer1.Panel2.Width - 2 * picEdit.Left
+        picEdit.Height = SplitContainer1.Panel2.Height - picEdit.Top - 2 * picEdit.Left - chkGrid.Height
+        chkGrid.Top = SplitContainer1.Panel2.Height - chkGrid.Height
+        chkRound.Top = chkGrid.Top
         RedrawEditor()
         resizeTab()
         'edit
@@ -765,6 +776,8 @@
                 Dim grp = Graphics.FromImage(bmpClipboard)
                 grp.DrawImage(picMain.Image, New RectangleF(0, 0, cellWidth, cellHeight), New RectangleF(currCellX * (cellWidth + 1), currCellY * (cellHeight + 1), cellWidth, cellHeight), GraphicsUnit.Pixel)
                 Clipboard.SetImage(bmpClipboard)
+            Case "editor image"
+                Clipboard.SetImage(picEdit.BackgroundImage)
             Case "BIN"
                 bmp = picMain.Image
                 s = ""
@@ -824,16 +837,24 @@
         Dim dotY As Integer = (e.Y + b / 2) / b - 1
         lblCursor.Text = "Cursor: " & dotX & "-" & dotY
         If e.Button = MouseButtons.Left Then
-            grpD.FillRectangle(New SolidBrush(Color.Black), dotX * a, dotY * b, a, b)
+            If chkRound.Checked = False Then
+                grpD.FillRectangle(New SolidBrush(Color.Black), dotX * a, dotY * b, a, b)
+            Else
+                grpD.FillEllipse(New SolidBrush(Color.Black), dotX * a + 1, dotY * b + 1, a - 2, b - 2)
+            End If
             bmpM.SetPixel(currCellX * (cellWidth + 1) + dotX, currCellY * (cellHeight + 1) + dotY, Color.Black)
-            If hasEditorGrid Then
+            If chkGrid.Checked = True Then
                 grpD.DrawRectangle(New Pen(Color.LightGray), dotX * a, dotY * b, a, b)
             End If
         End If
         If e.Button = MouseButtons.Right Then
-            grpD.FillRectangle(New SolidBrush(Color.White), dotX * a, dotY * b, a, b)
+            If chkRound.Checked = False Then
+                grpD.FillRectangle(New SolidBrush(Color.White), dotX * a, dotY * b, a, b)
+            Else
+                grpD.FillEllipse(New SolidBrush(Color.White), dotX * a + 1, dotY * b + 1, a - 2, b - 2)
+            End If
             bmpM.SetPixel(currCellX * (cellWidth + 1) + dotX, currCellY * (cellHeight + 1) + dotY, Color.White)
-            If hasEditorGrid Then
+            If chkGrid.Checked = True Then
                 grpD.DrawRectangle(New Pen(Color.LightGray), dotX * a, dotY * b, a, b)
             End If
         End If
@@ -964,6 +985,22 @@
             Next
         Next
         picMain.Refresh()
+
+    End Sub
+
+    Private Sub SplitContainer1_Panel2_Paint(sender As Object, e As PaintEventArgs) Handles SplitContainer1.Panel2.Paint
+
+    End Sub
+
+    Private Sub chkRound_CheckedChanged(sender As Object, e As EventArgs) Handles chkRound.CheckedChanged
+        RedrawEditor()
+    End Sub
+
+    Private Sub chkGrid_CheckedChanged(sender As Object, e As EventArgs) Handles chkGrid.CheckedChanged
+        RedrawEditor()
+    End Sub
+
+    Private Sub picEdit_Click(sender As Object, e As EventArgs) Handles picEdit.Click
 
     End Sub
 End Class
