@@ -114,6 +114,7 @@ Partial Class frmBMPFont
         Me.picEdit = New System.Windows.Forms.PictureBox()
         Me.iml35 = New System.Windows.Forms.ImageList(Me.components)
         Me.iml57 = New System.Windows.Forms.ImageList(Me.components)
+        Me.btnOutput1 = New System.Windows.Forms.Button()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -266,7 +267,7 @@ Partial Class frmBMPFont
         'cboCopyType
         '
         Me.cboCopyType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboCopyType.Items.AddRange(New Object() {"image", "editor image", "BIN", "HEX", "OCT", "DEC"})
+        Me.cboCopyType.Items.AddRange(New Object() {"editor image", "image", "SVG", "BIN", "HEX", "OCT", "DEC"})
         Me.cboCopyType.Location = New System.Drawing.Point(213, 311)
         Me.cboCopyType.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.cboCopyType.Name = "cboCopyType"
@@ -980,6 +981,7 @@ Partial Class frmBMPFont
         'tagSpecial
         '
         Me.tagSpecial.BackColor = System.Drawing.SystemColors.Control
+        Me.tagSpecial.Controls.Add(Me.btnOutput1)
         Me.tagSpecial.Controls.Add(Me.btnSpecial)
         Me.tagSpecial.Location = New System.Drawing.Point(4, 25)
         Me.tagSpecial.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
@@ -993,9 +995,9 @@ Partial Class frmBMPFont
         Me.btnSpecial.Location = New System.Drawing.Point(8, 4)
         Me.btnSpecial.Margin = New System.Windows.Forms.Padding(4)
         Me.btnSpecial.Name = "btnSpecial"
-        Me.btnSpecial.Size = New System.Drawing.Size(133, 29)
+        Me.btnSpecial.Size = New System.Drawing.Size(352, 29)
         Me.btnSpecial.TabIndex = 30
-        Me.btnSpecial.Text = "Special"
+        Me.btnSpecial.Text = "Compare"
         Me.btnSpecial.UseVisualStyleBackColor = True
         '
         'lblCursor
@@ -1078,6 +1080,16 @@ Partial Class frmBMPFont
         Me.iml57.ImageStream = CType(resources.GetObject("iml57.ImageStream"), System.Windows.Forms.ImageListStreamer)
         Me.iml57.TransparentColor = System.Drawing.Color.Transparent
         Me.iml57.Images.SetKeyName(0, "5x7.png")
+        '
+        'btnOutput1
+        '
+        Me.btnOutput1.Location = New System.Drawing.Point(8, 41)
+        Me.btnOutput1.Margin = New System.Windows.Forms.Padding(4)
+        Me.btnOutput1.Name = "btnOutput1"
+        Me.btnOutput1.Size = New System.Drawing.Size(352, 29)
+        Me.btnOutput1.TabIndex = 31
+        Me.btnOutput1.Text = "Output by GB Zones"
+        Me.btnOutput1.UseVisualStyleBackColor = True
         '
         'frmBMPFont
         '
@@ -1206,4 +1218,5 @@ Partial Class frmBMPFont
     Friend WithEvents cboCopyType As ComboBox
     Friend WithEvents chkRound As CheckBox
     Friend WithEvents chkGrid As CheckBox
+    Friend WithEvents btnOutput1 As Button
 End Class

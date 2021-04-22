@@ -123,7 +123,7 @@
                 End If
                 If codePage = 12000 Then
                     unicodeString = System.Text.Encoding.UTF8.GetString(currChar)
-                Elseif codePage=1200 then
+                ElseIf codePage = 1200 Then
                     currChar(1) = codeH(i)
                     currChar(0) = codeL(j)
                     unicodeString = System.Text.Encoding.GetEncoding(codePage).GetString(currChar)
@@ -715,6 +715,7 @@
         cboCodepage.SelectedIndex = 0
         cboSaveFileType.SelectedIndex = 0
         cboImportType.SelectedIndex = 0
+        cboCopyType.SelectedIndex = 0
         getFontList()
         txtSaveImagePath.Text = Application.StartupPath
         Me.KeyPreview = True
@@ -796,6 +797,37 @@
                     Next
                     s = s & vbCrLf
                 Next
+                Clipboard.SetText(s)
+            Case "SVG"
+                bmp = picMain.Image
+                s = "<?xml version=""1.0"" encoding=""UTF-8"" standalone=""no""?>" & vbCrLf
+                s = s & "<svg xmlns=""http://www.w3.org/2000/svg""" & vbCrLf
+                s = s & "     enable-background=""new 0 0 " & cellWidth * 10 & " " & cellHeight * 10 & """" & vbCrLf
+                s = s & "     width=""" & cellWidth * 10 & """ height=""" & cellHeight * 10 & """ viewBox=""0 0 " & cellWidth * 10 & " " & cellHeight * 10 & """>" & vbCrLf
+                s = s & "  <g style=""display:inline"">" & vbCrLf
+                If chkGrid.Checked = True Then
+                    For i = 0 To cellWidth
+                        s = s & "    <line x1=""" & i * 10 & """ y1=""0"" x2=""" & i * 10 & """ y2=""" & cellHeight * 10 & """ style=""stroke:#000;stroke-width:0.4px""/>" & vbCrLf
+                    Next
+                    For j = 0 To cellHeight
+                        s = s & "    <line y1=""" & j * 10 & """ x1=""0"" y2=""" & j * 10 & """ x2=""" & cellWidth * 10 & """ style=""stroke:#000;stroke-width:0.4px""/>" & vbCrLf
+                    Next
+                End If
+                For j = 0 To cellHeight - 1
+                    For i = 0 To cellWidth - 1
+                        c = bmp.GetPixel(currCellX * (cellWidth + 1) + i, currCellY * (cellHeight + 1) + j)
+                        If (c.R * 9 + c.G * 19 + c.B * 4 >> 5) < 128 And c.A > 128 Then
+                            If chkRound.Checked = True Then
+                                s = s & "    <circle r=""4"" cy=""" & j * 10 + 5 & """ cx=""" & i * 10 + 5 & """ style=""fill:rgb(" & c.R & "," & c.G & "," & c.B & ");fill-opacity:1""/>" & vbCrLf
+                            Else
+                                s = s & "    <rect width=""10"" height=""10"" y=""" & j * 10 & """ x=""" & i * 10 & """ style=""fill:rgb(" & c.R & "," & c.G & "," & c.B & ");fill-opacity:1""/>" & vbCrLf
+                            End If
+                        End If
+                    Next
+                    s = s & vbCrLf
+                Next
+                s = s & "  </g>" & vbCrLf
+                s = s & "</svg>"
                 Clipboard.SetText(s)
         End Select
     End Sub
@@ -1006,5 +1038,17 @@
 
     Private Sub picEdit_Click(sender As Object, e As EventArgs) Handles picEdit.Click
 
+    End Sub
+
+    Private Sub btnOutput1_Click(sender As Object, e As EventArgs) Handles btnOutput1.Click
+        ' GB Zones:
+        ' Double1 (Symbol): A1-A9 : A1-FE
+        ' Double2 (Hanzi) : B0-F7 : A1-FE
+        ' Double3 (Hanzi) : 81-A0 : 40-7E,80-FE
+        ' Double4 (Hanzi) : AA-FE : 40-7E,80-FE
+        ' Double5 (Symbol): A8-A9 : 40-7E,80-A0
+        ' DoubleUser1: AAA1-AFFE
+        ' DoubleUser2: F8A1-FEFE
+        ' DoubleUser3     : A1-A7 : 40-7E,80-A0
     End Sub
 End Class
