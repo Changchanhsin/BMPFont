@@ -123,6 +123,10 @@
                 End If
                 If codePage = 12000 Then
                     unicodeString = System.Text.Encoding.UTF8.GetString(currChar)
+                Elseif codePage=1200 then
+                    currChar(1) = codeH(i)
+                    currChar(0) = codeL(j)
+                    unicodeString = System.Text.Encoding.GetEncoding(codePage).GetString(currChar)
                 Else
                     unicodeString = System.Text.Encoding.GetEncoding(codePage).GetString(currChar)
                 End If
@@ -339,7 +343,7 @@
                 codeHighRange = {0, 15}
                 codePage = 1252
                 codeLength = 1
-            Case "Unicode(1200)"
+            Case "UnicodeUCS16(1200)"
                 codeLowRange = {0, 255}
                 codeHighRange = {0, 255}
                 codePage = 1200
