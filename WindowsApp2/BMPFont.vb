@@ -21,6 +21,8 @@
     Private bmpHead As New Bitmap(13, 13)
     Private bmpClipboard As New Bitmap(1, 1)
 
+    Private isShiftPress As Boolean
+
     Private Function in0255(v As Integer) As Integer
         If v < 0 Then
             in0255 = 0
@@ -155,6 +157,17 @@
         Next
     End Sub
 
+    Private Function getHead(x As Integer, y As Integer) As Integer
+        Dim rt = 0
+        For i As Integer = 0 To 7
+            rt = rt << 1
+            If bmpHead.GetPixel(x + i, y).GetBrightness < 0.5 Then
+                rt = rt + 1
+            End If
+        Next
+        Return rt
+    End Function
+
     Private Sub printHead()
         For i = 1 To 10
             bmpHead.SetPixel(1, i, Color.Black)
@@ -170,6 +183,16 @@
         drawHead(codeHeight, 2, 7)
         drawHead(0, 2, 8)
         drawHead(0, 2, 9)
+    End Sub
+
+    Private Sub readHead()
+        codePage = getHead(2, 2)
+        codePage = codePage << 8
+        codePage = codePage + getHead(2, 3)
+        cellWidth = getHead(2, 4)
+        cellHeight = getHead(2, 5)
+        codeWidth = getHead(2, 6)
+        codeHeight = getHead(2, 7)
     End Sub
 
     Private Sub createArray(cp As Integer, width As Integer, height As Integer)
@@ -530,6 +553,32 @@
         End Try
     End Sub
 
+    Private Sub importFontPNG()
+        Try
+            picHead.ImageLocation = txtImportFileName.Text
+            picHead.Load()
+            Dim bmpFont As Bitmap = picHead.Image
+            Dim bmpV As New Bitmap(13, picHead.Image.Height - 13)
+            Dim bmpH As New Bitmap(picHead.Image.Width - 13, 13)
+            Dim bmpMain As New Bitmap(picHead.Image.Width - 13, picHead.Image.Height - 13)
+            bmpMain = bmpFont.Clone(New Rectangle(13, 13, bmpFont.Width - 13, bmpFont.Height - 13), Imaging.PixelFormat.DontCare)
+            picMain.Image = bmpMain
+            picMain.Width = bmpMain.Width
+            picMain.Height = bmpMain.Height
+            bmpV = bmpFont.Clone(New Rectangle(0, 13, 13, bmpFont.Height - 13), Imaging.PixelFormat.DontCare)
+            picV.Image = bmpV
+            picV.Height = bmpV.Height
+            bmpH = bmpFont.Clone(New Rectangle(13, 0, bmpFont.Width - 13, 13), Imaging.PixelFormat.DontCare)
+            picH.Image = bmpH
+            picH.Width = bmpH.Width
+            bmpHead = bmpFont.Clone(New Rectangle(0, 0, 13, 13), Imaging.PixelFormat.DontCare)
+            picHead.Image = bmpHead
+            readHead()
+        Catch ex As Exception
+
+        End Try
+    End Sub
+
     Private Sub importRAW(width As Integer, height As Integer, sizeW As Integer, sizeH As Integer)
 
         Try
@@ -616,7 +665,7 @@
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
         Select Case cboImportType.Text
             Case ".FONT.PNG"
-                'importPNG()
+                importFontPNG()
             Case ".HZCG6"
                 'importHZCG6()
             Case Else
@@ -752,6 +801,10 @@
         chkGrid.Top = SplitContainer1.Panel2.Height - chkGrid.Height
         chkRound.Top = chkGrid.Top
         RedrawEditor()
+        lblBackColor.Left = SplitContainer1.Panel2.Width - lblBackColor.Width
+        lblBackColor.Top = SplitContainer1.Panel2.Height - lblBackColor.Height
+        lblForeColor.Left = lblBackColor.Left - lblForeColor.Width
+        lblForeColor.Top = lblBackColor.Top
         resizeTab()
         'edit
         btnCopyCharImage.Width = SplitContainer1.Panel2.Width - btnCopyCharImage.Left
@@ -859,6 +912,11 @@
         If picEdit.BackgroundImage Is Nothing Then
             Exit Sub
         End If
+        'If isShiftPress = True Then
+        'picEdit.Cursor = Cursors.Hand
+        'Else
+        'picEdit.Cursor = Cursors.Cross
+        'End If
         If e.X < 0 Or e.Y < 0 Or e.X > picEdit.Width Or e.Y > picEdit.Height Then
             Exit Sub
         End If
@@ -873,25 +931,44 @@
         Dim dotY As Integer = (e.Y + b / 2) / b - 1
         lblCursor.Text = "Cursor: " & dotX & "-" & dotY
         If e.Button = MouseButtons.Left Then
-            If chkRound.Checked = False Then
-                grpD.FillRectangle(New SolidBrush(Color.Black), dotX * a, dotY * b, a, b)
+            If isShiftPress = False Then
+                If chkRound.Checked = False Then
+                    grpD.FillRectangle(New SolidBrush(lblForeColor.BackColor), dotX * a, dotY * b, a, b)
+                Else
+                    grpD.FillEllipse(New SolidBrush(lblForeColor.BackColor), dotX * a + 1, dotY * b + 1, a - 2, b - 2)
+                End If
+                bmpM.SetPixel(currCellX * (cellWidth + 1) + dotX, currCellY * (cellHeight + 1) + dotY, lblForeColor.BackColor)
+                If chkGrid.Checked = True Then
+                    grpD.DrawRectangle(New Pen(Color.LightGray), dotX * a, dotY * b, a, b)
+                End If
             Else
-                grpD.FillEllipse(New SolidBrush(Color.Black), dotX * a + 1, dotY * b + 1, a - 2, b - 2)
+                lblForeColor.BackColor = bmpM.GetPixel(currCellX * (cellWidth + 1) + dotX, currCellY * (cellHeight + 1) + dotY)
+                If lblForeColor.BackColor.GetBrightness > 0.5 Then
+                    lblForeColor.ForeColor = Color.Black
+                Else
+                    lblForeColor.ForeColor = Color.White
+                End If
             End If
-            bmpM.SetPixel(currCellX * (cellWidth + 1) + dotX, currCellY * (cellHeight + 1) + dotY, Color.Black)
-            If chkGrid.Checked = True Then
-                grpD.DrawRectangle(New Pen(Color.LightGray), dotX * a, dotY * b, a, b)
+
             End If
-        End If
         If e.Button = MouseButtons.Right Then
-            If chkRound.Checked = False Then
-                grpD.FillRectangle(New SolidBrush(Color.White), dotX * a, dotY * b, a, b)
+            If isShiftPress = False Then
+                If chkRound.Checked = False Then
+                    grpD.FillRectangle(New SolidBrush(lblBackColor.BackColor), dotX * a, dotY * b, a, b)
+                Else
+                    grpD.FillEllipse(New SolidBrush(lblBackColor.BackColor), dotX * a + 1, dotY * b + 1, a - 2, b - 2)
+                End If
+                bmpM.SetPixel(currCellX * (cellWidth + 1) + dotX, currCellY * (cellHeight + 1) + dotY, lblBackColor.BackColor)
+                If chkGrid.Checked = True Then
+                    grpD.DrawRectangle(New Pen(Color.LightGray), dotX * a, dotY * b, a, b)
+                End If
             Else
-                grpD.FillEllipse(New SolidBrush(Color.White), dotX * a + 1, dotY * b + 1, a - 2, b - 2)
-            End If
-            bmpM.SetPixel(currCellX * (cellWidth + 1) + dotX, currCellY * (cellHeight + 1) + dotY, Color.White)
-            If chkGrid.Checked = True Then
-                grpD.DrawRectangle(New Pen(Color.LightGray), dotX * a, dotY * b, a, b)
+                lblBackColor.BackColor = bmpM.GetPixel(currCellX * (cellWidth + 1) + dotX, currCellY * (cellHeight + 1) + dotY)
+                If lblBackColor.BackColor.GetBrightness > 0.5 Then
+                    lblBackColor.ForeColor = Color.Black
+                Else
+                    lblBackColor.ForeColor = Color.White
+                End If
             End If
         End If
         picMain.Refresh()
@@ -962,6 +1039,10 @@
         End If
         If e.Control And e.KeyCode = Keys.C Then
             btnCopyImage_Click(sender, e)
+        End If
+        If e.KeyCode = Keys.ShiftKey Then
+            isShiftPress = True
+            picEdit.Cursor = Cursors.Hand
         End If
     End Sub
 
@@ -1050,5 +1131,16 @@
         ' DoubleUser1: AAA1-AFFE
         ' DoubleUser2: F8A1-FEFE
         ' DoubleUser3     : A1-A7 : 40-7E,80-A0
+    End Sub
+
+    Private Sub frmBMPFont_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
+        If e.KeyCode = Keys.ShiftKey Then
+            isShiftPress = False
+            picEdit.Cursor = Cursors.Cross
+        End If
+    End Sub
+
+    Private Sub picEdit_MouseEnter(sender As Object, e As EventArgs) Handles picEdit.MouseEnter
+
     End Sub
 End Class
