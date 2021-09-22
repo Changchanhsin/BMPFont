@@ -930,6 +930,9 @@
         Dim dotX As Integer = (e.X + a / 2) / a - 1
         Dim dotY As Integer = (e.Y + b / 2) / b - 1
         lblCursor.Text = "Cursor: " & dotX & "-" & dotY
+        If dotX >= cellWidth Or dotY >= cellHeight Then
+            Exit Sub
+        End If
         If e.Button = MouseButtons.Left Then
             If isShiftPress = False Then
                 If chkRound.Checked = False Then
@@ -1141,6 +1144,10 @@
     End Sub
 
     Private Sub picEdit_MouseEnter(sender As Object, e As EventArgs) Handles picEdit.MouseEnter
+
+    End Sub
+
+    Private Sub picEdit_Layout(sender As Object, e As LayoutEventArgs) Handles picEdit.Layout
 
     End Sub
 End Class
