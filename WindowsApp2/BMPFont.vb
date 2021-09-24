@@ -744,9 +744,9 @@
         End If
         bmp.Dispose()
         If Not IsNothing(picEdit.Image) Then
-            picEdit.BackgroundImage.Dispose()
+            picEdit.Image.Dispose()
         End If
-        picEdit.BackgroundImage = bmpD
+        picEdit.Image = bmpD
     End Sub
 
     Private Sub getFontList()
@@ -835,7 +835,7 @@
                 grp.DrawImage(picMain.Image, New RectangleF(0, 0, cellWidth, cellHeight), New RectangleF(currCellX * (cellWidth + 1), currCellY * (cellHeight + 1), cellWidth, cellHeight), GraphicsUnit.Pixel)
                 Clipboard.SetImage(bmpClipboard)
             Case "editor image"
-                Clipboard.SetImage(picEdit.BackgroundImage)
+                Clipboard.SetImage(picEdit.Image)
             Case "BIN"
                 bmp = picMain.Image
                 s = ""
@@ -909,7 +909,7 @@
     End Sub
 
     Private Sub picEditor_MouseMove(sender As Object, e As MouseEventArgs) Handles picEdit.MouseMove
-        If picEdit.BackgroundImage Is Nothing Then
+        If picEdit.Image Is Nothing Then
             Exit Sub
         End If
         'If isShiftPress = True Then
@@ -920,7 +920,7 @@
         If e.X < 0 Or e.Y < 0 Or e.X > picEdit.Width Or e.Y > picEdit.Height Then
             Exit Sub
         End If
-        Dim grpD As Graphics = Graphics.FromImage(picEdit.BackgroundImage)
+        Dim grpD As Graphics = Graphics.FromImage(picEdit.Image)
         Dim bmpM As Bitmap = picMain.Image
         Dim grpM As Graphics = Graphics.FromImage(picMain.Image)
 

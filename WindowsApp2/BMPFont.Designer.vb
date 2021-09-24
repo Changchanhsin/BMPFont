@@ -253,7 +253,7 @@ Partial Class frmBMPFont
         Me.lblBackColor.BackColor = System.Drawing.Color.White
         Me.lblBackColor.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
         Me.lblBackColor.ForeColor = System.Drawing.Color.Black
-        Me.lblBackColor.Location = New System.Drawing.Point(407, 750)
+        Me.lblBackColor.Location = New System.Drawing.Point(405, 750)
         Me.lblBackColor.Name = "lblBackColor"
         Me.lblBackColor.Size = New System.Drawing.Size(19, 20)
         Me.lblBackColor.TabIndex = 43
@@ -266,7 +266,7 @@ Partial Class frmBMPFont
         Me.lblForeColor.BackColor = System.Drawing.Color.Black
         Me.lblForeColor.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
         Me.lblForeColor.ForeColor = System.Drawing.Color.White
-        Me.lblForeColor.Location = New System.Drawing.Point(382, 750)
+        Me.lblForeColor.Location = New System.Drawing.Point(380, 750)
         Me.lblForeColor.Name = "lblForeColor"
         Me.lblForeColor.Size = New System.Drawing.Size(19, 20)
         Me.lblForeColor.TabIndex = 42
@@ -317,7 +317,7 @@ Partial Class frmBMPFont
         Me.tabControl.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.tabControl.Name = "tabControl"
         Me.tabControl.SelectedIndex = 0
-        Me.tabControl.Size = New System.Drawing.Size(413, 358)
+        Me.tabControl.Size = New System.Drawing.Size(411, 358)
         Me.tabControl.TabIndex = 30
         '
         'tagCreate
@@ -351,7 +351,7 @@ Partial Class frmBMPFont
         Me.tagCreate.Location = New System.Drawing.Point(4, 28)
         Me.tagCreate.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.tagCreate.Name = "tagCreate"
-        Me.tagCreate.Size = New System.Drawing.Size(405, 326)
+        Me.tagCreate.Size = New System.Drawing.Size(403, 326)
         Me.tagCreate.TabIndex = 4
         Me.tagCreate.Text = "Create"
         '
@@ -610,7 +610,7 @@ Partial Class frmBMPFont
         Me.tagOpen.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.tagOpen.Name = "tagOpen"
         Me.tagOpen.Padding = New System.Windows.Forms.Padding(3, 2, 3, 2)
-        Me.tagOpen.Size = New System.Drawing.Size(405, 326)
+        Me.tagOpen.Size = New System.Drawing.Size(403, 326)
         Me.tagOpen.TabIndex = 0
         Me.tagOpen.Text = "Open"
         '
@@ -797,7 +797,7 @@ Partial Class frmBMPFont
         Me.tagSave.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.tagSave.Name = "tagSave"
         Me.tagSave.Padding = New System.Windows.Forms.Padding(3, 2, 3, 2)
-        Me.tagSave.Size = New System.Drawing.Size(405, 326)
+        Me.tagSave.Size = New System.Drawing.Size(403, 326)
         Me.tagSave.TabIndex = 1
         Me.tagSave.Text = "Save"
         '
@@ -903,7 +903,7 @@ Partial Class frmBMPFont
         Me.tagEdit.Location = New System.Drawing.Point(4, 28)
         Me.tagEdit.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.tagEdit.Name = "tagEdit"
-        Me.tagEdit.Size = New System.Drawing.Size(405, 326)
+        Me.tagEdit.Size = New System.Drawing.Size(403, 326)
         Me.tagEdit.TabIndex = 2
         Me.tagEdit.Text = "Edit"
         '
@@ -1016,7 +1016,7 @@ Partial Class frmBMPFont
         Me.tagSpecial.Location = New System.Drawing.Point(4, 28)
         Me.tagSpecial.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.tagSpecial.Name = "tagSpecial"
-        Me.tagSpecial.Size = New System.Drawing.Size(405, 326)
+        Me.tagSpecial.Size = New System.Drawing.Size(403, 326)
         Me.tagSpecial.TabIndex = 3
         Me.tagSpecial.Text = "Special"
         '
@@ -1101,13 +1101,12 @@ Partial Class frmBMPFont
         Me.picEdit.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.picEdit.BackgroundImage = Global.WindowsApp2.My.Resources.Resources.background1
         Me.picEdit.Cursor = System.Windows.Forms.Cursors.Cross
         Me.picEdit.InitialImage = Nothing
         Me.picEdit.Location = New System.Drawing.Point(8, 461)
         Me.picEdit.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.picEdit.Name = "picEdit"
-        Me.picEdit.Size = New System.Drawing.Size(366, 264)
+        Me.picEdit.Size = New System.Drawing.Size(364, 264)
         Me.picEdit.TabIndex = 6
         Me.picEdit.TabStop = False
         '
