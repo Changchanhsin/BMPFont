@@ -84,6 +84,10 @@ Partial Class frmBMPFont
         Me.txtImportFileName = New System.Windows.Forms.TextBox()
         Me.btnImport = New System.Windows.Forms.Button()
         Me.tagSave = New System.Windows.Forms.TabPage()
+        Me.txtCodeRangeEnd = New System.Windows.Forms.TextBox()
+        Me.txtCodeRangeStart = New System.Windows.Forms.TextBox()
+        Me.Label30 = New System.Windows.Forms.Label()
+        Me.Label29 = New System.Windows.Forms.Label()
         Me.Label19 = New System.Windows.Forms.Label()
         Me.Label23 = New System.Windows.Forms.Label()
         Me.Label18 = New System.Windows.Forms.Label()
@@ -117,6 +121,7 @@ Partial Class frmBMPFont
         Me.picEdit = New System.Windows.Forms.PictureBox()
         Me.iml35 = New System.Windows.Forms.ImageList(Me.components)
         Me.iml57 = New System.Windows.Forms.ImageList(Me.components)
+        Me.btnPic2HZ = New System.Windows.Forms.Button()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -253,7 +258,7 @@ Partial Class frmBMPFont
         Me.lblBackColor.BackColor = System.Drawing.Color.White
         Me.lblBackColor.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
         Me.lblBackColor.ForeColor = System.Drawing.Color.Black
-        Me.lblBackColor.Location = New System.Drawing.Point(405, 750)
+        Me.lblBackColor.Location = New System.Drawing.Point(401, 750)
         Me.lblBackColor.Name = "lblBackColor"
         Me.lblBackColor.Size = New System.Drawing.Size(19, 20)
         Me.lblBackColor.TabIndex = 43
@@ -266,7 +271,7 @@ Partial Class frmBMPFont
         Me.lblForeColor.BackColor = System.Drawing.Color.Black
         Me.lblForeColor.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
         Me.lblForeColor.ForeColor = System.Drawing.Color.White
-        Me.lblForeColor.Location = New System.Drawing.Point(380, 750)
+        Me.lblForeColor.Location = New System.Drawing.Point(376, 750)
         Me.lblForeColor.Name = "lblForeColor"
         Me.lblForeColor.Size = New System.Drawing.Size(19, 20)
         Me.lblForeColor.TabIndex = 42
@@ -317,7 +322,7 @@ Partial Class frmBMPFont
         Me.tabControl.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.tabControl.Name = "tabControl"
         Me.tabControl.SelectedIndex = 0
-        Me.tabControl.Size = New System.Drawing.Size(411, 358)
+        Me.tabControl.Size = New System.Drawing.Size(407, 358)
         Me.tabControl.TabIndex = 30
         '
         'tagCreate
@@ -351,7 +356,7 @@ Partial Class frmBMPFont
         Me.tagCreate.Location = New System.Drawing.Point(4, 28)
         Me.tagCreate.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.tagCreate.Name = "tagCreate"
-        Me.tagCreate.Size = New System.Drawing.Size(403, 326)
+        Me.tagCreate.Size = New System.Drawing.Size(399, 326)
         Me.tagCreate.TabIndex = 4
         Me.tagCreate.Text = "Create"
         '
@@ -498,7 +503,7 @@ Partial Class frmBMPFont
         '
         Me.cboCodepage.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboCodepage.FormattingEnabled = True
-        Me.cboCodepage.Items.AddRange(New Object() {"Unknown(0)", "ASCII-7(1252)", "ASCII-8(1252)", "UnicodeUCS16(1200)", "ISO/IEC10646BMP(1200)", "ISO/IEC10646SMP(65005)", "ISO/IEC10646SIP(65005)", "ISO/IEC10646TIP(65005)", "GB2312双字节(936)", "GBK双字节(936)", "GB18030单字节(936)", "GB18030双字节(936)", "Big-5双字节(950)", "Big-5单字节(950)", "Shift-JIS双字节(932)", "Shift-JIS单字节(932)"})
+        Me.cboCodepage.Items.AddRange(New Object() {"Unknown(0)", "ASCII-7(1252)", "ASCII-8(1252)", "UnicodeUCS16(1200)", "ISO/IEC10646BMP(1200)", "ISO/IEC10646SMP(65005)", "ISO/IEC10646SIP(65005)", "ISO/IEC10646TIP(65005)", "ISO/IEC10646-Fxxxx(65005)", "GB2312双字节(936)", "GBK双字节(936)", "GB18030单字节(936)", "GB18030双字节(936)", "Big-5双字节(950)", "Big-5单字节(950)", "Shift-JIS双字节(932)", "Shift-JIS单字节(932)"})
         Me.cboCodepage.Location = New System.Drawing.Point(99, 73)
         Me.cboCodepage.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.cboCodepage.Name = "cboCodepage"
@@ -610,7 +615,7 @@ Partial Class frmBMPFont
         Me.tagOpen.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.tagOpen.Name = "tagOpen"
         Me.tagOpen.Padding = New System.Windows.Forms.Padding(3, 2, 3, 2)
-        Me.tagOpen.Size = New System.Drawing.Size(403, 326)
+        Me.tagOpen.Size = New System.Drawing.Size(399, 326)
         Me.tagOpen.TabIndex = 0
         Me.tagOpen.Text = "Open"
         '
@@ -784,6 +789,10 @@ Partial Class frmBMPFont
         'tagSave
         '
         Me.tagSave.BackColor = System.Drawing.SystemColors.Control
+        Me.tagSave.Controls.Add(Me.txtCodeRangeEnd)
+        Me.tagSave.Controls.Add(Me.txtCodeRangeStart)
+        Me.tagSave.Controls.Add(Me.Label30)
+        Me.tagSave.Controls.Add(Me.Label29)
         Me.tagSave.Controls.Add(Me.Label19)
         Me.tagSave.Controls.Add(Me.Label23)
         Me.tagSave.Controls.Add(Me.Label18)
@@ -797,9 +806,45 @@ Partial Class frmBMPFont
         Me.tagSave.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.tagSave.Name = "tagSave"
         Me.tagSave.Padding = New System.Windows.Forms.Padding(3, 2, 3, 2)
-        Me.tagSave.Size = New System.Drawing.Size(403, 326)
+        Me.tagSave.Size = New System.Drawing.Size(399, 326)
         Me.tagSave.TabIndex = 1
         Me.tagSave.Text = "Save"
+        '
+        'txtCodeRangeEnd
+        '
+        Me.txtCodeRangeEnd.Location = New System.Drawing.Point(225, 153)
+        Me.txtCodeRangeEnd.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtCodeRangeEnd.Name = "txtCodeRangeEnd"
+        Me.txtCodeRangeEnd.Size = New System.Drawing.Size(102, 28)
+        Me.txtCodeRangeEnd.TabIndex = 48
+        Me.txtCodeRangeEnd.Text = "FF"
+        '
+        'txtCodeRangeStart
+        '
+        Me.txtCodeRangeStart.Location = New System.Drawing.Point(225, 110)
+        Me.txtCodeRangeStart.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtCodeRangeStart.Name = "txtCodeRangeStart"
+        Me.txtCodeRangeStart.Size = New System.Drawing.Size(102, 28)
+        Me.txtCodeRangeStart.TabIndex = 47
+        Me.txtCodeRangeStart.Text = "0"
+        '
+        'Label30
+        '
+        Me.Label30.AutoSize = True
+        Me.Label30.Location = New System.Drawing.Point(64, 150)
+        Me.Label30.Name = "Label30"
+        Me.Label30.Size = New System.Drawing.Size(134, 18)
+        Me.Label30.TabIndex = 46
+        Me.Label30.Text = "CodeRange End:"
+        '
+        'Label29
+        '
+        Me.Label29.AutoSize = True
+        Me.Label29.Location = New System.Drawing.Point(63, 116)
+        Me.Label29.Name = "Label29"
+        Me.Label29.Size = New System.Drawing.Size(152, 18)
+        Me.Label29.TabIndex = 45
+        Me.Label29.Text = "CodeRange Start:"
         '
         'Label19
         '
@@ -830,7 +875,7 @@ Partial Class frmBMPFont
         '
         'picSave
         '
-        Me.picSave.Location = New System.Drawing.Point(4, 108)
+        Me.picSave.Location = New System.Drawing.Point(4, 191)
         Me.picSave.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.picSave.Name = "picSave"
         Me.picSave.Size = New System.Drawing.Size(46, 35)
@@ -839,7 +884,7 @@ Partial Class frmBMPFont
         '
         'btnOpenFolder
         '
-        Me.btnOpenFolder.Location = New System.Drawing.Point(66, 108)
+        Me.btnOpenFolder.Location = New System.Drawing.Point(66, 191)
         Me.btnOpenFolder.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnOpenFolder.Name = "btnOpenFolder"
         Me.btnOpenFolder.Size = New System.Drawing.Size(150, 35)
@@ -852,7 +897,7 @@ Partial Class frmBMPFont
         Me.txtSaveImagePath.Location = New System.Drawing.Point(66, 10)
         Me.txtSaveImagePath.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtSaveImagePath.Name = "txtSaveImagePath"
-        Me.txtSaveImagePath.Size = New System.Drawing.Size(211, 28)
+        Me.txtSaveImagePath.Size = New System.Drawing.Size(261, 28)
         Me.txtSaveImagePath.TabIndex = 31
         Me.txtSaveImagePath.Text = "256"
         '
@@ -864,7 +909,7 @@ Partial Class frmBMPFont
         Me.cboSaveFileType.Location = New System.Drawing.Point(66, 77)
         Me.cboSaveFileType.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.cboSaveFileType.Name = "cboSaveFileType"
-        Me.cboSaveFileType.Size = New System.Drawing.Size(210, 26)
+        Me.cboSaveFileType.Size = New System.Drawing.Size(261, 26)
         Me.cboSaveFileType.TabIndex = 32
         '
         'txtSaveImage
@@ -872,13 +917,13 @@ Partial Class frmBMPFont
         Me.txtSaveImage.Location = New System.Drawing.Point(66, 42)
         Me.txtSaveImage.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.txtSaveImage.Name = "txtSaveImage"
-        Me.txtSaveImage.Size = New System.Drawing.Size(211, 28)
+        Me.txtSaveImage.Size = New System.Drawing.Size(261, 28)
         Me.txtSaveImage.TabIndex = 31
         Me.txtSaveImage.Text = "256"
         '
         'btnSave
         '
-        Me.btnSave.Location = New System.Drawing.Point(225, 108)
+        Me.btnSave.Location = New System.Drawing.Point(225, 191)
         Me.btnSave.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.btnSave.Name = "btnSave"
         Me.btnSave.Size = New System.Drawing.Size(102, 35)
@@ -903,7 +948,7 @@ Partial Class frmBMPFont
         Me.tagEdit.Location = New System.Drawing.Point(4, 28)
         Me.tagEdit.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.tagEdit.Name = "tagEdit"
-        Me.tagEdit.Size = New System.Drawing.Size(403, 326)
+        Me.tagEdit.Size = New System.Drawing.Size(399, 326)
         Me.tagEdit.TabIndex = 2
         Me.tagEdit.Text = "Edit"
         '
@@ -1011,12 +1056,13 @@ Partial Class frmBMPFont
         'tagSpecial
         '
         Me.tagSpecial.BackColor = System.Drawing.SystemColors.Control
+        Me.tagSpecial.Controls.Add(Me.btnPic2HZ)
         Me.tagSpecial.Controls.Add(Me.btnOutput1)
         Me.tagSpecial.Controls.Add(Me.btnSpecial)
         Me.tagSpecial.Location = New System.Drawing.Point(4, 28)
         Me.tagSpecial.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.tagSpecial.Name = "tagSpecial"
-        Me.tagSpecial.Size = New System.Drawing.Size(403, 326)
+        Me.tagSpecial.Size = New System.Drawing.Size(399, 326)
         Me.tagSpecial.TabIndex = 3
         Me.tagSpecial.Text = "Special"
         '
@@ -1106,7 +1152,7 @@ Partial Class frmBMPFont
         Me.picEdit.Location = New System.Drawing.Point(8, 461)
         Me.picEdit.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.picEdit.Name = "picEdit"
-        Me.picEdit.Size = New System.Drawing.Size(364, 264)
+        Me.picEdit.Size = New System.Drawing.Size(360, 264)
         Me.picEdit.TabIndex = 6
         Me.picEdit.TabStop = False
         '
@@ -1121,6 +1167,16 @@ Partial Class frmBMPFont
         Me.iml57.ImageStream = CType(resources.GetObject("iml57.ImageStream"), System.Windows.Forms.ImageListStreamer)
         Me.iml57.TransparentColor = System.Drawing.Color.Transparent
         Me.iml57.Images.SetKeyName(0, "5x7.png")
+        '
+        'btnPic2HZ
+        '
+        Me.btnPic2HZ.Location = New System.Drawing.Point(10, 94)
+        Me.btnPic2HZ.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnPic2HZ.Name = "btnPic2HZ"
+        Me.btnPic2HZ.Size = New System.Drawing.Size(396, 35)
+        Me.btnPic2HZ.TabIndex = 32
+        Me.btnPic2HZ.Text = "pic to HZ"
+        Me.btnPic2HZ.UseVisualStyleBackColor = True
         '
         'frmBMPFont
         '
@@ -1252,4 +1308,9 @@ Partial Class frmBMPFont
     Friend WithEvents btnOutput1 As Button
     Friend WithEvents lblBackColor As Label
     Friend WithEvents lblForeColor As Label
+    Friend WithEvents txtCodeRangeEnd As TextBox
+    Friend WithEvents txtCodeRangeStart As TextBox
+    Friend WithEvents Label30 As Label
+    Friend WithEvents Label29 As Label
+    Friend WithEvents btnPic2HZ As Button
 End Class

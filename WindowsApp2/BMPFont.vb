@@ -111,14 +111,12 @@
                     currChar(0) = codeH(i)
                     currChar(1) = codeL(j)
                 ElseIf codePage = 12000 Then ' convert 3bytes To utf8
-                    currChar(0) = &HF0
-                    currChar(1) = &H80 + (codeUltraHigh << 4) + (codeH(i) >> 4)
-                    currChar(2) = &H80 + ((codeH(i) And &HF) << 2) + (codeL(j) >> 6)
-                    currChar(3) = &H80 + (codeL(j) And &H3F)
-                    'currChar(0) = 0
-                    'currChar(1) = codeUltraHigh
-                    'currChar(2) = codeH(j)
-                    'currChar(3) = codeL(i)
+                    If codeUltraHigh <= &H1F Then
+                        currChar(0) = &HF0 + (codeUltraHigh >> 2)
+                        currChar(1) = &H80 + ((codeUltraHigh And &H3) << 4) + (codeH(i) >> 4)
+                        currChar(2) = &H80 + ((codeH(i) And &HF) << 2) + (codeL(j) >> 6)
+                        currChar(3) = &H80 + (codeL(j) And &H3F)
+                    End If
                 Else
                     currChar(0) = codeH(i) * 16 + codeL(j)
                     currChar(1) = 0
@@ -394,6 +392,12 @@
                 codeHighRange = {0, 255}
                 codePage = 12000
                 codeLength = 4
+            Case "ISO/IEC10646-Fxxxx(65005)"
+                codeUltraHigh = 15
+                codeLowRange = {0, 255}
+                codeHighRange = {0, 255}
+                codePage = 12000
+                codeLength = 4
             Case "GB2312双字节(936)"
                 codeLowRange = {&HA1, &HFE}
                 codeHighRange = {&HA1, &HFE}
@@ -451,7 +455,7 @@
     Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
         Select Case cboSaveFileType.Text
             Case ".HZCG6"
-
+                saveHZ()
             Case ".CODE.PNG(多个)"
                 savePNGs()
             Case "RAW"
@@ -461,6 +465,43 @@
         End Select
     End Sub
 
+    Private Sub saveHZ()
+        Dim i, j, k, l
+        Dim c As Color
+        Dim d As Byte
+        Try
+            Dim bmp As Bitmap = picMain.Image
+
+            Dim FS As New System.IO.FileStream(txtSaveImagePath.Text & "\" & txtSaveImage.Text, IO.FileMode.Create, IO.FileAccess.Write, IO.FileShare.Write)
+            Dim Bw As New System.IO.BinaryWriter(FS)
+
+            For j = HexStrToLong(txtCodeRangeStart.Text) To HexStrToLong(txtCodeRangeEnd.Text)
+                For i = 0 To codeWidth - 1
+                    For k = 0 To cellHeight - 1
+                        For l = 0 To cellWidth - 1
+                            c = bmp.GetPixel(i * (cellWidth + 1) + l, j * (cellHeight + 1) + k)
+                            If (c.R * 9 + c.G * 19 + c.B * 4 >> 5) < 128 And c.A > 128 Then
+                                d += (1 << (7 - (l Mod 8)))
+                            End If
+                            If ((l + 1) Mod 8) = 0 Then
+                                'write to file
+                                Bw.Write(d)
+                                d = 0
+                            End If
+                        Next
+                        If (cellWidth Mod 8) <> 0 Then
+                            'writetofile
+                            Bw.Write(d)
+                            d = 0
+                        End If
+                    Next
+                Next
+            Next
+            FS.Close()
+        Catch ex2 As Exception
+            MessageBox.Show("Error on save RAW file : " & ex2.Message)
+        End Try
+    End Sub
     Private Sub saveRAW()
         Dim i, j, k, l
         Dim c As Color
@@ -1148,6 +1189,60 @@
     End Sub
 
     Private Sub picEdit_Layout(sender As Object, e As LayoutEventArgs) Handles picEdit.Layout
+
+    End Sub
+
+    Private Function HexStrToLong(myStr As String) As Long '16进制转整数
+        Dim tmpStr As String
+        Dim tmpchr As String
+        tmpStr = ""
+        tmpStr = Trim(myStr)
+        Dim value As Integer
+        value = 0
+        myStr = StrConv(myStr, vbUpperCase)
+        For i = 1 To Len(myStr)
+            tmpchr = Mid(myStr, i, 1)
+
+            Select Case tmpchr
+                Case "0"
+                    value = value + 0 * 16 ^ (Len(myStr) - i)
+                Case "1"
+                    value = value + 1 * 16 ^ (Len(myStr) - i)
+                Case "2"
+                    value = value + 2 * 16 ^ (Len(myStr) - i)
+                Case "3"
+                    value = value + 3 * 16 ^ (Len(myStr) - i)
+                Case "4"
+                    value = value + 4 * 16 ^ (Len(myStr) - i)
+                Case "5"
+                    value = value + 5 * 16 ^ (Len(myStr) - i)
+                Case "6"
+                    value = value + 6 * 16 ^ (Len(myStr) - i)
+                Case "7"
+                    value = value + 7 * 16 ^ (Len(myStr) - i)
+                Case "8"
+                    value = value + 8 * 16 ^ (Len(myStr) - i)
+                Case "9"
+                    value = value + 9 * 16 ^ (Len(myStr) - i)
+                Case "A"
+                    value = value + 10 * 16 ^ (Len(myStr) - i)
+                Case "B"
+                    value = value + 11 * 16 ^ (Len(myStr) - i)
+                Case "C"
+                    value = value + 12 * 16 ^ (Len(myStr) - i)
+                Case "D"
+                    value = value + 13 * 16 ^ (Len(myStr) - i)
+                Case "E"
+                    value = value + 14 * 16 ^ (Len(myStr) - i)
+                Case "F"
+                    value = value + 15 * 16 ^ (Len(myStr) - i)
+            End Select
+        Next
+        HexStrToLong = value
+
+    End Function
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles btnPic2HZ.Click
 
     End Sub
 End Class

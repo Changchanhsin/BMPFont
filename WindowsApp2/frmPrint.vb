@@ -1,11 +1,11 @@
 ﻿Public Class frmPrint
 
-    Private Sub ReadChar(r As System.IO.BinaryReader, w As Integer, h As Integer, ByRef b As Bitmap)
+    Private Function ReadChar(r As System.IO.BinaryReader, w As Integer, h As Integer, ByRef b As Bitmap) As String
         Try
             Dim widthBytes As Integer = Int((w + 7) / 8)
             Dim readBs = r.ReadBytes(widthBytes * h)
             If (readBs.Length < widthBytes * h) Then
-                Exit Sub
+                Return -1
             End If
             For j = 0 To (readBs.Length + 1) / widthBytes - 1 ' height - 1
                 For i = 0 To w - 1 'widthBytes * 8 - 1
@@ -18,10 +18,11 @@
                     End If
                 Next
             Next
+            Return 0
         Catch ex As Exception
-            Exit Sub
+            Return -1
         End Try
-    End Sub
+    End Function
 
     Private Sub RanderPage(r() As System.IO.BinaryReader, map() As Integer, grpmain As Graphics, mfont As Font, mfont2 As Font, mbrush As Brush, p As Pen,
                            bmpmain As Bitmap, files As Integer, charsizew() As Integer, charsizeh() As Integer, bmp() As Bitmap, destrect() As RectangleF,
@@ -29,15 +30,17 @@
         Dim p1 As Point
         Dim p2 As Point
         Dim u(4) As Byte
-        grpmain.DrawString("GB/T 13000", mfont2, mbrush, 0, 7)
-        grpmain.DrawString("15x16", mfont2, mbrush, 150, 7)
-        grpmain.DrawString("24x24", mfont2, mbrush, 270, 7)
-        grpmain.DrawString("48x48", mfont2, mbrush, 390, 7)
+        'grpmain.DrawString("GB/T 13000", mfont2, mbrush, 0, 7)
+        'grpmain.DrawString("15x16", mfont2, mbrush, 150, 7)
+        'grpmain.DrawString("24x24", mfont2, mbrush, 270, 7)
+        'grpmain.DrawString("48x48", mfont2, mbrush, 390, 7)
+        'grpmain.DrawString("48x48", mfont2, mbrush, 0, 7)
         p1.Y = 0
         p2.Y = 40
-        For i = 0 To files + 1
+        For i = 0 To files
             p1.X = i * 120 + 120
             p2.X = i * 120 + 120
+            grpmain.DrawString(charsizew(i) & "x" & charsizeh(i), mfont2, mbrush, i * 150, 7)
             grpmain.DrawLine(p, p1, p2)
         Next
         p1.X = 0
@@ -47,20 +50,23 @@
         grpmain.DrawLine(p, p1, p2)
 
         For j = 0 To Int(txtItemPerPage.Text) - 1
-            u(0) = &HF0
-            u(1) = &H80 + ((map(j + start) And &H3F000) >> 12)
-            u(2) = &H80 + ((map(j + start) And &HFC0) >> 6)
-            u(3) = &H80 + (map(j + start) And &H3F)
-            Dim s = System.Text.Encoding.UTF8.GetString(u)
-            grpmain.DrawString(s, mfont, mbrush, 15, 15 + 120 * j + 40)
-            grpmain.DrawString(Hex(map(j + start)), mfont2, mbrush, 30, 90 + 120 * j + 40)
-            p1.X = 0
-            p1.Y = j * 120 + 120 + 40
-            p2.X = bmpmain.Width
-            p2.Y = j * 120 + 120 + 40
-            grpmain.DrawLine(p, p1, p2)
+            'u(0) = &HF0
+            'u(1) = &H80 + ((map(j + start) And &H3F000) >> 12)
+            'u(2) = &H80 + ((map(j + start) And &HFC0) >> 6)
+            'u(3) = &H80 + (map(j + start) And &H3F)
+            'Dim s = System.Text.Encoding.UTF8.GetString(u)
+            'grpmain.DrawString(s, mfont, mbrush, 15, 15 + 120 * j + 40)
+            grpmain.DrawString(Hex(map(j + start)), mfont2, mbrush, 30, 100 + 120 * j + 40)
+            'p1.X = 0
+            'p1.Y = j * 120 + 120 + 40
+            'p2.X = bmpmain.Width
+            'p2.Y = j * 120 + 120 + 40
+            'grpmain.DrawLine(p, p1, p2)
             For i = 0 To files
-                ReadChar(r(i), charsizew(i), charsizeh(i), bmp(i))
+                If ReadChar(r(i), charsizew(i), charsizeh(i), bmp(i)) = -1 Then
+                    picMain.Refresh()
+                    Exit Sub
+                End If
                 grpmain.DrawImage(bmp(i), destrect(i).X, destrect(i).Y + 120 * j + 40, destrect(i).Width, destrect(i).Height)
                 p1.X = i * 120 + 120
                 p1.Y = j * 120 + 40
@@ -68,10 +74,15 @@
                 p2.Y = j * 120 + 120 + 40
                 grpmain.DrawLine(p, p1, p2)
             Next
-            p1.X = (files + 1) * 120 + 120
+            p1.X = (files) * 120 + 120
             p1.Y = j * 120 + 40
-            p2.X = (files + 1) * 120 + 120
+            p2.X = (files) * 120 + 120
             p2.Y = j * 120 + 120 + 40
+            grpmain.DrawLine(p, p1, p2)
+            p1.X = 0
+            p1.Y = j * 120 + 160
+            p2.X = bmpmain.Width
+            p2.Y = j * 120 + 160
             grpmain.DrawLine(p, p1, p2)
         Next
         picMain.Refresh()
@@ -124,7 +135,7 @@
             Dim srcRect(UBound(files)) As RectangleF
             For i = 0 To UBound(files)
                 bmp(i) = New Bitmap(charsizeW(i), charsizeH(i))
-                destRect(i).X = 120 * (i + 1) + 20
+                destRect(i).X = 120 * (i) + 20
                 destRect(i).Y = 20
                 destRect(i).Width = 80
                 destRect(i).Height = 80
@@ -153,7 +164,6 @@
                 picMain.Refresh()
                 picMain.Image.Save(txtSubFolder.Text & "." & map(i * Int(txtItemPerPage.Text)) & ".png")
             Next
-
 
             For i = 0 To UBound(files) - 1
                 bmp(i).Dispose()
