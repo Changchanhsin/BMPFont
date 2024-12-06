@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
-Partial Class frmBMPFont
+Partial Class frmFont
     Inherits System.Windows.Forms.Form
 
     'Form 重写 Dispose，以清理组件列表。
@@ -23,15 +23,16 @@ Partial Class frmBMPFont
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmBMPFont))
-        Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmFont))
+        Me.split = New System.Windows.Forms.SplitContainer()
         Me.pnlH = New System.Windows.Forms.Panel()
         Me.picH = New System.Windows.Forms.PictureBox()
+        Me.picHead = New System.Windows.Forms.PictureBox()
         Me.pnlV = New System.Windows.Forms.Panel()
         Me.picV = New System.Windows.Forms.PictureBox()
         Me.pnlMain = New System.Windows.Forms.Panel()
         Me.picMain = New System.Windows.Forms.PictureBox()
-        Me.picHead = New System.Windows.Forms.PictureBox()
+        Me.chkGap = New System.Windows.Forms.CheckBox()
         Me.lblBackColor = New System.Windows.Forms.Label()
         Me.lblForeColor = New System.Windows.Forms.Label()
         Me.chkRound = New System.Windows.Forms.CheckBox()
@@ -40,7 +41,7 @@ Partial Class frmBMPFont
         Me.tabControl = New System.Windows.Forms.TabControl()
         Me.tagCreate = New System.Windows.Forms.TabPage()
         Me.txtFontName = New System.Windows.Forms.ComboBox()
-        Me.Label2 = New System.Windows.Forms.Label()
+        Me.lblCharsizeHeight = New System.Windows.Forms.Label()
         Me.Label24 = New System.Windows.Forms.Label()
         Me.Label22 = New System.Windows.Forms.Label()
         Me.Label4 = New System.Windows.Forms.Label()
@@ -50,8 +51,8 @@ Partial Class frmBMPFont
         Me.Label21 = New System.Windows.Forms.Label()
         Me.Label3 = New System.Windows.Forms.Label()
         Me.Label8 = New System.Windows.Forms.Label()
-        Me.Label7 = New System.Windows.Forms.Label()
-        Me.Label1 = New System.Windows.Forms.Label()
+        Me.lblCharsize = New System.Windows.Forms.Label()
+        Me.lblCharsizeWidth = New System.Windows.Forms.Label()
         Me.chkBlack = New System.Windows.Forms.CheckBox()
         Me.chkMax = New System.Windows.Forms.CheckBox()
         Me.cboCodepage = New System.Windows.Forms.ComboBox()
@@ -65,6 +66,10 @@ Partial Class frmBMPFont
         Me.txtNewWidth = New System.Windows.Forms.TextBox()
         Me.btnCreate = New System.Windows.Forms.Button()
         Me.tagOpen = New System.Windows.Forms.TabPage()
+        Me.btnInsert = New System.Windows.Forms.Button()
+        Me.txtInsertStart = New System.Windows.Forms.TextBox()
+        Me.Label32 = New System.Windows.Forms.Label()
+        Me.Label31 = New System.Windows.Forms.Label()
         Me.chkInverse = New System.Windows.Forms.CheckBox()
         Me.Label9 = New System.Windows.Forms.Label()
         Me.Label10 = New System.Windows.Forms.Label()
@@ -110,6 +115,7 @@ Partial Class frmBMPFont
         Me.btnScale = New System.Windows.Forms.Button()
         Me.txtScale = New System.Windows.Forms.TextBox()
         Me.tagSpecial = New System.Windows.Forms.TabPage()
+        Me.btnPic2HZ = New System.Windows.Forms.Button()
         Me.btnOutput1 = New System.Windows.Forms.Button()
         Me.btnSpecial = New System.Windows.Forms.Button()
         Me.lblCursor = New System.Windows.Forms.Label()
@@ -121,18 +127,30 @@ Partial Class frmBMPFont
         Me.picEdit = New System.Windows.Forms.PictureBox()
         Me.iml35 = New System.Windows.Forms.ImageList(Me.components)
         Me.iml57 = New System.Windows.Forms.ImageList(Me.components)
-        Me.btnPic2HZ = New System.Windows.Forms.Button()
-        CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.SplitContainer1.Panel1.SuspendLayout()
-        Me.SplitContainer1.Panel2.SuspendLayout()
-        Me.SplitContainer1.SuspendLayout()
+        Me.ContextMenuStrip1 = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.btnOpenSaveimagepath = New System.Windows.Forms.Button()
+        Me.folderSave = New System.Windows.Forms.FolderBrowserDialog()
+        Me.btnOpenFile = New System.Windows.Forms.Button()
+        Me.fileOpen = New System.Windows.Forms.OpenFileDialog()
+        Me.btnEditorUp = New System.Windows.Forms.Button()
+        Me.btnEditorDown = New System.Windows.Forms.Button()
+        Me.btnEditorLeft = New System.Windows.Forms.Button()
+        Me.btnEditorRight = New System.Windows.Forms.Button()
+        Me.btnEditorRRight = New System.Windows.Forms.Button()
+        Me.btnEditorRLeft = New System.Windows.Forms.Button()
+        Me.btnEditorRDown = New System.Windows.Forms.Button()
+        Me.btnEditorRUp = New System.Windows.Forms.Button()
+        CType(Me.split, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.split.Panel1.SuspendLayout()
+        Me.split.Panel2.SuspendLayout()
+        Me.split.SuspendLayout()
         Me.pnlH.SuspendLayout()
         CType(Me.picH, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.picHead, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.pnlV.SuspendLayout()
         CType(Me.picV, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.pnlMain.SuspendLayout()
         CType(Me.picMain, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.picHead, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.tabControl.SuspendLayout()
         Me.tagCreate.SuspendLayout()
         Me.tagOpen.SuspendLayout()
@@ -143,77 +161,91 @@ Partial Class frmBMPFont
         CType(Me.picEdit, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
-        'SplitContainer1
+        'split
         '
-        Me.SplitContainer1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.SplitContainer1.Location = New System.Drawing.Point(0, 0)
-        Me.SplitContainer1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.SplitContainer1.Name = "SplitContainer1"
+        Me.split.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.split.Location = New System.Drawing.Point(0, 0)
+        Me.split.Name = "split"
         '
-        'SplitContainer1.Panel1
+        'split.Panel1
         '
-        Me.SplitContainer1.Panel1.Controls.Add(Me.pnlH)
-        Me.SplitContainer1.Panel1.Controls.Add(Me.pnlV)
-        Me.SplitContainer1.Panel1.Controls.Add(Me.pnlMain)
-        Me.SplitContainer1.Panel1.Controls.Add(Me.picHead)
+        Me.split.Panel1.Controls.Add(Me.pnlH)
+        Me.split.Panel1.Controls.Add(Me.picHead)
+        Me.split.Panel1.Controls.Add(Me.pnlV)
+        Me.split.Panel1.Controls.Add(Me.pnlMain)
         '
-        'SplitContainer1.Panel2
+        'split.Panel2
         '
-        Me.SplitContainer1.Panel2.Controls.Add(Me.lblBackColor)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.lblForeColor)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.chkRound)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.chkGrid)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.cboCopyType)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.tabControl)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.lblCursor)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.lblColRow)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.lblInfo)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.lblCode)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.btnPasteImage)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.btnCopyCharImage)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.picEdit)
-        Me.SplitContainer1.Size = New System.Drawing.Size(1241, 779)
-        Me.SplitContainer1.SplitterDistance = 794
-        Me.SplitContainer1.SplitterWidth = 6
-        Me.SplitContainer1.TabIndex = 0
+        Me.split.Panel2.Controls.Add(Me.btnEditorRRight)
+        Me.split.Panel2.Controls.Add(Me.btnEditorRLeft)
+        Me.split.Panel2.Controls.Add(Me.btnEditorRDown)
+        Me.split.Panel2.Controls.Add(Me.btnEditorRUp)
+        Me.split.Panel2.Controls.Add(Me.btnEditorRight)
+        Me.split.Panel2.Controls.Add(Me.btnEditorLeft)
+        Me.split.Panel2.Controls.Add(Me.btnEditorDown)
+        Me.split.Panel2.Controls.Add(Me.btnEditorUp)
+        Me.split.Panel2.Controls.Add(Me.chkGap)
+        Me.split.Panel2.Controls.Add(Me.lblBackColor)
+        Me.split.Panel2.Controls.Add(Me.lblForeColor)
+        Me.split.Panel2.Controls.Add(Me.chkRound)
+        Me.split.Panel2.Controls.Add(Me.chkGrid)
+        Me.split.Panel2.Controls.Add(Me.cboCopyType)
+        Me.split.Panel2.Controls.Add(Me.tabControl)
+        Me.split.Panel2.Controls.Add(Me.lblCursor)
+        Me.split.Panel2.Controls.Add(Me.lblColRow)
+        Me.split.Panel2.Controls.Add(Me.lblInfo)
+        Me.split.Panel2.Controls.Add(Me.lblCode)
+        Me.split.Panel2.Controls.Add(Me.btnPasteImage)
+        Me.split.Panel2.Controls.Add(Me.btnCopyCharImage)
+        Me.split.Panel2.Controls.Add(Me.picEdit)
+        Me.split.Size = New System.Drawing.Size(827, 599)
+        Me.split.SplitterDistance = 492
+        Me.split.TabIndex = 0
         '
         'pnlH
         '
         Me.pnlH.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.pnlH.BackColor = System.Drawing.SystemColors.ControlDark
         Me.pnlH.Controls.Add(Me.picH)
-        Me.pnlH.Location = New System.Drawing.Point(19, 0)
-        Me.pnlH.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.pnlH.Location = New System.Drawing.Point(13, 0)
         Me.pnlH.Name = "pnlH"
-        Me.pnlH.Size = New System.Drawing.Size(771, 19)
+        Me.pnlH.Size = New System.Drawing.Size(477, 13)
         Me.pnlH.TabIndex = 5
         '
         'picH
         '
         Me.picH.Location = New System.Drawing.Point(0, 0)
-        Me.picH.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.picH.Name = "picH"
-        Me.picH.Size = New System.Drawing.Size(188, 23)
+        Me.picH.Size = New System.Drawing.Size(55, 13)
         Me.picH.TabIndex = 0
         Me.picH.TabStop = False
+        '
+        'picHead
+        '
+        Me.picHead.AccessibleRole = System.Windows.Forms.AccessibleRole.Clock
+        Me.picHead.Location = New System.Drawing.Point(0, 0)
+        Me.picHead.Name = "picHead"
+        Me.picHead.Size = New System.Drawing.Size(13, 13)
+        Me.picHead.TabIndex = 0
+        Me.picHead.TabStop = False
         '
         'pnlV
         '
         Me.pnlV.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.pnlV.BackColor = System.Drawing.SystemColors.ControlDark
         Me.pnlV.Controls.Add(Me.picV)
-        Me.pnlV.Location = New System.Drawing.Point(0, 19)
-        Me.pnlV.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.pnlV.Location = New System.Drawing.Point(0, 13)
         Me.pnlV.Name = "pnlV"
-        Me.pnlV.Size = New System.Drawing.Size(19, 760)
+        Me.pnlV.Size = New System.Drawing.Size(13, 583)
         Me.pnlV.TabIndex = 4
         '
         'picV
         '
         Me.picV.Location = New System.Drawing.Point(0, 0)
-        Me.picV.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.picV.Name = "picV"
-        Me.picV.Size = New System.Drawing.Size(19, 217)
+        Me.picV.Size = New System.Drawing.Size(13, 145)
         Me.picV.TabIndex = 0
         Me.picV.TabStop = False
         '
@@ -224,32 +256,32 @@ Partial Class frmBMPFont
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.pnlMain.AutoScroll = True
         Me.pnlMain.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink
+        Me.pnlMain.BackColor = System.Drawing.SystemColors.ControlLight
         Me.pnlMain.Controls.Add(Me.picMain)
-        Me.pnlMain.Location = New System.Drawing.Point(19, 19)
-        Me.pnlMain.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.pnlMain.Location = New System.Drawing.Point(13, 13)
         Me.pnlMain.Name = "pnlMain"
-        Me.pnlMain.Size = New System.Drawing.Size(738, 673)
+        Me.pnlMain.Size = New System.Drawing.Size(477, 583)
         Me.pnlMain.TabIndex = 3
         '
         'picMain
         '
         Me.picMain.Cursor = System.Windows.Forms.Cursors.Default
         Me.picMain.Location = New System.Drawing.Point(0, 0)
-        Me.picMain.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.picMain.Name = "picMain"
-        Me.picMain.Size = New System.Drawing.Size(408, 143)
+        Me.picMain.Size = New System.Drawing.Size(181, 63)
         Me.picMain.TabIndex = 0
         Me.picMain.TabStop = False
         '
-        'picHead
+        'chkGap
         '
-        Me.picHead.AccessibleRole = System.Windows.Forms.AccessibleRole.Clock
-        Me.picHead.Location = New System.Drawing.Point(0, 0)
-        Me.picHead.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.picHead.Name = "picHead"
-        Me.picHead.Size = New System.Drawing.Size(19, 19)
-        Me.picHead.TabIndex = 0
-        Me.picHead.TabStop = False
+        Me.chkGap.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.chkGap.AutoSize = True
+        Me.chkGap.Location = New System.Drawing.Point(117, 581)
+        Me.chkGap.Name = "chkGap"
+        Me.chkGap.Size = New System.Drawing.Size(42, 16)
+        Me.chkGap.TabIndex = 44
+        Me.chkGap.Text = "gap"
+        Me.chkGap.UseVisualStyleBackColor = True
         '
         'lblBackColor
         '
@@ -258,9 +290,10 @@ Partial Class frmBMPFont
         Me.lblBackColor.BackColor = System.Drawing.Color.White
         Me.lblBackColor.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
         Me.lblBackColor.ForeColor = System.Drawing.Color.Black
-        Me.lblBackColor.Location = New System.Drawing.Point(401, 750)
+        Me.lblBackColor.Location = New System.Drawing.Point(315, 582)
+        Me.lblBackColor.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lblBackColor.Name = "lblBackColor"
-        Me.lblBackColor.Size = New System.Drawing.Size(19, 20)
+        Me.lblBackColor.Size = New System.Drawing.Size(13, 14)
         Me.lblBackColor.TabIndex = 43
         Me.lblBackColor.Text = "B"
         '
@@ -271,43 +304,45 @@ Partial Class frmBMPFont
         Me.lblForeColor.BackColor = System.Drawing.Color.Black
         Me.lblForeColor.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
         Me.lblForeColor.ForeColor = System.Drawing.Color.White
-        Me.lblForeColor.Location = New System.Drawing.Point(376, 750)
+        Me.lblForeColor.Location = New System.Drawing.Point(298, 582)
+        Me.lblForeColor.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lblForeColor.Name = "lblForeColor"
-        Me.lblForeColor.Size = New System.Drawing.Size(19, 20)
+        Me.lblForeColor.Size = New System.Drawing.Size(13, 14)
         Me.lblForeColor.TabIndex = 42
         Me.lblForeColor.Text = "F"
         '
         'chkRound
         '
+        Me.chkRound.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkRound.AutoSize = True
-        Me.chkRound.Location = New System.Drawing.Point(84, 751)
-        Me.chkRound.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.chkRound.Location = New System.Drawing.Point(57, 581)
         Me.chkRound.Name = "chkRound"
-        Me.chkRound.Size = New System.Drawing.Size(79, 22)
+        Me.chkRound.Size = New System.Drawing.Size(54, 16)
         Me.chkRound.TabIndex = 41
         Me.chkRound.Text = "round"
         Me.chkRound.UseVisualStyleBackColor = True
         '
         'chkGrid
         '
+        Me.chkGrid.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkGrid.AutoSize = True
-        Me.chkGrid.Location = New System.Drawing.Point(7, 751)
-        Me.chkGrid.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.chkGrid.Location = New System.Drawing.Point(3, 581)
         Me.chkGrid.Name = "chkGrid"
-        Me.chkGrid.Size = New System.Drawing.Size(70, 22)
+        Me.chkGrid.Size = New System.Drawing.Size(48, 16)
         Me.chkGrid.TabIndex = 41
         Me.chkGrid.Text = "grid"
         Me.chkGrid.UseVisualStyleBackColor = True
         '
         'cboCopyType
         '
+        Me.cboCopyType.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboCopyType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboCopyType.Items.AddRange(New Object() {"editor image", "image", "SVG", "BIN", "HEX", "OCT", "DEC"})
-        Me.cboCopyType.Location = New System.Drawing.Point(240, 373)
-        Me.cboCopyType.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.cboCopyType.Location = New System.Drawing.Point(190, 242)
+        Me.cboCopyType.Margin = New System.Windows.Forms.Padding(2, 1, 2, 1)
         Me.cboCopyType.Name = "cboCopyType"
-        Me.cboCopyType.Size = New System.Drawing.Size(94, 26)
-        Me.cboCopyType.TabIndex = 36
+        Me.cboCopyType.Size = New System.Drawing.Size(134, 20)
+        Me.cboCopyType.TabIndex = 13
         '
         'tabControl
         '
@@ -318,18 +353,18 @@ Partial Class frmBMPFont
         Me.tabControl.Controls.Add(Me.tagSave)
         Me.tabControl.Controls.Add(Me.tagEdit)
         Me.tabControl.Controls.Add(Me.tagSpecial)
-        Me.tabControl.Location = New System.Drawing.Point(3, 0)
-        Me.tabControl.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.tabControl.Location = New System.Drawing.Point(2, 0)
+        Me.tabControl.Margin = New System.Windows.Forms.Padding(2, 1, 2, 1)
         Me.tabControl.Name = "tabControl"
         Me.tabControl.SelectedIndex = 0
-        Me.tabControl.Size = New System.Drawing.Size(407, 358)
+        Me.tabControl.Size = New System.Drawing.Size(326, 239)
         Me.tabControl.TabIndex = 30
         '
         'tagCreate
         '
         Me.tagCreate.BackColor = System.Drawing.SystemColors.Control
         Me.tagCreate.Controls.Add(Me.txtFontName)
-        Me.tagCreate.Controls.Add(Me.Label2)
+        Me.tagCreate.Controls.Add(Me.lblCharsizeHeight)
         Me.tagCreate.Controls.Add(Me.Label24)
         Me.tagCreate.Controls.Add(Me.Label22)
         Me.tagCreate.Controls.Add(Me.Label4)
@@ -339,8 +374,8 @@ Partial Class frmBMPFont
         Me.tagCreate.Controls.Add(Me.Label21)
         Me.tagCreate.Controls.Add(Me.Label3)
         Me.tagCreate.Controls.Add(Me.Label8)
-        Me.tagCreate.Controls.Add(Me.Label7)
-        Me.tagCreate.Controls.Add(Me.Label1)
+        Me.tagCreate.Controls.Add(Me.lblCharsize)
+        Me.tagCreate.Controls.Add(Me.lblCharsizeWidth)
         Me.tagCreate.Controls.Add(Me.chkBlack)
         Me.tagCreate.Controls.Add(Me.chkMax)
         Me.tagCreate.Controls.Add(Me.cboCodepage)
@@ -353,246 +388,255 @@ Partial Class frmBMPFont
         Me.tagCreate.Controls.Add(Me.txtNewHeight)
         Me.tagCreate.Controls.Add(Me.txtNewWidth)
         Me.tagCreate.Controls.Add(Me.btnCreate)
-        Me.tagCreate.Location = New System.Drawing.Point(4, 28)
-        Me.tagCreate.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.tagCreate.Location = New System.Drawing.Point(4, 22)
+        Me.tagCreate.Margin = New System.Windows.Forms.Padding(2, 1, 2, 1)
         Me.tagCreate.Name = "tagCreate"
-        Me.tagCreate.Size = New System.Drawing.Size(399, 326)
+        Me.tagCreate.Size = New System.Drawing.Size(318, 213)
         Me.tagCreate.TabIndex = 4
         Me.tagCreate.Text = "Create"
         '
         'txtFontName
         '
+        Me.txtFontName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtFontName.FormattingEnabled = True
-        Me.txtFontName.Location = New System.Drawing.Point(102, 156)
-        Me.txtFontName.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.txtFontName.Location = New System.Drawing.Point(68, 104)
+        Me.txtFontName.Margin = New System.Windows.Forms.Padding(2, 1, 2, 1)
         Me.txtFontName.Name = "txtFontName"
-        Me.txtFontName.Size = New System.Drawing.Size(400, 26)
-        Me.txtFontName.TabIndex = 40
+        Me.txtFontName.Size = New System.Drawing.Size(245, 20)
+        Me.txtFontName.TabIndex = 6
         '
-        'Label2
+        'lblCharsizeHeight
         '
-        Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(222, 10)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(71, 18)
-        Me.Label2.TabIndex = 39
-        Me.Label2.Text = "Height:"
+        Me.lblCharsizeHeight.AutoSize = True
+        Me.lblCharsizeHeight.Location = New System.Drawing.Point(148, 8)
+        Me.lblCharsizeHeight.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.lblCharsizeHeight.Name = "lblCharsizeHeight"
+        Me.lblCharsizeHeight.Size = New System.Drawing.Size(47, 12)
+        Me.lblCharsizeHeight.TabIndex = 39
+        Me.lblCharsizeHeight.Text = "Height:"
         '
         'Label24
         '
         Me.Label24.AutoSize = True
-        Me.Label24.Location = New System.Drawing.Point(332, 222)
+        Me.Label24.Location = New System.Drawing.Point(188, 148)
+        Me.Label24.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label24.Name = "Label24"
-        Me.Label24.Size = New System.Drawing.Size(53, 18)
+        Me.Label24.Size = New System.Drawing.Size(35, 12)
         Me.Label24.TabIndex = 39
         Me.Label24.Text = "Size:"
         '
         'Label22
         '
         Me.Label22.AutoSize = True
-        Me.Label22.Location = New System.Drawing.Point(219, 222)
+        Me.Label22.Location = New System.Drawing.Point(127, 148)
+        Me.Label22.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label22.Name = "Label22"
-        Me.Label22.Size = New System.Drawing.Size(26, 18)
+        Me.Label22.Size = New System.Drawing.Size(17, 12)
         Me.Label22.TabIndex = 39
         Me.Label22.Text = "Y:"
         '
         'Label4
         '
-        Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(222, 46)
+        Me.Label4.Location = New System.Drawing.Point(148, 57)
+        Me.Label4.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(53, 18)
+        Me.Label4.Size = New System.Drawing.Size(47, 18)
         Me.Label4.TabIndex = 39
-        Me.Label4.Text = "High:"
+        Me.Label4.Text = "Row:"
         '
         'Label20
         '
         Me.Label20.AutoSize = True
-        Me.Label20.Location = New System.Drawing.Point(6, 222)
+        Me.Label20.Location = New System.Drawing.Point(4, 148)
+        Me.Label20.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label20.Name = "Label20"
-        Me.Label20.Size = New System.Drawing.Size(71, 18)
+        Me.Label20.Size = New System.Drawing.Size(47, 12)
         Me.Label20.TabIndex = 39
         Me.Label20.Text = "Offset:"
         '
         'Label6
         '
         Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(6, 158)
+        Me.Label6.Location = New System.Drawing.Point(4, 105)
+        Me.Label6.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(53, 18)
+        Me.Label6.Size = New System.Drawing.Size(35, 12)
         Me.Label6.TabIndex = 39
         Me.Label6.Text = "Font:"
         '
         'Label5
         '
         Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(6, 74)
+        Me.Label5.Location = New System.Drawing.Point(4, 30)
+        Me.Label5.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(89, 18)
+        Me.Label5.Size = New System.Drawing.Size(59, 12)
         Me.Label5.TabIndex = 39
         Me.Label5.Text = "Codepage:"
         '
         'Label21
         '
         Me.Label21.AutoSize = True
-        Me.Label21.Location = New System.Drawing.Point(99, 222)
+        Me.Label21.Location = New System.Drawing.Point(66, 148)
+        Me.Label21.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label21.Name = "Label21"
-        Me.Label21.Size = New System.Drawing.Size(26, 18)
+        Me.Label21.Size = New System.Drawing.Size(17, 12)
         Me.Label21.TabIndex = 39
         Me.Label21.Text = "X:"
         '
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(99, 46)
+        Me.Label3.Location = New System.Drawing.Point(66, 57)
+        Me.Label3.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(44, 18)
+        Me.Label3.Size = New System.Drawing.Size(29, 12)
         Me.Label3.TabIndex = 39
-        Me.Label3.Text = "Low:"
+        Me.Label3.Text = "Col:"
         '
         'Label8
         '
         Me.Label8.AutoSize = True
-        Me.Label8.Location = New System.Drawing.Point(6, 46)
+        Me.Label8.Location = New System.Drawing.Point(4, 57)
+        Me.Label8.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label8.Name = "Label8"
-        Me.Label8.Size = New System.Drawing.Size(89, 18)
+        Me.Label8.Size = New System.Drawing.Size(59, 12)
         Me.Label8.TabIndex = 39
         Me.Label8.Text = "Code Size"
         '
-        'Label7
+        'lblCharsize
         '
-        Me.Label7.AutoSize = True
-        Me.Label7.Location = New System.Drawing.Point(6, 10)
-        Me.Label7.Name = "Label7"
-        Me.Label7.Size = New System.Drawing.Size(89, 18)
-        Me.Label7.TabIndex = 39
-        Me.Label7.Text = "Char Size"
+        Me.lblCharsize.AutoSize = True
+        Me.lblCharsize.Location = New System.Drawing.Point(4, 7)
+        Me.lblCharsize.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.lblCharsize.Name = "lblCharsize"
+        Me.lblCharsize.Size = New System.Drawing.Size(59, 12)
+        Me.lblCharsize.TabIndex = 39
+        Me.lblCharsize.Text = "Char Size"
         '
-        'Label1
+        'lblCharsizeWidth
         '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(99, 10)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(62, 18)
-        Me.Label1.TabIndex = 39
-        Me.Label1.Text = "Width:"
+        Me.lblCharsizeWidth.AutoSize = True
+        Me.lblCharsizeWidth.Location = New System.Drawing.Point(64, 8)
+        Me.lblCharsizeWidth.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.lblCharsizeWidth.Name = "lblCharsizeWidth"
+        Me.lblCharsizeWidth.Size = New System.Drawing.Size(41, 12)
+        Me.lblCharsizeWidth.TabIndex = 39
+        Me.lblCharsizeWidth.Text = "Width:"
         '
         'chkBlack
         '
         Me.chkBlack.AutoSize = True
-        Me.chkBlack.Location = New System.Drawing.Point(189, 192)
-        Me.chkBlack.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.chkBlack.Location = New System.Drawing.Point(126, 128)
         Me.chkBlack.Name = "chkBlack"
-        Me.chkBlack.Size = New System.Drawing.Size(79, 22)
-        Me.chkBlack.TabIndex = 37
+        Me.chkBlack.Size = New System.Drawing.Size(54, 16)
+        Me.chkBlack.TabIndex = 8
         Me.chkBlack.Text = "Black"
         Me.chkBlack.UseVisualStyleBackColor = True
         '
         'chkMax
         '
         Me.chkMax.AutoSize = True
-        Me.chkMax.Location = New System.Drawing.Point(99, 192)
-        Me.chkMax.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.chkMax.Location = New System.Drawing.Point(66, 128)
         Me.chkMax.Name = "chkMax"
-        Me.chkMax.Size = New System.Drawing.Size(61, 22)
-        Me.chkMax.TabIndex = 38
+        Me.chkMax.Size = New System.Drawing.Size(42, 16)
+        Me.chkMax.TabIndex = 7
         Me.chkMax.Text = "Max"
         Me.chkMax.UseVisualStyleBackColor = True
         '
         'cboCodepage
         '
+        Me.cboCodepage.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboCodepage.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboCodepage.FormattingEnabled = True
         Me.cboCodepage.Items.AddRange(New Object() {"Unknown(0)", "ASCII-7(1252)", "ASCII-8(1252)", "UnicodeUCS16(1200)", "ISO/IEC10646BMP(1200)", "ISO/IEC10646SMP(65005)", "ISO/IEC10646SIP(65005)", "ISO/IEC10646TIP(65005)", "ISO/IEC10646-Fxxxx(65005)", "GB2312双字节(936)", "GBK双字节(936)", "GB18030单字节(936)", "GB18030双字节(936)", "Big-5双字节(950)", "Big-5单字节(950)", "Shift-JIS双字节(932)", "Shift-JIS单字节(932)"})
-        Me.cboCodepage.Location = New System.Drawing.Point(99, 73)
-        Me.cboCodepage.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.cboCodepage.Location = New System.Drawing.Point(66, 30)
+        Me.cboCodepage.Margin = New System.Windows.Forms.Padding(2, 1, 2, 1)
         Me.cboCodepage.Name = "cboCodepage"
-        Me.cboCodepage.Size = New System.Drawing.Size(403, 26)
-        Me.cboCodepage.TabIndex = 35
+        Me.cboCodepage.Size = New System.Drawing.Size(247, 20)
+        Me.cboCodepage.TabIndex = 2
         '
         'btnInitCharactors
         '
-        Me.btnInitCharactors.Location = New System.Drawing.Point(99, 254)
-        Me.btnInitCharactors.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnInitCharactors.Location = New System.Drawing.Point(66, 169)
         Me.btnInitCharactors.Name = "btnInitCharactors"
-        Me.btnInitCharactors.Size = New System.Drawing.Size(102, 35)
-        Me.btnInitCharactors.TabIndex = 34
+        Me.btnInitCharactors.Size = New System.Drawing.Size(68, 23)
+        Me.btnInitCharactors.TabIndex = 12
         Me.btnInitCharactors.Text = "Init"
         Me.btnInitCharactors.UseVisualStyleBackColor = True
         '
         'txtCharSize
         '
-        Me.txtCharSize.Location = New System.Drawing.Point(392, 218)
-        Me.txtCharSize.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtCharSize.Location = New System.Drawing.Point(223, 145)
         Me.txtCharSize.Name = "txtCharSize"
-        Me.txtCharSize.Size = New System.Drawing.Size(73, 28)
-        Me.txtCharSize.TabIndex = 32
+        Me.txtCharSize.Size = New System.Drawing.Size(50, 21)
+        Me.txtCharSize.TabIndex = 11
         '
         'txtCharOffsetY
         '
-        Me.txtCharOffsetY.Location = New System.Drawing.Point(252, 218)
-        Me.txtCharOffsetY.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtCharOffsetY.Location = New System.Drawing.Point(148, 145)
         Me.txtCharOffsetY.Name = "txtCharOffsetY"
-        Me.txtCharOffsetY.Size = New System.Drawing.Size(50, 28)
-        Me.txtCharOffsetY.TabIndex = 32
+        Me.txtCharOffsetY.Size = New System.Drawing.Size(35, 21)
+        Me.txtCharOffsetY.TabIndex = 10
         '
         'txtCharOffsetX
         '
-        Me.txtCharOffsetX.Location = New System.Drawing.Point(132, 218)
-        Me.txtCharOffsetX.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtCharOffsetX.Location = New System.Drawing.Point(88, 145)
         Me.txtCharOffsetX.Name = "txtCharOffsetX"
-        Me.txtCharOffsetX.Size = New System.Drawing.Size(49, 28)
-        Me.txtCharOffsetX.TabIndex = 33
+        Me.txtCharOffsetX.Size = New System.Drawing.Size(34, 21)
+        Me.txtCharOffsetX.TabIndex = 9
         '
         'txtNewSizeH
         '
-        Me.txtNewSizeH.Location = New System.Drawing.Point(300, 42)
-        Me.txtNewSizeH.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtNewSizeH.Location = New System.Drawing.Point(200, 54)
         Me.txtNewSizeH.Name = "txtNewSizeH"
-        Me.txtNewSizeH.Size = New System.Drawing.Size(50, 28)
-        Me.txtNewSizeH.TabIndex = 32
+        Me.txtNewSizeH.Size = New System.Drawing.Size(35, 21)
+        Me.txtNewSizeH.TabIndex = 4
         Me.txtNewSizeH.Text = "256"
         '
         'txtNewSizeW
         '
-        Me.txtNewSizeW.Location = New System.Drawing.Point(165, 41)
-        Me.txtNewSizeW.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtNewSizeW.Location = New System.Drawing.Point(110, 54)
         Me.txtNewSizeW.Name = "txtNewSizeW"
-        Me.txtNewSizeW.Size = New System.Drawing.Size(49, 28)
-        Me.txtNewSizeW.TabIndex = 33
+        Me.txtNewSizeW.Size = New System.Drawing.Size(34, 21)
+        Me.txtNewSizeW.TabIndex = 3
         Me.txtNewSizeW.Text = "256"
         '
         'txtNewHeight
         '
-        Me.txtNewHeight.Location = New System.Drawing.Point(300, 7)
-        Me.txtNewHeight.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtNewHeight.Location = New System.Drawing.Point(200, 5)
         Me.txtNewHeight.Name = "txtNewHeight"
-        Me.txtNewHeight.Size = New System.Drawing.Size(49, 28)
-        Me.txtNewHeight.TabIndex = 30
+        Me.txtNewHeight.Size = New System.Drawing.Size(34, 21)
+        Me.txtNewHeight.TabIndex = 1
         Me.txtNewHeight.Text = "48"
         '
         'txtNewWidth
         '
-        Me.txtNewWidth.Location = New System.Drawing.Point(165, 7)
-        Me.txtNewWidth.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtNewWidth.Location = New System.Drawing.Point(110, 5)
         Me.txtNewWidth.Name = "txtNewWidth"
-        Me.txtNewWidth.Size = New System.Drawing.Size(49, 28)
-        Me.txtNewWidth.TabIndex = 31
+        Me.txtNewWidth.Size = New System.Drawing.Size(34, 21)
+        Me.txtNewWidth.TabIndex = 0
         Me.txtNewWidth.Text = "48"
         '
         'btnCreate
         '
-        Me.btnCreate.Location = New System.Drawing.Point(99, 106)
-        Me.btnCreate.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnCreate.Location = New System.Drawing.Point(68, 77)
         Me.btnCreate.Name = "btnCreate"
-        Me.btnCreate.Size = New System.Drawing.Size(102, 35)
-        Me.btnCreate.TabIndex = 29
+        Me.btnCreate.Size = New System.Drawing.Size(68, 23)
+        Me.btnCreate.TabIndex = 5
         Me.btnCreate.Text = "Create"
         Me.btnCreate.UseVisualStyleBackColor = True
         '
         'tagOpen
         '
         Me.tagOpen.BackColor = System.Drawing.SystemColors.Control
+        Me.tagOpen.Controls.Add(Me.btnOpenFile)
+        Me.tagOpen.Controls.Add(Me.btnInsert)
+        Me.tagOpen.Controls.Add(Me.txtInsertStart)
+        Me.tagOpen.Controls.Add(Me.Label32)
+        Me.tagOpen.Controls.Add(Me.Label31)
         Me.tagOpen.Controls.Add(Me.chkInverse)
         Me.tagOpen.Controls.Add(Me.Label9)
         Me.tagOpen.Controls.Add(Me.Label10)
@@ -611,184 +655,226 @@ Partial Class frmBMPFont
         Me.tagOpen.Controls.Add(Me.txtImportWidth)
         Me.tagOpen.Controls.Add(Me.txtImportFileName)
         Me.tagOpen.Controls.Add(Me.btnImport)
-        Me.tagOpen.Location = New System.Drawing.Point(4, 28)
-        Me.tagOpen.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.tagOpen.Location = New System.Drawing.Point(4, 22)
+        Me.tagOpen.Margin = New System.Windows.Forms.Padding(2, 1, 2, 1)
         Me.tagOpen.Name = "tagOpen"
-        Me.tagOpen.Padding = New System.Windows.Forms.Padding(3, 2, 3, 2)
-        Me.tagOpen.Size = New System.Drawing.Size(399, 326)
+        Me.tagOpen.Padding = New System.Windows.Forms.Padding(2, 1, 2, 1)
+        Me.tagOpen.Size = New System.Drawing.Size(318, 213)
         Me.tagOpen.TabIndex = 0
         Me.tagOpen.Text = "Open"
+        '
+        'btnInsert
+        '
+        Me.btnInsert.Location = New System.Drawing.Point(71, 186)
+        Me.btnInsert.Name = "btnInsert"
+        Me.btnInsert.Size = New System.Drawing.Size(127, 23)
+        Me.btnInsert.TabIndex = 47
+        Me.btnInsert.Text = "Insert"
+        Me.btnInsert.UseVisualStyleBackColor = True
+        '
+        'txtInsertStart
+        '
+        Me.txtInsertStart.Location = New System.Drawing.Point(130, 159)
+        Me.txtInsertStart.Name = "txtInsertStart"
+        Me.txtInsertStart.Size = New System.Drawing.Size(103, 21)
+        Me.txtInsertStart.TabIndex = 49
+        Me.txtInsertStart.Text = "0"
+        '
+        'Label32
+        '
+        Me.Label32.AutoSize = True
+        Me.Label32.Location = New System.Drawing.Point(84, 163)
+        Me.Label32.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.Label32.Name = "Label32"
+        Me.Label32.Size = New System.Drawing.Size(41, 12)
+        Me.Label32.TabIndex = 48
+        Me.Label32.Text = "Start:"
+        '
+        'Label31
+        '
+        Me.Label31.Location = New System.Drawing.Point(6, 163)
+        Me.Label31.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.Label31.Name = "Label31"
+        Me.Label31.Size = New System.Drawing.Size(83, 20)
+        Me.Label31.TabIndex = 47
+        Me.Label31.Text = "Code Locate"
         '
         'chkInverse
         '
         Me.chkInverse.AutoSize = True
-        Me.chkInverse.Location = New System.Drawing.Point(228, 114)
-        Me.chkInverse.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.chkInverse.Location = New System.Drawing.Point(152, 101)
         Me.chkInverse.Name = "chkInverse"
-        Me.chkInverse.Size = New System.Drawing.Size(97, 22)
-        Me.chkInverse.TabIndex = 47
+        Me.chkInverse.Size = New System.Drawing.Size(66, 16)
+        Me.chkInverse.TabIndex = 23
         Me.chkInverse.Text = "Inverse"
         Me.chkInverse.UseVisualStyleBackColor = True
         '
         'Label9
         '
         Me.Label9.AutoSize = True
-        Me.Label9.Location = New System.Drawing.Point(225, 46)
+        Me.Label9.Location = New System.Drawing.Point(150, 56)
+        Me.Label9.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label9.Name = "Label9"
-        Me.Label9.Size = New System.Drawing.Size(71, 18)
+        Me.Label9.Size = New System.Drawing.Size(47, 12)
         Me.Label9.TabIndex = 40
         Me.Label9.Text = "Height:"
         '
         'Label10
         '
         Me.Label10.AutoSize = True
-        Me.Label10.Location = New System.Drawing.Point(225, 82)
+        Me.Label10.Location = New System.Drawing.Point(150, 80)
+        Me.Label10.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label10.Name = "Label10"
-        Me.Label10.Size = New System.Drawing.Size(53, 18)
+        Me.Label10.Size = New System.Drawing.Size(35, 12)
         Me.Label10.TabIndex = 41
         Me.Label10.Text = "High:"
         '
         'Label17
         '
         Me.Label17.AutoSize = True
-        Me.Label17.Location = New System.Drawing.Point(9, 150)
+        Me.Label17.Location = New System.Drawing.Point(6, 32)
+        Me.Label17.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label17.Name = "Label17"
-        Me.Label17.Size = New System.Drawing.Size(53, 18)
+        Me.Label17.Size = New System.Drawing.Size(35, 12)
         Me.Label17.TabIndex = 42
         Me.Label17.Text = "Type:"
         '
         'Label16
         '
         Me.Label16.AutoSize = True
-        Me.Label16.Location = New System.Drawing.Point(9, 10)
+        Me.Label16.Location = New System.Drawing.Point(6, 9)
+        Me.Label16.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label16.Name = "Label16"
-        Me.Label16.Size = New System.Drawing.Size(53, 18)
+        Me.Label16.Size = New System.Drawing.Size(35, 12)
         Me.Label16.TabIndex = 42
         Me.Label16.Text = "File:"
         '
         'Label11
         '
         Me.Label11.AutoSize = True
-        Me.Label11.Location = New System.Drawing.Point(9, 115)
+        Me.Label11.Location = New System.Drawing.Point(6, 102)
+        Me.Label11.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label11.Name = "Label11"
-        Me.Label11.Size = New System.Drawing.Size(71, 18)
+        Me.Label11.Size = New System.Drawing.Size(47, 12)
         Me.Label11.TabIndex = 42
         Me.Label11.Text = "Offset:"
         '
         'Label12
         '
         Me.Label12.AutoSize = True
-        Me.Label12.Location = New System.Drawing.Point(104, 82)
+        Me.Label12.Location = New System.Drawing.Point(69, 80)
+        Me.Label12.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label12.Name = "Label12"
-        Me.Label12.Size = New System.Drawing.Size(44, 18)
+        Me.Label12.Size = New System.Drawing.Size(29, 12)
         Me.Label12.TabIndex = 43
         Me.Label12.Text = "Low:"
         '
         'Label13
         '
         Me.Label13.AutoSize = True
-        Me.Label13.Location = New System.Drawing.Point(9, 82)
+        Me.Label13.Location = New System.Drawing.Point(6, 80)
+        Me.Label13.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label13.Name = "Label13"
-        Me.Label13.Size = New System.Drawing.Size(89, 18)
+        Me.Label13.Size = New System.Drawing.Size(59, 12)
         Me.Label13.TabIndex = 44
         Me.Label13.Text = "Code Size"
         '
         'Label14
         '
         Me.Label14.AutoSize = True
-        Me.Label14.Location = New System.Drawing.Point(9, 46)
+        Me.Label14.Location = New System.Drawing.Point(6, 56)
+        Me.Label14.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label14.Name = "Label14"
-        Me.Label14.Size = New System.Drawing.Size(89, 18)
+        Me.Label14.Size = New System.Drawing.Size(59, 12)
         Me.Label14.TabIndex = 45
         Me.Label14.Text = "Char Size"
         '
         'Label15
         '
         Me.Label15.AutoSize = True
-        Me.Label15.Location = New System.Drawing.Point(104, 46)
+        Me.Label15.Location = New System.Drawing.Point(69, 56)
+        Me.Label15.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label15.Name = "Label15"
-        Me.Label15.Size = New System.Drawing.Size(62, 18)
+        Me.Label15.Size = New System.Drawing.Size(41, 12)
         Me.Label15.TabIndex = 46
         Me.Label15.Text = "Width:"
         '
         'cboImportType
         '
+        Me.cboImportType.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboImportType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboImportType.FormattingEnabled = True
         Me.cboImportType.Items.AddRange(New Object() {"RAW", ".FONT.PNG", ".HZCG6"})
-        Me.cboImportType.Location = New System.Drawing.Point(107, 146)
-        Me.cboImportType.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.cboImportType.Location = New System.Drawing.Point(71, 29)
+        Me.cboImportType.Margin = New System.Windows.Forms.Padding(2, 1, 2, 1)
         Me.cboImportType.Name = "cboImportType"
-        Me.cboImportType.Size = New System.Drawing.Size(391, 26)
-        Me.cboImportType.TabIndex = 32
+        Me.cboImportType.Size = New System.Drawing.Size(243, 20)
+        Me.cboImportType.TabIndex = 17
         '
         'txtImportOffset
         '
-        Me.txtImportOffset.Location = New System.Drawing.Point(107, 114)
-        Me.txtImportOffset.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtImportOffset.Location = New System.Drawing.Point(71, 101)
         Me.txtImportOffset.Name = "txtImportOffset"
-        Me.txtImportOffset.Size = New System.Drawing.Size(103, 28)
-        Me.txtImportOffset.TabIndex = 29
+        Me.txtImportOffset.Size = New System.Drawing.Size(70, 21)
+        Me.txtImportOffset.TabIndex = 22
         Me.txtImportOffset.Text = "0"
         '
         'txtImportSizeH
         '
-        Me.txtImportSizeH.Location = New System.Drawing.Point(303, 78)
-        Me.txtImportSizeH.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtImportSizeH.Location = New System.Drawing.Point(202, 77)
         Me.txtImportSizeH.Name = "txtImportSizeH"
-        Me.txtImportSizeH.Size = New System.Drawing.Size(44, 28)
-        Me.txtImportSizeH.TabIndex = 30
+        Me.txtImportSizeH.Size = New System.Drawing.Size(31, 21)
+        Me.txtImportSizeH.TabIndex = 21
         Me.txtImportSizeH.Text = "256"
         '
         'txtImportSizeW
         '
-        Me.txtImportSizeW.Location = New System.Drawing.Point(165, 78)
-        Me.txtImportSizeW.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtImportSizeW.Location = New System.Drawing.Point(110, 77)
         Me.txtImportSizeW.Name = "txtImportSizeW"
-        Me.txtImportSizeW.Size = New System.Drawing.Size(44, 28)
-        Me.txtImportSizeW.TabIndex = 31
-        Me.txtImportSizeW.Text = "64"
+        Me.txtImportSizeW.Size = New System.Drawing.Size(31, 21)
+        Me.txtImportSizeW.TabIndex = 20
+        Me.txtImportSizeW.Text = "256"
         '
         'txtImportHeight
         '
-        Me.txtImportHeight.Location = New System.Drawing.Point(303, 42)
-        Me.txtImportHeight.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtImportHeight.Location = New System.Drawing.Point(202, 53)
         Me.txtImportHeight.Name = "txtImportHeight"
-        Me.txtImportHeight.Size = New System.Drawing.Size(44, 28)
-        Me.txtImportHeight.TabIndex = 27
+        Me.txtImportHeight.Size = New System.Drawing.Size(31, 21)
+        Me.txtImportHeight.TabIndex = 19
         Me.txtImportHeight.Text = "16"
         '
         'txtImportWidth
         '
-        Me.txtImportWidth.Location = New System.Drawing.Point(165, 42)
-        Me.txtImportWidth.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtImportWidth.Location = New System.Drawing.Point(110, 53)
         Me.txtImportWidth.Name = "txtImportWidth"
-        Me.txtImportWidth.Size = New System.Drawing.Size(44, 28)
-        Me.txtImportWidth.TabIndex = 28
+        Me.txtImportWidth.Size = New System.Drawing.Size(31, 21)
+        Me.txtImportWidth.TabIndex = 18
         Me.txtImportWidth.Text = "8"
         '
         'txtImportFileName
         '
-        Me.txtImportFileName.Location = New System.Drawing.Point(107, 6)
-        Me.txtImportFileName.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtImportFileName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtImportFileName.Location = New System.Drawing.Point(71, 6)
         Me.txtImportFileName.Name = "txtImportFileName"
-        Me.txtImportFileName.Size = New System.Drawing.Size(391, 28)
-        Me.txtImportFileName.TabIndex = 26
+        Me.txtImportFileName.Size = New System.Drawing.Size(189, 21)
+        Me.txtImportFileName.TabIndex = 16
         Me.txtImportFileName.Text = "C:\Users\张展新\Desktop\font\[AYUMI]N.FNT"
         '
         'btnImport
         '
-        Me.btnImport.Location = New System.Drawing.Point(107, 179)
-        Me.btnImport.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnImport.Location = New System.Drawing.Point(71, 128)
         Me.btnImport.Name = "btnImport"
-        Me.btnImport.Size = New System.Drawing.Size(190, 35)
-        Me.btnImport.TabIndex = 25
+        Me.btnImport.Size = New System.Drawing.Size(127, 23)
+        Me.btnImport.TabIndex = 24
         Me.btnImport.Text = "Import"
         Me.btnImport.UseVisualStyleBackColor = True
         '
         'tagSave
         '
         Me.tagSave.BackColor = System.Drawing.SystemColors.Control
+        Me.tagSave.Controls.Add(Me.btnOpenSaveimagepath)
         Me.tagSave.Controls.Add(Me.txtCodeRangeEnd)
         Me.tagSave.Controls.Add(Me.txtCodeRangeStart)
         Me.tagSave.Controls.Add(Me.Label30)
@@ -802,132 +888,136 @@ Partial Class frmBMPFont
         Me.tagSave.Controls.Add(Me.cboSaveFileType)
         Me.tagSave.Controls.Add(Me.txtSaveImage)
         Me.tagSave.Controls.Add(Me.btnSave)
-        Me.tagSave.Location = New System.Drawing.Point(4, 28)
-        Me.tagSave.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.tagSave.Location = New System.Drawing.Point(4, 22)
+        Me.tagSave.Margin = New System.Windows.Forms.Padding(2, 1, 2, 1)
         Me.tagSave.Name = "tagSave"
-        Me.tagSave.Padding = New System.Windows.Forms.Padding(3, 2, 3, 2)
-        Me.tagSave.Size = New System.Drawing.Size(399, 326)
+        Me.tagSave.Padding = New System.Windows.Forms.Padding(2, 1, 2, 1)
+        Me.tagSave.Size = New System.Drawing.Size(296, 213)
         Me.tagSave.TabIndex = 1
         Me.tagSave.Text = "Save"
         '
         'txtCodeRangeEnd
         '
-        Me.txtCodeRangeEnd.Location = New System.Drawing.Point(225, 153)
-        Me.txtCodeRangeEnd.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtCodeRangeEnd.Location = New System.Drawing.Point(150, 102)
         Me.txtCodeRangeEnd.Name = "txtCodeRangeEnd"
-        Me.txtCodeRangeEnd.Size = New System.Drawing.Size(102, 28)
-        Me.txtCodeRangeEnd.TabIndex = 48
+        Me.txtCodeRangeEnd.Size = New System.Drawing.Size(69, 21)
+        Me.txtCodeRangeEnd.TabIndex = 29
         Me.txtCodeRangeEnd.Text = "FF"
         '
         'txtCodeRangeStart
         '
-        Me.txtCodeRangeStart.Location = New System.Drawing.Point(225, 110)
-        Me.txtCodeRangeStart.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtCodeRangeStart.Location = New System.Drawing.Point(150, 73)
         Me.txtCodeRangeStart.Name = "txtCodeRangeStart"
-        Me.txtCodeRangeStart.Size = New System.Drawing.Size(102, 28)
-        Me.txtCodeRangeStart.TabIndex = 47
+        Me.txtCodeRangeStart.Size = New System.Drawing.Size(69, 21)
+        Me.txtCodeRangeStart.TabIndex = 28
         Me.txtCodeRangeStart.Text = "0"
         '
         'Label30
         '
         Me.Label30.AutoSize = True
-        Me.Label30.Location = New System.Drawing.Point(64, 150)
+        Me.Label30.Location = New System.Drawing.Point(42, 105)
+        Me.Label30.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label30.Name = "Label30"
-        Me.Label30.Size = New System.Drawing.Size(134, 18)
+        Me.Label30.Size = New System.Drawing.Size(89, 12)
         Me.Label30.TabIndex = 46
         Me.Label30.Text = "CodeRange End:"
         '
         'Label29
         '
         Me.Label29.AutoSize = True
-        Me.Label29.Location = New System.Drawing.Point(63, 116)
+        Me.Label29.Location = New System.Drawing.Point(42, 77)
+        Me.Label29.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label29.Name = "Label29"
-        Me.Label29.Size = New System.Drawing.Size(152, 18)
+        Me.Label29.Size = New System.Drawing.Size(101, 12)
         Me.Label29.TabIndex = 45
         Me.Label29.Text = "CodeRange Start:"
         '
         'Label19
         '
         Me.Label19.AutoSize = True
-        Me.Label19.Location = New System.Drawing.Point(6, 78)
+        Me.Label19.Location = New System.Drawing.Point(4, 52)
+        Me.Label19.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label19.Name = "Label19"
-        Me.Label19.Size = New System.Drawing.Size(53, 18)
+        Me.Label19.Size = New System.Drawing.Size(35, 12)
         Me.Label19.TabIndex = 44
         Me.Label19.Text = "Type:"
         '
         'Label23
         '
         Me.Label23.AutoSize = True
-        Me.Label23.Location = New System.Drawing.Point(6, 12)
+        Me.Label23.Location = New System.Drawing.Point(4, 8)
+        Me.Label23.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label23.Name = "Label23"
-        Me.Label23.Size = New System.Drawing.Size(53, 18)
+        Me.Label23.Size = New System.Drawing.Size(35, 12)
         Me.Label23.TabIndex = 43
         Me.Label23.Text = "Path:"
         '
         'Label18
         '
         Me.Label18.AutoSize = True
-        Me.Label18.Location = New System.Drawing.Point(6, 46)
+        Me.Label18.Location = New System.Drawing.Point(4, 31)
+        Me.Label18.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label18.Name = "Label18"
-        Me.Label18.Size = New System.Drawing.Size(53, 18)
+        Me.Label18.Size = New System.Drawing.Size(35, 12)
         Me.Label18.TabIndex = 43
         Me.Label18.Text = "File:"
         '
         'picSave
         '
-        Me.picSave.Location = New System.Drawing.Point(4, 191)
-        Me.picSave.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.picSave.Location = New System.Drawing.Point(3, 127)
         Me.picSave.Name = "picSave"
-        Me.picSave.Size = New System.Drawing.Size(46, 35)
+        Me.picSave.Size = New System.Drawing.Size(31, 23)
         Me.picSave.TabIndex = 34
         Me.picSave.TabStop = False
         '
         'btnOpenFolder
         '
-        Me.btnOpenFolder.Location = New System.Drawing.Point(66, 191)
-        Me.btnOpenFolder.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnOpenFolder.Location = New System.Drawing.Point(44, 127)
         Me.btnOpenFolder.Name = "btnOpenFolder"
-        Me.btnOpenFolder.Size = New System.Drawing.Size(150, 35)
-        Me.btnOpenFolder.TabIndex = 33
+        Me.btnOpenFolder.Size = New System.Drawing.Size(100, 23)
+        Me.btnOpenFolder.TabIndex = 30
         Me.btnOpenFolder.Text = "Open folder"
         Me.btnOpenFolder.UseVisualStyleBackColor = True
         '
         'txtSaveImagePath
         '
-        Me.txtSaveImagePath.Location = New System.Drawing.Point(66, 10)
-        Me.txtSaveImagePath.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtSaveImagePath.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtSaveImagePath.Location = New System.Drawing.Point(44, 7)
         Me.txtSaveImagePath.Name = "txtSaveImagePath"
-        Me.txtSaveImagePath.Size = New System.Drawing.Size(261, 28)
-        Me.txtSaveImagePath.TabIndex = 31
+        Me.txtSaveImagePath.Size = New System.Drawing.Size(194, 21)
+        Me.txtSaveImagePath.TabIndex = 25
         Me.txtSaveImagePath.Text = "256"
         '
         'cboSaveFileType
         '
+        Me.cboSaveFileType.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboSaveFileType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboSaveFileType.FormattingEnabled = True
-        Me.cboSaveFileType.Items.AddRange(New Object() {".FONT.PNG", "RAW", ".HZCG6", ".CODE.PNG(多个)"})
-        Me.cboSaveFileType.Location = New System.Drawing.Point(66, 77)
-        Me.cboSaveFileType.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.cboSaveFileType.Items.AddRange(New Object() {".FONT.PNG", "RAW", ".CODE.PNG(多个)", ".CODE.SVG(多个)", ".XML", ".HZCG6", ".hz.ww-hh"})
+        Me.cboSaveFileType.Location = New System.Drawing.Point(44, 51)
+        Me.cboSaveFileType.Margin = New System.Windows.Forms.Padding(2, 1, 2, 1)
         Me.cboSaveFileType.Name = "cboSaveFileType"
-        Me.cboSaveFileType.Size = New System.Drawing.Size(261, 26)
-        Me.cboSaveFileType.TabIndex = 32
+        Me.cboSaveFileType.Size = New System.Drawing.Size(247, 20)
+        Me.cboSaveFileType.TabIndex = 27
         '
         'txtSaveImage
         '
-        Me.txtSaveImage.Location = New System.Drawing.Point(66, 42)
-        Me.txtSaveImage.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtSaveImage.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtSaveImage.Location = New System.Drawing.Point(44, 28)
         Me.txtSaveImage.Name = "txtSaveImage"
-        Me.txtSaveImage.Size = New System.Drawing.Size(261, 28)
-        Me.txtSaveImage.TabIndex = 31
+        Me.txtSaveImage.Size = New System.Drawing.Size(247, 21)
+        Me.txtSaveImage.TabIndex = 26
         Me.txtSaveImage.Text = "256"
         '
         'btnSave
         '
-        Me.btnSave.Location = New System.Drawing.Point(225, 191)
-        Me.btnSave.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnSave.Location = New System.Drawing.Point(150, 127)
         Me.btnSave.Name = "btnSave"
-        Me.btnSave.Size = New System.Drawing.Size(102, 35)
-        Me.btnSave.TabIndex = 30
+        Me.btnSave.Size = New System.Drawing.Size(68, 23)
+        Me.btnSave.TabIndex = 31
         Me.btnSave.Text = "Save"
         Me.btnSave.UseVisualStyleBackColor = True
         '
@@ -945,112 +1035,109 @@ Partial Class frmBMPFont
         Me.tagEdit.Controls.Add(Me.btnInverseColor)
         Me.tagEdit.Controls.Add(Me.btnScale)
         Me.tagEdit.Controls.Add(Me.txtScale)
-        Me.tagEdit.Location = New System.Drawing.Point(4, 28)
-        Me.tagEdit.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.tagEdit.Location = New System.Drawing.Point(4, 22)
+        Me.tagEdit.Margin = New System.Windows.Forms.Padding(2, 1, 2, 1)
         Me.tagEdit.Name = "tagEdit"
-        Me.tagEdit.Size = New System.Drawing.Size(399, 326)
+        Me.tagEdit.Size = New System.Drawing.Size(318, 213)
         Me.tagEdit.TabIndex = 2
         Me.tagEdit.Text = "Edit"
         '
         'Label25
         '
         Me.Label25.AutoSize = True
-        Me.Label25.Location = New System.Drawing.Point(222, 142)
+        Me.Label25.Location = New System.Drawing.Point(148, 95)
+        Me.Label25.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label25.Name = "Label25"
-        Me.Label25.Size = New System.Drawing.Size(26, 18)
+        Me.Label25.Size = New System.Drawing.Size(17, 12)
         Me.Label25.TabIndex = 42
         Me.Label25.Text = "Y:"
         '
         'Label28
         '
         Me.Label28.AutoSize = True
-        Me.Label28.Location = New System.Drawing.Point(8, 6)
+        Me.Label28.Location = New System.Drawing.Point(5, 4)
+        Me.Label28.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label28.Name = "Label28"
-        Me.Label28.Size = New System.Drawing.Size(62, 18)
+        Me.Label28.Size = New System.Drawing.Size(41, 12)
         Me.Label28.TabIndex = 43
         Me.Label28.Text = "Scale:"
         '
         'Label26
         '
         Me.Label26.AutoSize = True
-        Me.Label26.Location = New System.Drawing.Point(8, 142)
+        Me.Label26.Location = New System.Drawing.Point(5, 95)
+        Me.Label26.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label26.Name = "Label26"
-        Me.Label26.Size = New System.Drawing.Size(71, 18)
+        Me.Label26.Size = New System.Drawing.Size(47, 12)
         Me.Label26.TabIndex = 43
         Me.Label26.Text = "Offset:"
         '
         'Label27
         '
         Me.Label27.AutoSize = True
-        Me.Label27.Location = New System.Drawing.Point(100, 142)
+        Me.Label27.Location = New System.Drawing.Point(67, 95)
+        Me.Label27.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label27.Name = "Label27"
-        Me.Label27.Size = New System.Drawing.Size(26, 18)
+        Me.Label27.Size = New System.Drawing.Size(17, 12)
         Me.Label27.TabIndex = 44
         Me.Label27.Text = "X:"
         '
         'txtMoveY
         '
-        Me.txtMoveY.Location = New System.Drawing.Point(255, 138)
-        Me.txtMoveY.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtMoveY.Location = New System.Drawing.Point(170, 92)
         Me.txtMoveY.Name = "txtMoveY"
-        Me.txtMoveY.Size = New System.Drawing.Size(50, 28)
-        Me.txtMoveY.TabIndex = 40
+        Me.txtMoveY.Size = New System.Drawing.Size(35, 21)
+        Me.txtMoveY.TabIndex = 37
         '
         'txtMoveX
         '
-        Me.txtMoveX.Location = New System.Drawing.Point(134, 138)
-        Me.txtMoveX.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtMoveX.Location = New System.Drawing.Point(89, 92)
         Me.txtMoveX.Name = "txtMoveX"
-        Me.txtMoveX.Size = New System.Drawing.Size(49, 28)
-        Me.txtMoveX.TabIndex = 41
+        Me.txtMoveX.Size = New System.Drawing.Size(34, 21)
+        Me.txtMoveX.TabIndex = 36
         '
         'btnMove
         '
-        Me.btnMove.Location = New System.Drawing.Point(90, 174)
-        Me.btnMove.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnMove.Location = New System.Drawing.Point(60, 116)
         Me.btnMove.Name = "btnMove"
-        Me.btnMove.Size = New System.Drawing.Size(190, 35)
-        Me.btnMove.TabIndex = 28
+        Me.btnMove.Size = New System.Drawing.Size(127, 23)
+        Me.btnMove.TabIndex = 38
         Me.btnMove.Text = "Move"
         Me.btnMove.UseVisualStyleBackColor = True
         '
         'btnToBlackWhite
         '
-        Me.btnToBlackWhite.Location = New System.Drawing.Point(210, 84)
-        Me.btnToBlackWhite.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnToBlackWhite.Location = New System.Drawing.Point(140, 56)
         Me.btnToBlackWhite.Name = "btnToBlackWhite"
-        Me.btnToBlackWhite.Size = New System.Drawing.Size(190, 35)
-        Me.btnToBlackWhite.TabIndex = 28
+        Me.btnToBlackWhite.Size = New System.Drawing.Size(127, 23)
+        Me.btnToBlackWhite.TabIndex = 35
         Me.btnToBlackWhite.Text = "To Black/White"
         Me.btnToBlackWhite.UseVisualStyleBackColor = True
         '
         'btnInverseColor
         '
-        Me.btnInverseColor.Location = New System.Drawing.Point(10, 84)
-        Me.btnInverseColor.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnInverseColor.Location = New System.Drawing.Point(7, 56)
         Me.btnInverseColor.Name = "btnInverseColor"
-        Me.btnInverseColor.Size = New System.Drawing.Size(190, 35)
-        Me.btnInverseColor.TabIndex = 28
+        Me.btnInverseColor.Size = New System.Drawing.Size(127, 23)
+        Me.btnInverseColor.TabIndex = 34
         Me.btnInverseColor.Text = "Inverse Color"
         Me.btnInverseColor.UseVisualStyleBackColor = True
         '
         'btnScale
         '
-        Me.btnScale.Location = New System.Drawing.Point(90, 38)
-        Me.btnScale.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnScale.Location = New System.Drawing.Point(60, 25)
         Me.btnScale.Name = "btnScale"
-        Me.btnScale.Size = New System.Drawing.Size(190, 35)
-        Me.btnScale.TabIndex = 28
+        Me.btnScale.Size = New System.Drawing.Size(127, 23)
+        Me.btnScale.TabIndex = 33
         Me.btnScale.Text = "Scale up/down"
         Me.btnScale.UseVisualStyleBackColor = True
         '
         'txtScale
         '
-        Me.txtScale.Location = New System.Drawing.Point(90, 5)
-        Me.txtScale.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.txtScale.Location = New System.Drawing.Point(60, 3)
         Me.txtScale.Name = "txtScale"
-        Me.txtScale.Size = New System.Drawing.Size(192, 28)
-        Me.txtScale.TabIndex = 27
+        Me.txtScale.Size = New System.Drawing.Size(129, 21)
+        Me.txtScale.TabIndex = 32
         Me.txtScale.Text = "100%"
         '
         'tagSpecial
@@ -1059,86 +1146,107 @@ Partial Class frmBMPFont
         Me.tagSpecial.Controls.Add(Me.btnPic2HZ)
         Me.tagSpecial.Controls.Add(Me.btnOutput1)
         Me.tagSpecial.Controls.Add(Me.btnSpecial)
-        Me.tagSpecial.Location = New System.Drawing.Point(4, 28)
-        Me.tagSpecial.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.tagSpecial.Location = New System.Drawing.Point(4, 22)
+        Me.tagSpecial.Margin = New System.Windows.Forms.Padding(2, 1, 2, 1)
         Me.tagSpecial.Name = "tagSpecial"
-        Me.tagSpecial.Size = New System.Drawing.Size(399, 326)
+        Me.tagSpecial.Size = New System.Drawing.Size(318, 213)
         Me.tagSpecial.TabIndex = 3
         Me.tagSpecial.Text = "Special"
         '
+        'btnPic2HZ
+        '
+        Me.btnPic2HZ.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnPic2HZ.Location = New System.Drawing.Point(7, 63)
+        Me.btnPic2HZ.Name = "btnPic2HZ"
+        Me.btnPic2HZ.Size = New System.Drawing.Size(306, 23)
+        Me.btnPic2HZ.TabIndex = 41
+        Me.btnPic2HZ.Text = "pic to HZ"
+        Me.btnPic2HZ.UseVisualStyleBackColor = True
+        '
         'btnOutput1
         '
-        Me.btnOutput1.Location = New System.Drawing.Point(9, 49)
-        Me.btnOutput1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnOutput1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnOutput1.Location = New System.Drawing.Point(6, 33)
         Me.btnOutput1.Name = "btnOutput1"
-        Me.btnOutput1.Size = New System.Drawing.Size(396, 35)
-        Me.btnOutput1.TabIndex = 31
+        Me.btnOutput1.Size = New System.Drawing.Size(307, 23)
+        Me.btnOutput1.TabIndex = 40
         Me.btnOutput1.Text = "Output by GB Zones"
         Me.btnOutput1.UseVisualStyleBackColor = True
         '
         'btnSpecial
         '
-        Me.btnSpecial.Location = New System.Drawing.Point(9, 5)
-        Me.btnSpecial.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnSpecial.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnSpecial.Location = New System.Drawing.Point(6, 3)
         Me.btnSpecial.Name = "btnSpecial"
-        Me.btnSpecial.Size = New System.Drawing.Size(396, 35)
-        Me.btnSpecial.TabIndex = 30
+        Me.btnSpecial.Size = New System.Drawing.Size(307, 23)
+        Me.btnSpecial.TabIndex = 39
         Me.btnSpecial.Text = "Compare"
         Me.btnSpecial.UseVisualStyleBackColor = True
         '
         'lblCursor
         '
-        Me.lblCursor.AutoSize = True
-        Me.lblCursor.Location = New System.Drawing.Point(14, 433)
+        Me.lblCursor.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblCursor.Location = New System.Drawing.Point(7, 335)
+        Me.lblCursor.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lblCursor.Name = "lblCursor"
-        Me.lblCursor.Size = New System.Drawing.Size(71, 18)
+        Me.lblCursor.Size = New System.Drawing.Size(166, 12)
         Me.lblCursor.TabIndex = 21
-        Me.lblCursor.Text = "Cursor:"
+        Me.lblCursor.Text = "Dot"
         '
         'lblColRow
         '
-        Me.lblColRow.AutoSize = True
-        Me.lblColRow.Location = New System.Drawing.Point(14, 415)
+        Me.lblColRow.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblColRow.Location = New System.Drawing.Point(7, 323)
+        Me.lblColRow.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lblColRow.Name = "lblColRow"
-        Me.lblColRow.Size = New System.Drawing.Size(53, 18)
+        Me.lblColRow.Size = New System.Drawing.Size(167, 12)
         Me.lblColRow.TabIndex = 21
-        Me.lblColRow.Text = "Edit:"
+        Me.lblColRow.Text = "Location"
         '
         'lblInfo
         '
-        Me.lblInfo.AutoSize = True
-        Me.lblInfo.Location = New System.Drawing.Point(14, 371)
+        Me.lblInfo.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblInfo.Location = New System.Drawing.Point(7, 247)
+        Me.lblInfo.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lblInfo.Name = "lblInfo"
-        Me.lblInfo.Size = New System.Drawing.Size(44, 18)
+        Me.lblInfo.Size = New System.Drawing.Size(167, 12)
         Me.lblInfo.TabIndex = 21
-        Me.lblInfo.Text = "Info"
+        Me.lblInfo.Text = "Charsize"
         '
         'lblCode
         '
-        Me.lblCode.AutoSize = True
-        Me.lblCode.Location = New System.Drawing.Point(14, 394)
+        Me.lblCode.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblCode.Location = New System.Drawing.Point(7, 311)
+        Me.lblCode.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lblCode.Name = "lblCode"
-        Me.lblCode.Size = New System.Drawing.Size(44, 18)
+        Me.lblCode.Size = New System.Drawing.Size(167, 12)
         Me.lblCode.TabIndex = 21
         Me.lblCode.Text = "Code"
         '
         'btnPasteImage
         '
-        Me.btnPasteImage.Location = New System.Drawing.Point(240, 415)
-        Me.btnPasteImage.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnPasteImage.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnPasteImage.Location = New System.Drawing.Point(260, 266)
         Me.btnPasteImage.Name = "btnPasteImage"
-        Me.btnPasteImage.Size = New System.Drawing.Size(190, 35)
-        Me.btnPasteImage.TabIndex = 18
+        Me.btnPasteImage.Size = New System.Drawing.Size(64, 23)
+        Me.btnPasteImage.TabIndex = 15
         Me.btnPasteImage.Text = "Paste"
         Me.btnPasteImage.UseVisualStyleBackColor = True
         '
         'btnCopyCharImage
         '
-        Me.btnCopyCharImage.Location = New System.Drawing.Point(343, 371)
-        Me.btnCopyCharImage.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.btnCopyCharImage.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnCopyCharImage.Location = New System.Drawing.Point(190, 266)
         Me.btnCopyCharImage.Name = "btnCopyCharImage"
-        Me.btnCopyCharImage.Size = New System.Drawing.Size(89, 35)
-        Me.btnCopyCharImage.TabIndex = 17
+        Me.btnCopyCharImage.Size = New System.Drawing.Size(64, 23)
+        Me.btnCopyCharImage.TabIndex = 14
         Me.btnCopyCharImage.Text = "Copy"
         Me.btnCopyCharImage.UseVisualStyleBackColor = True
         '
@@ -1147,12 +1255,12 @@ Partial Class frmBMPFont
         Me.picEdit.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.picEdit.BackColor = System.Drawing.SystemColors.Info
         Me.picEdit.Cursor = System.Windows.Forms.Cursors.Cross
         Me.picEdit.InitialImage = Nothing
-        Me.picEdit.Location = New System.Drawing.Point(8, 461)
-        Me.picEdit.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
+        Me.picEdit.Location = New System.Drawing.Point(2, 353)
         Me.picEdit.Name = "picEdit"
-        Me.picEdit.Size = New System.Drawing.Size(360, 264)
+        Me.picEdit.Size = New System.Drawing.Size(326, 222)
         Me.picEdit.TabIndex = 6
         Me.picEdit.TabStop = False
         '
@@ -1168,37 +1276,137 @@ Partial Class frmBMPFont
         Me.iml57.TransparentColor = System.Drawing.Color.Transparent
         Me.iml57.Images.SetKeyName(0, "5x7.png")
         '
-        'btnPic2HZ
+        'ContextMenuStrip1
         '
-        Me.btnPic2HZ.Location = New System.Drawing.Point(10, 94)
-        Me.btnPic2HZ.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.btnPic2HZ.Name = "btnPic2HZ"
-        Me.btnPic2HZ.Size = New System.Drawing.Size(396, 35)
-        Me.btnPic2HZ.TabIndex = 32
-        Me.btnPic2HZ.Text = "pic to HZ"
-        Me.btnPic2HZ.UseVisualStyleBackColor = True
+        Me.ContextMenuStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
+        Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
+        Me.ContextMenuStrip1.Size = New System.Drawing.Size(61, 4)
         '
-        'frmBMPFont
+        'btnOpenSaveimagepath
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 18.0!)
+        Me.btnOpenSaveimagepath.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnOpenSaveimagepath.Location = New System.Drawing.Point(244, 5)
+        Me.btnOpenSaveimagepath.Name = "btnOpenSaveimagepath"
+        Me.btnOpenSaveimagepath.Size = New System.Drawing.Size(47, 23)
+        Me.btnOpenSaveimagepath.TabIndex = 47
+        Me.btnOpenSaveimagepath.Text = "open"
+        Me.btnOpenSaveimagepath.UseVisualStyleBackColor = True
+        '
+        'btnOpenFile
+        '
+        Me.btnOpenFile.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnOpenFile.Location = New System.Drawing.Point(266, 4)
+        Me.btnOpenFile.Name = "btnOpenFile"
+        Me.btnOpenFile.Size = New System.Drawing.Size(47, 23)
+        Me.btnOpenFile.TabIndex = 50
+        Me.btnOpenFile.Text = "open"
+        Me.btnOpenFile.UseVisualStyleBackColor = True
+        '
+        'fileOpen
+        '
+        Me.fileOpen.FileName = "OpenFileDialog1"
+        '
+        'btnEditorUp
+        '
+        Me.btnEditorUp.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnEditorUp.Location = New System.Drawing.Point(190, 295)
+        Me.btnEditorUp.Name = "btnEditorUp"
+        Me.btnEditorUp.Size = New System.Drawing.Size(29, 23)
+        Me.btnEditorUp.TabIndex = 45
+        Me.btnEditorUp.Text = "Up"
+        Me.btnEditorUp.UseVisualStyleBackColor = True
+        '
+        'btnEditorDown
+        '
+        Me.btnEditorDown.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnEditorDown.Location = New System.Drawing.Point(225, 295)
+        Me.btnEditorDown.Name = "btnEditorDown"
+        Me.btnEditorDown.Size = New System.Drawing.Size(29, 23)
+        Me.btnEditorDown.TabIndex = 46
+        Me.btnEditorDown.Text = "Dn"
+        Me.btnEditorDown.UseVisualStyleBackColor = True
+        '
+        'btnEditorLeft
+        '
+        Me.btnEditorLeft.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnEditorLeft.Location = New System.Drawing.Point(260, 295)
+        Me.btnEditorLeft.Name = "btnEditorLeft"
+        Me.btnEditorLeft.Size = New System.Drawing.Size(29, 23)
+        Me.btnEditorLeft.TabIndex = 47
+        Me.btnEditorLeft.Text = "Lf"
+        Me.btnEditorLeft.UseVisualStyleBackColor = True
+        '
+        'btnEditorRight
+        '
+        Me.btnEditorRight.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnEditorRight.Location = New System.Drawing.Point(295, 295)
+        Me.btnEditorRight.Name = "btnEditorRight"
+        Me.btnEditorRight.Size = New System.Drawing.Size(29, 23)
+        Me.btnEditorRight.TabIndex = 48
+        Me.btnEditorRight.Text = "Rt"
+        Me.btnEditorRight.UseVisualStyleBackColor = True
+        '
+        'btnEditorRRight
+        '
+        Me.btnEditorRRight.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnEditorRRight.Location = New System.Drawing.Point(295, 324)
+        Me.btnEditorRRight.Name = "btnEditorRRight"
+        Me.btnEditorRRight.Size = New System.Drawing.Size(29, 23)
+        Me.btnEditorRRight.TabIndex = 52
+        Me.btnEditorRRight.Text = "RR"
+        Me.btnEditorRRight.UseVisualStyleBackColor = True
+        '
+        'btnEditorRLeft
+        '
+        Me.btnEditorRLeft.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnEditorRLeft.Location = New System.Drawing.Point(260, 324)
+        Me.btnEditorRLeft.Name = "btnEditorRLeft"
+        Me.btnEditorRLeft.Size = New System.Drawing.Size(29, 23)
+        Me.btnEditorRLeft.TabIndex = 51
+        Me.btnEditorRLeft.Text = "RL"
+        Me.btnEditorRLeft.UseVisualStyleBackColor = True
+        '
+        'btnEditorRDown
+        '
+        Me.btnEditorRDown.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnEditorRDown.Location = New System.Drawing.Point(225, 324)
+        Me.btnEditorRDown.Name = "btnEditorRDown"
+        Me.btnEditorRDown.Size = New System.Drawing.Size(29, 23)
+        Me.btnEditorRDown.TabIndex = 50
+        Me.btnEditorRDown.Text = "RD"
+        Me.btnEditorRDown.UseVisualStyleBackColor = True
+        '
+        'btnEditorRUp
+        '
+        Me.btnEditorRUp.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnEditorRUp.Location = New System.Drawing.Point(190, 324)
+        Me.btnEditorRUp.Name = "btnEditorRUp"
+        Me.btnEditorRUp.Size = New System.Drawing.Size(29, 23)
+        Me.btnEditorRUp.TabIndex = 49
+        Me.btnEditorRUp.Text = "RU"
+        Me.btnEditorRUp.UseVisualStyleBackColor = True
+        '
+        'frmFont
+        '
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1241, 779)
-        Me.Controls.Add(Me.SplitContainer1)
-        Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.Name = "frmBMPFont"
+        Me.ClientSize = New System.Drawing.Size(827, 599)
+        Me.Controls.Add(Me.split)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.Name = "frmFont"
         Me.Text = "BMP Font"
-        Me.SplitContainer1.Panel1.ResumeLayout(False)
-        Me.SplitContainer1.Panel2.ResumeLayout(False)
-        Me.SplitContainer1.Panel2.PerformLayout()
-        CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.SplitContainer1.ResumeLayout(False)
+        Me.split.Panel1.ResumeLayout(False)
+        Me.split.Panel2.ResumeLayout(False)
+        Me.split.Panel2.PerformLayout()
+        CType(Me.split, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.split.ResumeLayout(False)
         Me.pnlH.ResumeLayout(False)
         CType(Me.picH, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.picHead, System.ComponentModel.ISupportInitialize).EndInit()
         Me.pnlV.ResumeLayout(False)
         CType(Me.picV, System.ComponentModel.ISupportInitialize).EndInit()
         Me.pnlMain.ResumeLayout(False)
         CType(Me.picMain, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.picHead, System.ComponentModel.ISupportInitialize).EndInit()
         Me.tabControl.ResumeLayout(False)
         Me.tagCreate.ResumeLayout(False)
         Me.tagCreate.PerformLayout()
@@ -1215,7 +1423,7 @@ Partial Class frmBMPFont
 
     End Sub
 
-    Friend WithEvents SplitContainer1 As SplitContainer
+    Friend WithEvents split As SplitContainer
     Friend WithEvents pnlH As Panel
     Friend WithEvents picH As PictureBox
     Friend WithEvents pnlV As Panel
@@ -1263,14 +1471,14 @@ Partial Class frmBMPFont
     Friend WithEvents txtScale As TextBox
     Friend WithEvents tagSpecial As TabPage
     Friend WithEvents btnSpecial As Button
-    Friend WithEvents Label2 As Label
+    Friend WithEvents lblCharsizeHeight As Label
     Friend WithEvents Label4 As Label
     Friend WithEvents Label6 As Label
     Friend WithEvents Label5 As Label
     Friend WithEvents Label3 As Label
     Friend WithEvents Label8 As Label
-    Friend WithEvents Label7 As Label
-    Friend WithEvents Label1 As Label
+    Friend WithEvents lblCharsize As Label
+    Friend WithEvents lblCharsizeWidth As Label
     Friend WithEvents Label9 As Label
     Friend WithEvents Label10 As Label
     Friend WithEvents Label17 As Label
@@ -1313,4 +1521,22 @@ Partial Class frmBMPFont
     Friend WithEvents Label30 As Label
     Friend WithEvents Label29 As Label
     Friend WithEvents btnPic2HZ As Button
+    Friend WithEvents chkGap As CheckBox
+    Friend WithEvents btnInsert As Button
+    Friend WithEvents txtInsertStart As TextBox
+    Friend WithEvents Label32 As Label
+    Friend WithEvents Label31 As Label
+    Friend WithEvents ContextMenuStrip1 As ContextMenuStrip
+    Friend WithEvents btnOpenSaveimagepath As Button
+    Friend WithEvents folderSave As FolderBrowserDialog
+    Friend WithEvents btnOpenFile As Button
+    Friend WithEvents fileOpen As OpenFileDialog
+    Friend WithEvents btnEditorRRight As Button
+    Friend WithEvents btnEditorRLeft As Button
+    Friend WithEvents btnEditorRDown As Button
+    Friend WithEvents btnEditorRUp As Button
+    Friend WithEvents btnEditorRight As Button
+    Friend WithEvents btnEditorLeft As Button
+    Friend WithEvents btnEditorDown As Button
+    Friend WithEvents btnEditorUp As Button
 End Class
