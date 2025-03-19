@@ -1110,7 +1110,7 @@ Partial Class frmFont
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboImportType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboImportType.FormattingEnabled = True
-        Me.cboImportType.Items.AddRange(New Object() {"RAW", ".FONT.PNG", ".HZCG6", "Nintendo-8Bit"})
+        Me.cboImportType.Items.AddRange(New Object() {"RAW", ".FONT.PNG", ".HZCG6", "Nintendo-FC", "Nintendo-GB"})
         Me.cboImportType.Location = New System.Drawing.Point(46, 29)
         Me.cboImportType.Margin = New System.Windows.Forms.Padding(2, 1, 2, 1)
         Me.cboImportType.Name = "cboImportType"
@@ -1206,7 +1206,7 @@ Partial Class frmFont
         Me.tagSave.Margin = New System.Windows.Forms.Padding(2, 1, 2, 1)
         Me.tagSave.Name = "tagSave"
         Me.tagSave.Padding = New System.Windows.Forms.Padding(2, 1, 2, 1)
-        Me.tagSave.Size = New System.Drawing.Size(307, 201)
+        Me.tagSave.Size = New System.Drawing.Size(308, 201)
         Me.tagSave.TabIndex = 1
         Me.tagSave.Text = "Save"
         '
@@ -1223,7 +1223,7 @@ Partial Class frmFont
         'btnOpenSaveimagepath
         '
         Me.btnOpenSaveimagepath.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOpenSaveimagepath.Location = New System.Drawing.Point(264, 5)
+        Me.btnOpenSaveimagepath.Location = New System.Drawing.Point(265, 5)
         Me.btnOpenSaveimagepath.Name = "btnOpenSaveimagepath"
         Me.btnOpenSaveimagepath.Size = New System.Drawing.Size(47, 23)
         Me.btnOpenSaveimagepath.TabIndex = 47
@@ -1303,7 +1303,7 @@ Partial Class frmFont
         'btnOpenFolder
         '
         Me.btnOpenFolder.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOpenFolder.Location = New System.Drawing.Point(170, 139)
+        Me.btnOpenFolder.Location = New System.Drawing.Point(171, 139)
         Me.btnOpenFolder.Name = "btnOpenFolder"
         Me.btnOpenFolder.Size = New System.Drawing.Size(141, 23)
         Me.btnOpenFolder.TabIndex = 30
@@ -1316,7 +1316,7 @@ Partial Class frmFont
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtSaveImagePath.Location = New System.Drawing.Point(44, 7)
         Me.txtSaveImagePath.Name = "txtSaveImagePath"
-        Me.txtSaveImagePath.Size = New System.Drawing.Size(214, 21)
+        Me.txtSaveImagePath.Size = New System.Drawing.Size(215, 21)
         Me.txtSaveImagePath.TabIndex = 25
         Me.txtSaveImagePath.Text = "256"
         '
@@ -1330,7 +1330,7 @@ Partial Class frmFont
         Me.cboSaveFileType.Location = New System.Drawing.Point(43, 59)
         Me.cboSaveFileType.Margin = New System.Windows.Forms.Padding(2, 1, 2, 1)
         Me.cboSaveFileType.Name = "cboSaveFileType"
-        Me.cboSaveFileType.Size = New System.Drawing.Size(268, 20)
+        Me.cboSaveFileType.Size = New System.Drawing.Size(269, 20)
         Me.cboSaveFileType.TabIndex = 27
         '
         'txtSaveImage
@@ -1339,14 +1339,14 @@ Partial Class frmFont
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtSaveImage.Location = New System.Drawing.Point(44, 34)
         Me.txtSaveImage.Name = "txtSaveImage"
-        Me.txtSaveImage.Size = New System.Drawing.Size(267, 21)
+        Me.txtSaveImage.Size = New System.Drawing.Size(268, 21)
         Me.txtSaveImage.TabIndex = 26
         Me.txtSaveImage.Text = "256"
         '
         'btnSave
         '
         Me.btnSave.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnSave.Location = New System.Drawing.Point(170, 110)
+        Me.btnSave.Location = New System.Drawing.Point(171, 110)
         Me.btnSave.Name = "btnSave"
         Me.btnSave.Size = New System.Drawing.Size(141, 23)
         Me.btnSave.TabIndex = 31

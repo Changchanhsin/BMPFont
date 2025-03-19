@@ -1321,16 +1321,17 @@ Public Class frmFont
                 For l = 0 To codeWidth - 1
                     If t * codeWidth + l >= startLoc And t * codeWidth + 1 <= endloc Then
                         readBs = Bw.ReadBytes(widthBytes * cellHeight)
-                        If readBs.Length = 0 Then
+                        If readBs.Length < widthBytes * cellHeight - 1 Then
                             If codePage = 0 Then
                                 codeHeight = t + 1
                                 codeHighRange(1) = codeHeight - 1
                                 Dim bmpOldMain As Bitmap = picMain.Image
-                                Dim h As Integer = (t + 1) * (Height + 1)
+                                Dim h As Integer = (t + 1) * (cellHeight + 1)
                                 Dim bmpNew As Bitmap = New Bitmap(bmpOldMain.Width, h)
                                 bmpNew = bmpOldMain.Clone(New Rectangle(0, 0, bmpNew.Width, bmpNew.Height), Imaging.PixelFormat.DontCare)
-                                picMain.Image = bmpNew
                                 bmpOldMain.Dispose()
+                                bmpMain = bmpNew
+                                picMain.Image = bmpMain
                                 picMain.Height = h
                                 picMain.Refresh()
                                 Dim bmpOldV As Bitmap = picV.Image
@@ -1384,7 +1385,7 @@ Public Class frmFont
         End Try
     End Sub
 
-    Private Sub insertNintendo8bit(st As String, ed As String)
+    Private Sub insertNintendo8bit(st As String, ed As String, bs_step As Integer, bs_off As Integer)
         Try
             Dim FS As New System.IO.FileStream(txtImportFileName.Text, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
             Dim Bw As New System.IO.BinaryReader(FS)
@@ -1416,15 +1417,16 @@ Public Class frmFont
             For t = 0 To codeHeight - 1
                 For l = 0 To codeWidth - 1
                     readBs = Bw.ReadBytes(cellHeight * 2)
-                    If readBs.Length < 0 Then
+                    If readBs.Length < cellHeight * 2 - 1 Then
                         codeHeight = t + 1
                         codeHighRange(1) = codeHeight - 1
                         Dim bmpOldMain As Bitmap = picMain.Image
-                        Dim h As Integer = (t + 1) * (Height + 1)
+                        Dim h As Integer = (t + 1) * (cellHeight + 1)
                         Dim bmpNew As Bitmap = New Bitmap(bmpOldMain.Width, h)
                         bmpNew = bmpOldMain.Clone(New Rectangle(0, 0, bmpNew.Width, bmpNew.Height), Imaging.PixelFormat.DontCare)
-                        picMain.Image = bmpNew
                         bmpOldMain.Dispose()
+                        bmpMain = bmpNew
+                        picMain.Image = bmpMain
                         picMain.Height = h
                         picMain.Refresh()
                         Dim bmpOldV As Bitmap = picV.Image
@@ -1441,9 +1443,9 @@ Public Class frmFont
                     End If
                     For j = 0 To 7
                         For i = 0 To 7
-                            If (j + Int(i / 8)) < readBs.Length Then
-                                c = (readBs(j + Int(i / 8)) >> (7 - i)) Mod 2
-                                c = (c << 1) + ((readBs(j + 8 + Int(i / 8)) >> (7 - i)) Mod 2)
+                            If j < readBs.Length / 2 Then
+                                c = (readBs(j * bs_step + Int(i / 8)) >> (7 - i)) Mod 2
+                                c = (c << 1) + ((readBs(j * bs_step + bs_off + Int(i / 8)) >> (7 - i)) Mod 2)
                                 If chkBigEndding.Checked Then
                                     bmp.SetPixel(7 - i, j, cx(c))
                                 Else
@@ -1480,10 +1482,10 @@ Public Class frmFont
 
     End Sub
 
-    Private Sub importNintendo8bit(sizeW As Integer, sizeH As Integer, cp As String, st As String, ed As String)
+    Private Sub importNintendo8bit(sizeW As Integer, sizeH As Integer, cp As String, st As String, ed As String, bs_step As Integer, bs_off As Integer)
         NewFont(cp, sizeW, sizeH)
         createArray(codePage, 8, 8)
-        insertNintendo8bit(st, ed)
+        insertNintendo8bit(st, ed, bs_step, bs_off)
     End Sub
 
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
@@ -1492,8 +1494,10 @@ Public Class frmFont
                 importFontPNG()
             Case ".HZCG6"
                 'importHZCG6()
-            Case "Nintendo-8Bit"
-                importNintendo8bit(txtImportSizeW.Text, txtImportSizeH.Text, cboImportCodepage.Text, txtInsertStart.Text, txtInsertEnd.Text)
+            Case "Nintendo-FC"
+                importNintendo8bit(txtImportSizeW.Text, txtImportSizeH.Text, cboImportCodepage.Text, txtInsertStart.Text, txtInsertEnd.Text, 1, 8)
+            Case "Nintendo-GB"
+                importNintendo8bit(txtImportSizeW.Text, txtImportSizeH.Text, cboImportCodepage.Text, txtInsertStart.Text, txtInsertEnd.Text, 2, 1)
             Case Else
                 importRAW(txtImportWidth.Text, txtImportHeight.Text, txtImportSizeW.Text, txtImportSizeH.Text, cboImportCodepage.Text, txtInsertStart.Text, txtInsertEnd.Text)
         End Select
