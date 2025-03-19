@@ -1,6 +1,6 @@
 ﻿Public Class clsBMP
     ' 
-    Private charset As clsCharset
+    Private charset As clsFont
 
     'Private bmpMain As Bitmap
     Private bmpHead As New Bitmap(13, 13)
@@ -12,7 +12,7 @@
     Private bmpDigitalL() As Bitmap
     Private bmpDigitalS() As Bitmap
 
-    Private picMain As PictureBox
+    Public picMain As PictureBox
     Private picHead As PictureBox
     Private picV As PictureBox
     Private picH As PictureBox
@@ -77,12 +77,13 @@
         charset.codeUltraHigh = getHead(2, 8)
     End Sub
 
-    Public Sub create(cs As clsCharset)
+    Public Sub create(cs As clsFont)
         charset = cs
 
         Dim bmpV As New Bitmap(13, charset.codeHeight * (charset.cellHeight + 1) + 1)
         Dim bmpH As New Bitmap(charset.codeWidth * (charset.cellWidth + 1) + 1, 13)
         Dim bmpMain As New Bitmap(charset.codeWidth * (charset.cellWidth + 1) + 1, charset.codeHeight * (charset.cellHeight + 1) + 1)
+        'Dim bmpHead As New Bitmap(13, 13)
 
         Dim grpOutputHead As Graphics = Graphics.FromImage(bmpHead)
         grpOutputHead.DrawLine(Pens.Blue, 0, 12, 12, 12)

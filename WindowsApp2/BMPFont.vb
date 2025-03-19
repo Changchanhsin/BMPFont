@@ -13,6 +13,7 @@ Public Class frmFont
 
     Private cellWidth As Integer = 0
     Private cellHeight As Integer = 0
+    Private cellBaseline As Integer = 0
     Private codeWidth As Integer = 0
     Private codeHeight As Integer = 0
 
@@ -22,9 +23,15 @@ Public Class frmFont
     Private bmpDigitalL(16) As Bitmap
     Private bmpDigitalS(16) As Bitmap
     Private bmpHead As New Bitmap(13, 13)
+    Private bmpV As Bitmap
+    Private bmpH As Bitmap
+    Private bmpMain As Bitmap
     Private bmpClipboard As New Bitmap(1, 1)
 
     Private isShiftPress As Boolean
+    Private isCtrlPress As Boolean
+    Private zoomInOut As Integer = 1
+    Private isResizing As Boolean = False
 
     Private Sub updateInfoData()
         lblCodepage.Text = "Codepage: " & Str(codePage)
@@ -51,6 +58,7 @@ Public Class frmFont
     Private Function hexstr(n, sz) As String
         hexstr = Strings.Right("0000000" & Hex(n), sz)
     End Function
+
     Private Function in0255(v As Integer) As Integer
         If v < 0 Then
             in0255 = 0
@@ -126,6 +134,10 @@ Public Class frmFont
             size = Int(txtCharSize.Text)
         End If
 
+        txtCharOffsetX.Text = Str(offset)
+        txtCharOffsetY.Text = Str(offsetY)
+        txtCharSize.Text = Str(size)
+
         Dim mFont As Font
         mFont = New Font(txtFontName.Text, size)
         Dim currChar(5) As Byte
@@ -133,6 +145,7 @@ Public Class frmFont
         Dim bmp As New Bitmap(cellWidth, cellHeight)
         Dim grp As Graphics = Graphics.FromImage(bmp)
         Dim brs As New SolidBrush(Color.White)
+        startProgress(codeHeight)
         For i = 0 To codeHeight - 1
             For j = 0 To codeWidth - 1
                 If codeLength = 2 Then
@@ -163,18 +176,19 @@ Public Class frmFont
                 grp.DrawString(unicodeString, mFont, mBrush, offset, offsetY)
                 grpMain.DrawImage(bmp, j * (cellWidth + 1), i * (cellHeight + 1))
             Next
+            goProgress(i + 1)
         Next
+        endProgress()
         brs.Dispose()
         mFont.Dispose()
         bmp.Dispose()
         mBrush.Dispose()
         picMain.Refresh()
+        RedrawEditor()
     End Sub
 
     Private Sub drawHead(dt As Integer, x As Integer, y As Integer)
         For i As Integer = 0 To 7
-            'If ((dt Mod 2) Xor ((x + i + y) Mod 2)) = 0 Then
-            '            If ((dt Mod 2)) = 0 Then
             If ((dt >> (7 - i)) Mod 2) = 0 Then
                 bmpHead.SetPixel(x + i, y, Color.White)
             Else
@@ -201,14 +215,14 @@ Public Class frmFont
             bmpHead.SetPixel(i, 1, Color.Black)
             bmpHead.SetPixel(i, 10, Color.Black)
         Next
-        drawHead(codePage / 256, 2, 2)
+        drawHead(Int(codePage / 256), 2, 2)
         drawHead(codePage Mod 256, 2, 3)
         drawHead(cellWidth, 2, 4)
         drawHead(cellHeight, 2, 5)
         drawHead(codeWidth, 2, 6)
         drawHead(codeHeight, 2, 7)
         drawHead(codeUltraHigh, 2, 8)
-        drawHead(0, 2, 9)
+        drawHead(cellBaseline, 2, 9)
     End Sub
 
     Private Sub readHead()
@@ -220,7 +234,34 @@ Public Class frmFont
         codeWidth = getHead(2, 6)
         codeHeight = getHead(2, 7)
         codeUltraHigh = getHead(2, 8)
+        cellBaseline = getHead(2, 9)
         SetRange(codePage, codeWidth, codeHeight)
+    End Sub
+
+    Private Sub mapRange()
+        Dim i, j, k As Integer
+
+        'For i = 0 To 255
+        'codeL(i) = 0
+        'codeH(i) = 0
+        'Next
+
+        k = 0
+        For i = 0 To codeLowRange.Length - 1 Step 2
+            For j = codeLowRange(i) To codeLowRange(i + 1)
+                codeL(k) = j
+                k = k + 1
+            Next
+        Next
+        codeWidth = k
+        k = 0
+        For i = 0 To codeHighRange.Length - 1 Step 2
+            For j = codeHighRange(i) To codeHighRange(i + 1)
+                codeH(k) = j
+                k = k + 1
+            Next
+        Next
+        codeHeight = k
     End Sub
 
     Private Sub SetRange(cp, cw, ch)
@@ -276,10 +317,12 @@ Public Class frmFont
                     codeLength = 2
                 End If
             Case Else
-                codeLowRange = {0, 255}
-                codeHighRange = {0, 255}
+                codeLowRange = {0, in0255(cw)}
+                codeHighRange = {0, in0255(ch)}
                 codeLength = 2
         End Select
+
+        mapRange()
     End Sub
 
     Private Function mapW(ByRef map()) As Integer
@@ -287,19 +330,17 @@ Public Class frmFont
     End Function
 
     Private Sub cleanArea(sc As String, ec As String)
-        Dim bmp As New Bitmap(cellWidth, cellHeight)
-        Dim grp = Graphics.FromImage(bmp)
-        grp.FillRectangle(New SolidBrush(Color.White), 0, 0, cellWidth, cellHeight)
         Dim grpMain As Graphics = Graphics.FromImage(picMain.Image)
         Dim s As Integer = code2loc(sc)
         Dim e As Integer = code2loc(ec)
         If e < s Then
             Exit Sub
         End If
+        Dim wb As New SolidBrush(Color.White)
         For j = 0 To codeHeight
             For i = 0 To codeWidth
                 If j * codeWidth + i >= s And j * codeWidth + i <= e Then
-                    grpMain.DrawImage(bmp, i * (cellWidth + 1), j * (cellHeight + 1))
+                    grpMain.FillRectangle(wb, i * (cellWidth + 1), j * (cellHeight + 1), cellWidth, cellHeight)
                 End If
             Next
         Next
@@ -307,168 +348,145 @@ Public Class frmFont
         picMain.Refresh()
     End Sub
 
-    Private Sub createArray(cp As Integer, width As Integer, height As Integer)
-        Dim mapW(256) As Integer
-        Dim mapH(256) As Integer
-        For i = 0 To 255
-            mapW(i) = 0
-            mapH(i) = 0
-            codeL(i) = 0
-            codeH(i) = 0
-        Next
-        Dim sizeW As Integer = 0
-        Dim sizeH As Integer = 0
-        For i = 0 To codeLowRange.Length - 1 Step 2
-            sizeW = sizeW + codeLowRange(i + 1) - codeLowRange(i) + 1
-            For j = codeLowRange(i) To codeLowRange(i + 1)
-                mapW(j) = 1
-            Next
-        Next
-        For i = 0 To codeHighRange.Length - 1 Step 2
-            sizeH = sizeH + codeHighRange(i + 1) - codeHighRange(i) + 1
-            For j = codeHighRange(i) To codeHighRange(i + 1)
-                mapH(j) = 1
-            Next
-        Next
-        Dim xC As Integer = 0
-        Dim yC As Integer = 0
-        For i = 0 To 255
-            If mapW(i) = 1 Then
-                codeL(xC) = i
-                xC = xC + 1
-            End If
-            If mapH(i) = 1 Then
-                codeH(yC) = i
-                yC = yC + 1
-            End If
-        Next
-
-        Dim bmpV As New Bitmap(13, sizeH * (height + 1) + 1)
-        Dim bmpH As New Bitmap(sizeW * (width + 1) + 1, 13)
-        Dim bmpMain As New Bitmap(sizeW * (width + 1) + 1, sizeH * (height + 1) + 1)
-
-        cellWidth = width
-        cellHeight = height
-        codeWidth = sizeW
-        codeHeight = sizeH
-        codePage = cp
-
+    Private Sub drawHeadAndLine()
+        ' draw Head
         Dim grpOutputHead As Graphics = Graphics.FromImage(bmpHead)
+        grpOutputHead.FillRectangle(New SolidBrush(Color.White), 0, 0, 12, 12)
         grpOutputHead.DrawLine(Pens.Blue, 0, 12, 12, 12)
         grpOutputHead.DrawLine(Pens.Blue, 12, 0, 12, 12)
         picHead.Image = bmpHead
+        picHead.Width = 13 ' * zoomInOut
+        picHead.Height = 13 ' * zoomInOut
         printHead()
         picHead.Refresh()
 
-        Dim grpOutputV As Graphics = Graphics.FromImage(bmpV)
+        Dim grpOutputMain As Graphics = Graphics.FromImage(picMain.Image)
+
+        newBitmap(bmpH, codeWidth * (cellWidth + 1), 13)
         Dim grpOutputH As Graphics = Graphics.FromImage(bmpH)
-        Dim grpOutputMain As Graphics = Graphics.FromImage(bmpMain)
-        grpOutputV.FillRectangle(New SolidBrush(Color.White), 0, 0, bmpV.Width, bmpV.Height)
         grpOutputH.FillRectangle(New SolidBrush(Color.White), 0, 0, bmpH.Width, bmpH.Height)
-        grpOutputMain.FillRectangle(New SolidBrush(Color.White), 0, 0, bmpMain.Width, bmpMain.Height)
-        Dim iCount = 0
-        For i = 0 To 255
-            If mapW(i) = 1 Then
-                grpOutputH.DrawLine(Pens.Blue, iCount * (width + 1) - 1, 0, iCount * (width + 1) - 1, 12)
-                If (width >= 18) Then
-                    If codeLength >= 2 Then
-                        grpOutputH.DrawImage(bmpDigitalL(Int(i / 16)), 2 + iCount * (width + 1), 3)
-                        grpOutputH.DrawImage(bmpDigitalL(i Mod 16), 10 + iCount * (width + 1), 3)
-                    Else
-                        grpOutputH.DrawImage(bmpDigitalL(i Mod 16), 2 + iCount * (width + 1), 3)
-                    End If
-                ElseIf (width >= 16) Then
-                    If codeLength >= 2 Then
-                        grpOutputH.DrawImage(bmpDigitalL(Int(i / 16)), 2 + iCount * (width + 1), 3)
-                        grpOutputH.DrawImage(bmpDigitalL(i Mod 16), 8 + iCount * (width + 1), 3)
-                    Else
-                        grpOutputH.DrawImage(bmpDigitalL(i Mod 16), 2 + iCount * (width + 1), 3)
-                    End If
-                ElseIf (width >= 8) Then
-                    If codeLength >= 2 Then
-                        grpOutputH.DrawImage(bmpDigitalS(Int(i / 16)), 1 + iCount * (width + 1), 3)
-                        grpOutputH.DrawImage(bmpDigitalS(i Mod 16), 5 + iCount * (width + 1), 3)
-                    Else
-                        grpOutputH.DrawImage(bmpDigitalL(i Mod 16), 1 + iCount * (width + 1), 3)
-                    End If
-                ElseIf (width >= 6) Then
-                    If codeLength >= 2 Then
-                        grpOutputH.DrawImage(bmpDigitalS(Int(i / 16)), 2 + iCount * (width + 1), 0)
-                        grpOutputH.DrawImage(bmpDigitalS(i Mod 16), 2 + iCount * (width + 1), 6)
-                    Else
-                        grpOutputH.DrawImage(bmpDigitalS(i Mod 16), 2 + iCount * (width + 1), 4)
-                    End If
+        For i = 0 To codeWidth - 1
+            grpOutputH.DrawLine(Pens.Blue, i * (cellWidth + 1) - 1, 0, i * (cellWidth + 1) - 1, 12)
+            If (cellWidth >= 18) Then
+                If codeLength >= 2 Then
+                    grpOutputH.DrawImage(bmpDigitalL(Int(codeL(i) / 16)), 2 + i * (cellWidth + 1), 3)
+                    grpOutputH.DrawImage(bmpDigitalL(codeL(i) Mod 16), 10 + i * (cellWidth + 1), 3)
+                Else
+                    grpOutputH.DrawImage(bmpDigitalL(codeL(i) Mod 16), 2 + i * (cellWidth + 1), 3)
                 End If
-                grpOutputMain.DrawLine(Pens.Blue, iCount * (width + 1) - 1, 0, iCount * (width + 1) - 1, sizeH * (height + 1) - 1)
-                iCount = iCount + 1
-            End If
-        Next
-        grpOutputH.DrawLine(Pens.Blue, sizeW * (width + 1) - 1, 0, sizeW * (width + 1) - 1, 12)
-        grpOutputMain.DrawLine(Pens.Blue, sizeW * (width + 1) - 1, 0, sizeW * (width + 1) - 1, sizeH * (height + 1) - 1)
-
-        iCount = 0
-        For i = 0 To 255
-            If mapH(i) = 1 Then
-                grpOutputV.DrawLine(Pens.Blue, 0, iCount * (height + 1) - 1, 12, iCount * (height + 1) - 1)
-                If (height >= 18) Then
-                    If codeLength >= 2 Then
-                        grpOutputV.DrawImage(bmpDigitalL(Int(i / 16)), 5, 2 + iCount * (height + 1))
-                        grpOutputV.DrawImage(bmpDigitalL(i Mod 16), 5, 10 + iCount * (height + 1))
-                    Else
-                        grpOutputV.DrawImage(bmpDigitalL(i Mod 16), 5, 2 + iCount * (height + 1))
-                    End If
-                ElseIf (height >= 10) Then
-                    If codeLength >= 2 Then
-                        grpOutputV.DrawImage(bmpDigitalL(Int(i / 16)), 0, 2 + iCount * (height + 1))
-                    End If
-                    grpOutputV.DrawImage(bmpDigitalL(i Mod 16), 6, 2 + iCount * (height + 1))
-                ElseIf (height >= 8) Then
-                    If codeLength >= 2 Then
-                        grpOutputV.DrawImage(bmpDigitalS(Int(i / 16)), 2, 2 + iCount * (height + 1))
-                    End If
-                    grpOutputV.DrawImage(bmpDigitalS(i Mod 16), 6, 2 + iCount * (height + 1))
-                ElseIf (height >= 6) Then
-                    If codeLength >= 2 Then
-                        grpOutputV.DrawImage(bmpDigitalS(Int(i / 16)), 2, 1 + iCount * (height + 1))
-                    End If
-                    grpOutputV.DrawImage(bmpDigitalS(i Mod 16), 6, 1 + iCount * (height + 1))
+            ElseIf (cellWidth >= 16) Then
+                If codeLength >= 2 Then
+                    grpOutputH.DrawImage(bmpDigitalL(Int(codeL(i) / 16)), 2 + i * (cellWidth + 1), 3)
+                    grpOutputH.DrawImage(bmpDigitalL(codeL(i) Mod 16), 8 + i * (cellWidth + 1), 3)
+                Else
+                    grpOutputH.DrawImage(bmpDigitalL(codeL(i) Mod 16), 2 + i * (cellWidth + 1), 3)
                 End If
-                grpOutputMain.DrawLine(Pens.Blue, 0, iCount * (height + 1) - 1, sizeW * (width + 1) - 1, iCount * (height + 1) - 1)
-                iCount = iCount + 1
+            ElseIf (cellWidth >= 9) Then
+                If codeLength >= 2 Then
+                    grpOutputH.DrawImage(bmpDigitalS(Int(codeL(i) / 16)), 1 + i * (cellWidth + 1), 3)
+                    grpOutputH.DrawImage(bmpDigitalS(codeL(i) Mod 16), 5 + i * (cellWidth + 1), 3)
+                Else
+                    grpOutputH.DrawImage(bmpDigitalL(codeL(i) Mod 16), 1 + i * (cellWidth + 1), 3)
+                End If
+            ElseIf (cellWidth >= 7) Then
+                If codeLength >= 2 Then
+                    grpOutputH.DrawImage(bmpDigitalS(Int(codeL(i) / 16)), 1 + i * (cellWidth + 1), 0)
+                    grpOutputH.DrawImage(bmpDigitalS(codeL(i) Mod 16), 1 + i * (cellWidth + 1), 6)
+                Else
+                    grpOutputH.DrawImage(bmpDigitalL(codeL(i) Mod 16), 1 + i * (cellWidth + 1), 3)
+                End If
+            ElseIf (cellWidth >= 5) Then
+                If codeLength >= 2 Then
+                    grpOutputH.DrawImage(bmpDigitalS(Int(codeL(i) / 16)), 1 + i * (cellWidth + 1), 0)
+                    grpOutputH.DrawImage(bmpDigitalS(codeL(i) Mod 16), 1 + i * (cellWidth + 1), 6)
+                Else
+                    grpOutputH.DrawImage(bmpDigitalS(codeL(i) Mod 16), 1 + i * (cellWidth + 1), 4)
+                End If
+            ElseIf (cellWidth >= 3) Then
+                If codeLength >= 2 Then
+                    grpOutputH.DrawImage(bmpDigitalS(Int(codeL(i) / 16)), i * (cellWidth + 1), 0)
+                    grpOutputH.DrawImage(bmpDigitalS(codeL(i) Mod 16), i * (cellWidth + 1), 6)
+                Else
+                    grpOutputH.DrawImage(bmpDigitalS(codeL(i) Mod 16), i * (cellWidth + 1), 4)
+                End If
             End If
+            grpOutputMain.DrawLine(Pens.Blue, i * (cellWidth + 1) - 1, 0, i * (cellWidth + 1) - 1, codeHeight * (cellHeight + 1) - 1)
         Next
-        grpOutputV.DrawLine(Pens.Blue, 0, sizeH * (height + 1) - 1, 12, sizeH * (height + 1) - 1)
-        grpOutputMain.DrawLine(Pens.Blue, 0, sizeH * (height + 1) - 1, sizeW * (width + 1) - 1, sizeH * (height + 1) - 1)
-
-        grpOutputV.DrawLine(Pens.Blue, 12, 0, 12, sizeH * (height + 1) - 1)
-        grpOutputH.DrawLine(Pens.Blue, 0, 12, sizeW * (width + 1) - 1, 12)
-        If Not IsNothing(picV.Image) Then
-            picV.Image.Dispose()
-        End If
-        picV.Image = bmpV
-        picV.Width = 13
-        picV.Height = sizeH * (height + 1)
-        picV.Refresh()
+        grpOutputH.DrawLine(Pens.Blue, codeWidth * (cellWidth + 1) - 1, 0, codeWidth * (cellWidth + 1) - 1, 12)
+        grpOutputMain.DrawLine(Pens.Blue, codeWidth * (cellWidth + 1) - 1, 0, codeWidth * (cellWidth + 1) - 1, codeHeight * (cellHeight + 1) - 1)
+        grpOutputH.DrawLine(Pens.Blue, 0, 12, codeWidth * (cellWidth + 1) - 1, 12)
         If Not IsNothing(picH.Image) Then
             picH.Image.Dispose()
         End If
         picH.Image = bmpH
-        picH.Width = sizeW * (width + 1)
-        picH.Height = 13
+        picH.Width = codeWidth * (cellWidth + 1) ' * zoomInOut
+        picH.Height = 13 '* zoomInOut
         picH.Refresh()
+
+        newBitmap(bmpV, 13, codeHeight * (cellHeight + 1))
+        Dim grpOutputV As Graphics = Graphics.FromImage(bmpV)
+        grpOutputV.FillRectangle(New SolidBrush(Color.White), 0, 0, bmpV.Width, bmpV.Height)
+        For i = 0 To codeHeight - 1
+            grpOutputV.DrawLine(Pens.Blue, 0, i * (cellHeight + 1) - 1, 12, i * (cellHeight + 1) - 1)
+            If (cellHeight >= 18) Then
+                If codeLength >= 2 Then
+                    grpOutputV.DrawImage(bmpDigitalL(Int(codeH(i) / 16)), 5, 2 + i * (cellHeight + 1))
+                    grpOutputV.DrawImage(bmpDigitalL(codeH(i) Mod 16), 5, 10 + i * (cellHeight + 1))
+                Else
+                    grpOutputV.DrawImage(bmpDigitalL(codeH(i) Mod 16), 5, 2 + i * (cellHeight + 1))
+                End If
+            ElseIf (cellHeight >= 10) Then
+                If codeLength >= 2 Then
+                    grpOutputV.DrawImage(bmpDigitalL(Int(codeH(i) / 16)), 0, 2 + i * (cellHeight + 1))
+                End If
+                grpOutputV.DrawImage(bmpDigitalL(codeH(i) Mod 16), 6, 2 + i * (cellHeight + 1))
+            ElseIf (cellHeight >= 8) Then
+                If codeLength >= 2 Then
+                    grpOutputV.DrawImage(bmpDigitalS(Int(codeH(i) / 16)), 2, 2 + i * (cellHeight + 1))
+                End If
+                grpOutputV.DrawImage(bmpDigitalS(codeH(i) Mod 16), 6, 2 + i * (cellHeight + 1))
+            ElseIf (cellHeight >= 6) Then
+                If codeLength >= 2 Then
+                    grpOutputV.DrawImage(bmpDigitalS(Int(codeH(i) / 16)), 2, 1 + i * (cellHeight + 1))
+                End If
+                grpOutputV.DrawImage(bmpDigitalS(codeH(i) Mod 16), 6, 1 + i * (cellHeight + 1))
+            End If
+            grpOutputMain.DrawLine(Pens.Blue, 0, i * (cellHeight + 1) - 1, codeWidth * (cellWidth + 1) - 1, i * (cellHeight + 1) - 1)
+        Next
+        grpOutputV.DrawLine(Pens.Blue, 0, codeHeight * (cellHeight + 1) - 1, 12, codeHeight * (cellHeight + 1) - 1)
+        grpOutputMain.DrawLine(Pens.Blue, 0, codeHeight * (cellHeight + 1) - 1, codeWidth * (cellWidth + 1) - 1, codeHeight * (cellHeight + 1) - 1)
+        grpOutputV.DrawLine(Pens.Blue, 12, 0, 12, codeHeight * (cellHeight + 1) - 1)
+        If Not IsNothing(picV.Image) Then
+            picV.Image.Dispose()
+        End If
+        picV.Image = bmpV
+        picV.Width = 13 '* zoomInOut
+        picV.Height = codeHeight * (cellHeight + 1) '* zoomInOut
+        picV.Refresh()
+
+        bmpMain = picMain.Image
+        picMain.Refresh()
+    End Sub
+
+    Private Sub createArray(cp As Integer, width As Integer, height As Integer)
+        'SetRange(cp, width, height)
+        cellWidth = width
+        cellHeight = height
+        newBitmap(bmpMain, codeWidth * (cellWidth + 1), codeHeight * (cellHeight + 1))
+        Dim grp = Graphics.FromImage(bmpMain)
+        grp.FillRectangle(New SolidBrush(Color.White), 0, 0, codeWidth * (cellWidth + 1), codeHeight * (cellHeight + 1))
         If Not IsNothing(picMain.Image) Then
             picMain.Image.Dispose()
         End If
         picMain.Image = bmpMain
-        picMain.Width = sizeW * (width + 1)
-        picMain.Height = sizeH * (height + 1)
-        picMain.Refresh()
+        'picMain.Width = bmpMain.Width * zoomInOut
+        'picMain.Height = bmpMain.Height * zoomInOut
+        drawHeadAndLine()
         updateInfoData()
         updateActiveData()
-
     End Sub
 
-    Private Sub NewFont(codepage_name)
+    Private Sub NewFont(codepage_name As String, sizeW As Integer, sizeH As Integer)
         Select Case codepage_name
             Case "ASCII-7(1252)"
                 codeLowRange = {0, 15}
@@ -555,17 +573,19 @@ Public Class frmFont
                 codePage = 932
                 codeLength = 1
             Case Else
-                codeLowRange = {0, in0255(txtNewSizeW.Text - 1)}
-                codeHighRange = {0, in0255(txtNewSizeH.Text - 1)}
+                codeLowRange = {0, in0255(sizeW - 1)}
+                codeHighRange = {0, in0255(sizeH - 1)}
                 codePage = 0
                 codeLength = 2
         End Select
+        mapRange()
 
     End Sub
 
     Private Sub Create_Click(sender As Object, e As EventArgs) Handles btnCreate.Click
-        NewFont(cboCodepage.SelectedItem)
+        NewFont(cboCodepage.SelectedItem, txtNewSizeW.Text, txtNewSizeH.Text)
         createArray(codePage, txtNewWidth.Text, txtNewHeight.Text)
+        RedrawEditor()
     End Sub
 
     Private Sub picMain_Move(sender As Object, e As EventArgs) Handles picMain.Move
@@ -592,8 +612,8 @@ Public Class frmFont
                 saveSVGs()
             Case "RAW"
                 saveRAW()
-            Case ".XML"
-                saveXML()
+            Case ".TTX"
+                saveFontXML()
             Case Else
                 savePNG()
         End Select
@@ -619,7 +639,7 @@ Public Class frmFont
 
     Private Sub saveHZwwhh()
         Try
-            Dim bmp As Bitmap = picMain.Image
+            bmpMain = picMain.Image
 
             Dim FS As New System.IO.FileStream(txtSaveImagePath.Text & "\" & txtSaveImage.Text & ".hz." & Str(cellWidth).Trim() & "-" & Str(cellHeight).Trim(), IO.FileMode.Create, IO.FileAccess.Write, IO.FileShare.Write)
             Dim Bw As New System.IO.BinaryWriter(FS)
@@ -656,7 +676,7 @@ Public Class frmFont
                     If (j * 256 + i) <= max And (j * 256 + i) >= min Then
                         For k = 0 To cellHeight - 1
                             For l = 0 To cellWidth - 1
-                                c = bmp.GetPixel(i * (cellWidth + 1) + l, j * (cellHeight + 1) + k)
+                                c = bmpMain.GetPixel(i * (cellWidth + 1) + l, j * (cellHeight + 1) + k)
                                 If (c.R * 9 + c.G * 19 + c.B * 4 >> 5) < 128 And c.A > 128 Then
                                     d += (1 << (7 - (l Mod 8)))
                                 End If
@@ -684,7 +704,7 @@ Public Class frmFont
 
     Private Sub saveHZ()
         Try
-            Dim bmp As Bitmap = picMain.Image
+            bmpMain = picMain.Image
 
             Dim FS As New System.IO.FileStream(txtSaveImagePath.Text & "\" & txtSaveImage.Text, IO.FileMode.Create, IO.FileAccess.Write, IO.FileShare.Write)
             Dim Bw As New System.IO.BinaryWriter(FS)
@@ -696,7 +716,7 @@ Public Class frmFont
                 For i = 0 To codeWidth - 1
                     For k = 0 To cellHeight - 1
                         For l = 0 To cellWidth - 1
-                            c = bmp.GetPixel(i * (cellWidth + 1) + l, j * (cellHeight + 1) + k)
+                            c = bmpMain.GetPixel(i * (cellWidth + 1) + l, j * (cellHeight + 1) + k)
                             If (c.R * 9 + c.G * 19 + c.B * 4 >> 5) < 128 And c.A > 128 Then
                                 d += (1 << (7 - (l Mod 8)))
                             End If
@@ -721,7 +741,7 @@ Public Class frmFont
     End Sub
     Private Sub saveRAW()
         Try
-            Dim bmp As Bitmap = picMain.Image
+            bmpMain = picMain.Image
 
             Dim FS As New System.IO.FileStream(txtSaveImagePath.Text & "\" & txtSaveImage.Text, IO.FileMode.Create, IO.FileAccess.Write, IO.FileShare.Write)
             Dim Bw As New System.IO.BinaryWriter(FS)
@@ -729,11 +749,12 @@ Public Class frmFont
             Dim i, j, k, l
             Dim c As Color
             Dim d As Byte
+            startProgress(codeHeight)
             For j = 0 To codeHeight - 1
                 For i = 0 To codeWidth - 1
                     For k = 0 To cellHeight - 1
                         For l = 0 To cellWidth - 1
-                            c = bmp.GetPixel(i * (cellWidth + 1) + l, j * (cellHeight + 1) + k)
+                            c = bmpMain.GetPixel(i * (cellWidth + 1) + l, j * (cellHeight + 1) + k)
                             If (c.R * 9 + c.G * 19 + c.B * 4 >> 5) < 128 And c.A > 128 Then
                                 d += (1 << (7 - (l Mod 8)))
                             End If
@@ -750,62 +771,52 @@ Public Class frmFont
                         End If
                     Next
                 Next
+                goProgress(j + 1)
             Next
+            endProgress()
             FS.Close()
         Catch ex2 As Exception
             MessageBox.Show("Error on save RAW file : " & ex2.Message)
+            endProgress()
         End Try
     End Sub
 
     Private Sub savePNGs()
-        picSave.Visible = False
-        picSave.Width = cellWidth
-        picSave.Height = cellHeight
+        'picSave.Visible = False
+        'picSave.Width = cellWidth
+        'picSave.Height = cellHeight
         Dim srcSize As Rectangle
         srcSize.Width = cellWidth
         srcSize.Height = cellHeight
-        Dim bmpSave As New Bitmap(picSave.Width, picSave.Height)
+        Dim bmpSave As New Bitmap(cellWidth, cellHeight)
         Dim grpSave As Graphics = Graphics.FromImage(bmpSave)
         For j = 0 To codeHeight - 1
             For i = 0 To codeWidth - 1
                 srcSize.X = i * (cellWidth + 1)
                 srcSize.Y = j * (cellHeight + 1)
-                grpSave.DrawImage(picMain.Image, 0, 0, srcSize, GraphicsUnit.Pixel)
-                picSave.Image = bmpSave
+                grpSave.DrawImageUnscaled(picMain.Image, srcSize)
                 Try
-                    picSave.Image.Save(txtSaveImagePath.Text & "\" & txtSaveImage.Text & "." & hexstr(j, codeLength / 2) & hexstr(i, codeLength / 2) & ".FONT.PNG")
+                    bmpSave.Save(txtSaveImagePath.Text & "\" & txtSaveImage.Text & "." & hexstr(j, codeLength / 2) & hexstr(i, codeLength / 2) & ".FONT.PNG")
                 Catch ex As Exception
 
                 End Try
             Next
         Next
-        If Not IsNothing(picSave.Image) Then
-            picSave.Image.Dispose()
-        End If
-        picSave.Image = bmpSave
-        picSave.Refresh()
         bmpSave.Dispose()
     End Sub
 
     Private Sub savePNG()
-        picSave.Visible = False
-        '        picSave.Width = picHead.Width + picMain.Width
-        '       picSave.Height = picHead.Height + picMain.Height
-        Dim bmpSave As New Bitmap(picHead.Width + picMain.Width, picHead.Height + picMain.Height)
+        Dim bmpSave As New Bitmap(picHead.Image.Width + picMain.Image.Width, picHead.Image.Height + picMain.Image.Height)
         Dim grpSave As Graphics = Graphics.FromImage(bmpSave)
-        grpSave.DrawImage(picHead.Image, 0, 0)
-        grpSave.DrawImage(picH.Image, 13, 0)
-        grpSave.DrawImage(picV.Image, 0, 13)
-        grpSave.DrawImage(picMain.Image, 13, 13)
-        If Not IsNothing(picSave.Image) Then
-            picSave.Image.Dispose()
-        End If
-        picSave.Image = bmpSave
-        'picSave.Update()
-        '        picSave.Refresh()
+        '.Clone(New Rectangle(13, 13, bmpFont.Width - 13, bmpFont.Height - 13), Imaging.PixelFormat.DontCare)
+        grpSave.DrawImage(picHead.Image, 0, 0, 13, 13)
+        grpSave.DrawImageUnscaled(picH.Image, 13, 0)
+        grpSave.DrawImageUnscaled(picV.Image, 0, 13)
+        grpSave.DrawImageUnscaledAndClipped(picMain.Image, New Rectangle(13, 13, picMain.Image.Width, picMain.Image.Height))
         Try
-            Dim fn = txtSaveImagePath.Text & "\" & txtSaveImage.Text & ".FONT.PNG"
-            picSave.Image.Save(fn)
+            Dim fn = txtSaveImagePath.Text & "\" & txtSaveImage.Text & ".FONT.png"
+            bmpSave.Save(fn)
+            picMain.Image.Save(fn & ".png")
             bmpSave.Dispose()
         Catch ex As Exception
             MessageBox.Show("error save:" & ex.Message)
@@ -813,7 +824,13 @@ Public Class frmFont
     End Sub
 
     Private Function loc2code(x, y) As String
-        loc2code = Hex(codeH(y)) & Hex(codeL(x))
+        Dim l As Integer
+        If codeLength >= 2 Then
+            l = 2
+        Else
+            l = 1
+        End If
+        loc2code = hexstr(codeH(y), l) & hexstr(codeL(x), l)
     End Function
 
     Private Sub saveSVG()
@@ -827,7 +844,7 @@ Public Class frmFont
         Dim svg_use As String = ""
 
         Dim FS As New System.IO.FileStream(txtSaveImagePath.Text & "\" & txtSaveImage.Text & ".SVG", IO.FileMode.Create, IO.FileAccess.Write, IO.FileShare.Write)
-
+        startProgress(codeHeight)
         For j = 0 To codeHeight - 1
             For i = 0 To codeWidth - 1
                 'currCellX = i
@@ -838,7 +855,9 @@ Public Class frmFont
                                     """ width=""" & cellWidth * 10 & """ height=""" & cellHeight * 10 &
                                     """ xlink:href=""#code" & loc2code(i, j) & """ />" & vbCrLf
             Next
+            goProgress(j + 1)
         Next
+        endProgress()
 
         svg_def = "<defs>" & svg_def & "</defs>"
         svg_use = "<g style=""display:inline"">" & svg_use & "</g>"
@@ -870,6 +889,7 @@ Public Class frmFont
         cboCopyType.Text = "SVG"
         Dim i, j
         Dim s As String
+        startProgress(codeHeight)
         For j = 0 To codeHeight - 1
             For i = 0 To codeWidth - 1
                 '                currCellX = i
@@ -881,7 +901,9 @@ Public Class frmFont
                 FS.Write(b, 0, UBound(b) + 1)
                 FS.Close()
             Next
+            goProgress(j + 1)
         Next
+        endProgress()
 
         '    currCellX = oldX
         '  currCellY = oldY
@@ -890,7 +912,7 @@ Public Class frmFont
         RedrawEditor()
     End Sub
 
-    Private Function bmp2xmltext(bmp As Bitmap, x As Integer, y As Integer) As String
+    Private Function bmp2fontxmltext(bmp As Bitmap, x As Integer, y As Integer) As String
         Dim grid, gap, round As Boolean
         gap = chkGap.Checked
         grid = chkGrid.Checked
@@ -924,33 +946,277 @@ Public Class frmFont
 
         MessageBox.Show(xd.OuterXml())
 
-        bmp2xmltext = xd.ToString()
+        bmp2fontxmltext = xd.ToString()
     End Function
-    Private Sub saveXML()
-        Dim oldType = cboCopyType.Text
-        '        Dim oldX = currCellX
-        '      Dim oldY = currCellY
-        cboCopyType.Text = "SVG"
-        Dim i, j
-        Dim s As String
-        '        Dim FS As New System.IO.FileStream(txtSaveImagePath.Text & "\" & txtSaveImage.Text & "." & hexstr(j, codeLength) & hexstr(i, codeLength) & ".SVG", IO.FileMode.Create, IO.FileAccess.Write, IO.FileShare.Write)
+
+    Private Sub xmlAddNodeValue(ByRef xd As XmlDocument, ByRef pnode As XmlElement, nodename As String, nodevalue As String)
+        Dim xmlnode = xd.CreateElement(nodename)
+        xmlnode.SetAttribute("value", nodevalue)
+        pnode.AppendChild(xmlnode)
+    End Sub
+
+    Private Sub xmlAddNamerecord(ByRef xd As XmlDocument, ByRef pnode As XmlElement, id As Integer, data As String)
+        Dim namerecord = xd.CreateElement("namerecord")
+        namerecord.SetAttribute("nameID", id)
+        namerecord.SetAttribute("platformID", 1)
+        namerecord.SetAttribute("platEncID", 0)
+        namerecord.SetAttribute("langID", "0x0")
+        namerecord.SetAttribute("unicode", "True")
+        namerecord.InnerText = data
+        pnode.AppendChild(namerecord)
+    End Sub
+
+
+    Private Sub saveFontXML()
+        Dim i, j, k, l As Integer
+        Dim c As Color
+        Dim grid, gap, round As Integer
+
+        startProgress(codeHeight)
+
+        Dim xd As XmlDocument = New XmlDocument()
+        Dim declar = xd.CreateXmlDeclaration("1.0", "UTF-8", "no")
+        xd.AppendChild(declar)
+        Dim ttFont = xd.CreateElement("ttFont")
+        ttFont.SetAttribute("sfntVersion", "\x00\x01\x00\x00")
+        ttFont.SetAttribute("ttLibVersion", "4.38")
+        Dim GlyphOrder = xd.CreateElement("GlyphOrder")
+
+        Dim head = xd.CreateElement("head")
+        xmlAddNodeValue(xd, head, "tableVersion", "1.0")
+        xmlAddNodeValue(xd, head, "fontRevision", "1.0")
+        xmlAddNodeValue(xd, head, "checkSumAdjustment", 0)
+        xmlAddNodeValue(xd, head, "magicNumber", "0x5F0F3CF5")
+        xmlAddNodeValue(xd, head, "flags", "00000000 00000000")
+        xmlAddNodeValue(xd, head, "unitsPerEm", cellWidth * 10)
+        xmlAddNodeValue(xd, head, "created", "Tue Jun 28 00:12:30 2011")
+        xmlAddNodeValue(xd, head, "modified", "Tue Jun 28 00:12:30 2011")
+        xmlAddNodeValue(xd, head, "xMin", 0)
+        xmlAddNodeValue(xd, head, "yMin", 0)
+        xmlAddNodeValue(xd, head, "xMax", cellWidth * 10)
+        xmlAddNodeValue(xd, head, "yMax", cellHeight * 10)
+        xmlAddNodeValue(xd, head, "macStyle", "00000000 00000000")
+        xmlAddNodeValue(xd, head, "lowestRecPPEM", 8)
+        xmlAddNodeValue(xd, head, "fontDirectionHint", 2)
+        xmlAddNodeValue(xd, head, "indexToLocFormat", 1)
+        xmlAddNodeValue(xd, head, "glyphDataFormat", 0)
+
+        Dim hhea = xd.CreateElement("hhea")
+        xmlAddNodeValue(xd, hhea, "tableVersion", "0x00010000")
+        xmlAddNodeValue(xd, hhea, "ascent", cellWidth * 10)
+        xmlAddNodeValue(xd, hhea, "descent", -cellWidth * 3)
+        xmlAddNodeValue(xd, hhea, "lineGap", 0)
+        xmlAddNodeValue(xd, hhea, "advanceWidthMax", cellWidth * 10)
+        xmlAddNodeValue(xd, hhea, "minLeftSideBearing", -cellWidth)
+        xmlAddNodeValue(xd, hhea, "minRightSideBearing", cellWidth)
+        xmlAddNodeValue(xd, hhea, "xMaxExtent", cellWidth * 10)
+        xmlAddNodeValue(xd, hhea, "caretSlopeRise", 1)
+        xmlAddNodeValue(xd, hhea, "caretSlopeRun", 0)
+        xmlAddNodeValue(xd, hhea, "caretOffset", 0)
+        xmlAddNodeValue(xd, hhea, "reserved0", 0)
+        xmlAddNodeValue(xd, hhea, "reserved1", 0)
+        xmlAddNodeValue(xd, hhea, "reserved2", 0)
+        xmlAddNodeValue(xd, hhea, "reserved3", 0)
+        xmlAddNodeValue(xd, hhea, "metricDataFormat", 0)
+        xmlAddNodeValue(xd, hhea, "numberOfHMetrics", codeWidth * codeHeight)
+
+        Dim maxp = xd.CreateElement("maxp")
+        xmlAddNodeValue(xd, maxp, "tableVersion", "0x10000")
+        xmlAddNodeValue(xd, maxp, "numGlyphs", codeWidth * codeHeight)
+        xmlAddNodeValue(xd, maxp, "maxPoints", codeWidth * codeHeight)
+        xmlAddNodeValue(xd, maxp, "maxContours", cellWidth * cellHeight)
+        xmlAddNodeValue(xd, maxp, "maxCompositePoints", 0)
+        xmlAddNodeValue(xd, maxp, "maxCompositeContours", 0)
+        xmlAddNodeValue(xd, maxp, "maxZones", 2)
+        xmlAddNodeValue(xd, maxp, "maxTwilightPoints", 0)
+        xmlAddNodeValue(xd, maxp, "maxStorage", 0)
+        xmlAddNodeValue(xd, maxp, "maxFunctionDefs", 0)
+        xmlAddNodeValue(xd, maxp, "maxInstructionDefs", 0)
+        xmlAddNodeValue(xd, maxp, "maxStackElements", 0)
+        xmlAddNodeValue(xd, maxp, "maxSizeOfInstructions", 0)
+        xmlAddNodeValue(xd, maxp, "maxComponentElements", 0)
+        xmlAddNodeValue(xd, maxp, "maxComponentDepth", 0)
+
+        Dim os2 = xd.CreateElement("OS_2")
+        xmlAddNodeValue(xd, os2, "version", 2)
+        xmlAddNodeValue(xd, os2, "xAvgCharWidth", cellWidth * 10)
+        xmlAddNodeValue(xd, os2, "usWeightClass", cellHeight * 10)
+        xmlAddNodeValue(xd, os2, "usWidthClass", 5)
+        xmlAddNodeValue(xd, os2, "fsType", "00000000 00000100")
+        xmlAddNodeValue(xd, os2, "ySubscriptXSize", cellWidth * 5)
+        xmlAddNodeValue(xd, os2, "ySubscriptYSize", cellHeight * 5)
+        xmlAddNodeValue(xd, os2, "ySubscriptXOffset", 0)
+        xmlAddNodeValue(xd, os2, "ySubscriptYOffset", 0)
+        xmlAddNodeValue(xd, os2, "ySuperscriptXSize", cellWidth * 5)
+        xmlAddNodeValue(xd, os2, "ySuperscriptYSize", cellHeight * 5)
+        xmlAddNodeValue(xd, os2, "ySuperscriptXOffset", 0)
+        xmlAddNodeValue(xd, os2, "ySuperscriptYOffset", cellHeight * 5)
+        xmlAddNodeValue(xd, os2, "yStrikeoutSize", 51)
+        xmlAddNodeValue(xd, os2, "yStrikeoutPosition", 204)
+        xmlAddNodeValue(xd, os2, "sFamilyClass", 0)
+        Dim panose = xd.CreateElement("panose")
+        xmlAddNodeValue(xd, panose, "bFamilyType", 2)
+        xmlAddNodeValue(xd, panose, "bSerifStyle", 0)
+        xmlAddNodeValue(xd, panose, "bWeight", 4)
+        xmlAddNodeValue(xd, panose, "bProportion", 0)
+        xmlAddNodeValue(xd, panose, "bContrast", 0)
+        xmlAddNodeValue(xd, panose, "bStrokeVariation", 0)
+        xmlAddNodeValue(xd, panose, "bArmStyle", 0)
+        xmlAddNodeValue(xd, panose, "bLetterForm", 0)
+        xmlAddNodeValue(xd, panose, "bMidline", 0)
+        xmlAddNodeValue(xd, panose, "bXHeight", 0)
+        os2.AppendChild(panose)
+        xmlAddNodeValue(xd, os2, "ulUnicodeRange1", "00000000 00000000 00000000 00000001")
+        xmlAddNodeValue(xd, os2, "ulUnicodeRange2", "00000000 00000000 00000000 00000000")
+        xmlAddNodeValue(xd, os2, "ulUnicodeRange3", "00000000 00000000 00000000 00000000")
+        xmlAddNodeValue(xd, os2, "ulUnicodeRange4", "00000000 00000000 00000000 00000000")
+        xmlAddNodeValue(xd, os2, "achVendID", "BMPF")
+        xmlAddNodeValue(xd, os2, "fsSelection", "00000000 01000000")
+        xmlAddNodeValue(xd, os2, "usFirstCharIndex", &H20)
+        xmlAddNodeValue(xd, os2, "usLastCharIndex", 255)
+        xmlAddNodeValue(xd, os2, "sTypoAscender", cellHeight * 5)
+        xmlAddNodeValue(xd, os2, "sTypoDescender", 0)
+        xmlAddNodeValue(xd, os2, "sTypoLineGap", 0)
+        xmlAddNodeValue(xd, os2, "usWinAscent", cellHeight * 10)
+        xmlAddNodeValue(xd, os2, "usWinDescent", cellHeight * 2)
+        xmlAddNodeValue(xd, os2, "ulCodePageRange1", "00000000 00000000 00000000 00000001")
+        xmlAddNodeValue(xd, os2, "ulCodePageRange2", "00000000 00000000 00000000 00000000")
+        xmlAddNodeValue(xd, os2, "sxHeight", cellHeight * 10)
+        xmlAddNodeValue(xd, os2, "sCapHeight", cellHeight * 10)
+        xmlAddNodeValue(xd, os2, "usDefaultChar", 0)
+        xmlAddNodeValue(xd, os2, "usBreakChar", 32)
+        xmlAddNodeValue(xd, os2, "usMaxContext", 0)
+
+        Dim hmtx = xd.CreateElement("hmtx")
+        Dim cmap = xd.CreateElement("cmap")
+        Dim cmap_tableVersion = xd.CreateElement("tableVersion")
+        cmap_tableVersion.SetAttribute("version", 0)
+        cmap.AppendChild(cmap_tableVersion)
+        Dim cmap_format_4_1 = xd.CreateElement("cmap_format_4")
+        cmap_format_4_1.SetAttribute("platformID", 0)
+        cmap_format_4_1.SetAttribute("platEncID", 3)
+        cmap_format_4_1.SetAttribute("language", 0)
+        Dim cmap_format_4_2 = xd.CreateElement("cmap_format_4")
+        cmap_format_4_2.SetAttribute("platformID", 3)
+        cmap_format_4_2.SetAttribute("platEncID", 1)
+        cmap_format_4_2.SetAttribute("language", 0)
+        Dim glyf = xd.CreateElement("glyf")
+        Dim bmp As Bitmap = picMain.Image
         For j = 0 To codeHeight - 1
             For i = 0 To codeWidth - 1
-                '            currCellX = i
-                '          currCellY = j
-                '        RedrawEditor()
-                s = bmp2xmltext(picMain.Image, i, j)
-                Dim b = System.Text.Encoding.UTF8.GetBytes(s)
-                '               FS.Write(b, 0, UBound(b) + 1)
+                Dim GlyphID = xd.CreateElement("GlyphID")
+                GlyphID.SetAttribute("name", "char" & loc2code(i, j))
+                GlyphOrder.AppendChild(GlyphID)
+
+                Dim mtx = xd.CreateElement("mtx")
+                mtx.SetAttribute("name", "char" & loc2code(i, j))
+                mtx.SetAttribute("width", cellWidth * 10)
+                mtx.SetAttribute("lsb", "0")
+                hmtx.AppendChild(mtx)
+
+                Dim map = xd.CreateElement("map")
+                map.SetAttribute("name", "char" & loc2code(i, j))
+                map.SetAttribute("code", "0x" & loc2code(i, j))
+                cmap_format_4_1.AppendChild(map)
+                cmap_format_4_2.AppendChild(map.Clone)
+
+                Dim TTGlyph = xd.CreateElement("TTGlyph")
+                TTGlyph.SetAttribute("name", "char" & loc2code(i, j))
+                TTGlyph.SetAttribute("xMin", "0")
+                TTGlyph.SetAttribute("yMin", "0")
+                TTGlyph.SetAttribute("xMax", cellWidth * 10)
+                TTGlyph.SetAttribute("yMax", cellHeight * 10)
+
+                If chkGap.Checked Then
+                    gap = 1
+                Else
+                    gap = 0
+                End If
+                For k = 0 To cellHeight - 1
+                    For l = 0 To cellWidth - 1
+                        c = bmp.GetPixel(i * (cellWidth + 1) + l, j * (cellHeight + 1) + k)
+                        If (c.R * 9 + c.G * 19 + c.B * 4 >> 5) < 128 And c.A > 128 Then
+                            Dim contour = xd.CreateElement("contour")
+                            Dim pt1 = xd.CreateElement("pt")
+                            pt1.SetAttribute("x", l * 10 + 10 - gap)
+                            pt1.SetAttribute("y", cellHeight * 7 - k * 10 + gap)
+                            pt1.SetAttribute("on", "1")
+                            contour.AppendChild(pt1)
+                            Dim pt2 = xd.CreateElement("pt")
+                            pt2.SetAttribute("x", l * 10 + 10 - gap)
+                            pt2.SetAttribute("y", cellHeight * 7 - k * 10 + 10 - gap)
+                            pt2.SetAttribute("on", "1")
+                            contour.AppendChild(pt2)
+                            Dim pt3 = xd.CreateElement("pt")
+                            pt3.SetAttribute("x", l * 10 + gap)
+                            pt3.SetAttribute("y", cellHeight * 7 - k * 10 + 10 - gap)
+                            pt3.SetAttribute("on", "1")
+                            contour.AppendChild(pt3)
+                            Dim pt4 = xd.CreateElement("pt")
+                            pt4.SetAttribute("x", l * 10 + gap)
+                            pt4.SetAttribute("y", cellHeight * 7 - k * 10 + gap)
+                            pt4.SetAttribute("on", "1")
+                            contour.AppendChild(pt4)
+                            TTGlyph.AppendChild(contour)
+                        End If
+                    Next
+                Next
+                Dim instructions = xd.CreateElement("instructions")
+                TTGlyph.AppendChild(instructions)
+                glyf.AppendChild(TTGlyph)
             Next
+            goProgress(j + 1)
         Next
-        '      FS.Close()
+        cmap.AppendChild(cmap_format_4_1)
+        cmap.AppendChild(cmap_format_4_2)
 
-        '        currCellX = oldX
-        '      currCellY = oldY
-        cboCopyType.Text = oldType
+        ttFont.AppendChild(GlyphOrder)
+        ttFont.AppendChild(head)
+        ttFont.AppendChild(hhea)
+        ttFont.AppendChild(maxp)
+        ttFont.AppendChild(os2)
+        ttFont.AppendChild(hmtx)
+        ttFont.AppendChild(cmap)
+        Dim loca = xd.CreateElement("loca")
+        ttFont.AppendChild(loca)
+        ttFont.AppendChild(glyf)
 
-        RedrawEditor()
+        Dim _name = xd.CreateElement("name")
+        xmlAddNamerecord(xd, _name, "0", "Copyright Chanhsin 2024") 'copyright
+        xmlAddNamerecord(xd, _name, "1", txtSaveImage.Text) ' font name
+        xmlAddNamerecord(xd, _name, "2", "Regular") ' font type
+        xmlAddNamerecord(xd, _name, "3", "BMPFont " & txtSaveImage.Text) ' font name full
+        xmlAddNamerecord(xd, _name, "4", txtSaveImage.Text & " Regular") ' font type full
+        xmlAddNamerecord(xd, _name, "5", "Version 1.0") ' version
+        xmlAddNamerecord(xd, _name, "6", txtSaveImage.Text) ' font name
+        xmlAddNamerecord(xd, _name, "7", "BMPFont, is a tool from Chanhsin") ' builder note
+        xmlAddNamerecord(xd, _name, "8", "http://github") ' builder url
+        xmlAddNamerecord(xd, _name, "9", "Chanhsin") ' builder name
+        xmlAddNamerecord(xd, _name, "10", txtSaveImage.Text & " was build with BMPFont") ' builder name
+        ttFont.AppendChild(_name)
+
+        Dim post = xd.CreateElement("post")
+        xmlAddNodeValue(xd, post, "formatType", "3.0")
+        xmlAddNodeValue(xd, post, "italicAngle", "0.0")
+        xmlAddNodeValue(xd, post, "underlinePosition", "102")
+        xmlAddNodeValue(xd, post, "underlineThickness", "51")
+        xmlAddNodeValue(xd, post, "isFixedPitch", "0")
+        xmlAddNodeValue(xd, post, "minMemType42", "0")
+        xmlAddNodeValue(xd, post, "maxMemType42", "0")
+        xmlAddNodeValue(xd, post, "minMemType1", "0")
+        xmlAddNodeValue(xd, post, "maxMemType1", "0")
+        ttFont.AppendChild(post)
+
+        xd.AppendChild(ttFont)
+        xd.Save(txtSaveImagePath.Text & "\" & txtSaveImage.Text & ".TTX")
+        endProgress()
+    End Sub
+
+    Private Sub newBitmap(ByRef bmp As Bitmap, w As Integer, h As Integer)
+        If IsNothing(bmp) = False Then
+            bmp.Dispose()
+        End If
+        bmp = New Bitmap(w, h)
     End Sub
 
     Private Sub importFontPNG()
@@ -960,9 +1226,9 @@ Public Class frmFont
             picHead.Image = System.Drawing.Image.FromStream(fs)
             fs.Close()
             Dim bmpFont As Bitmap = picHead.Image
-            Dim bmpV As New Bitmap(13, picHead.Image.Height - 13)
-            Dim bmpH As New Bitmap(picHead.Image.Width - 13, 13)
-            Dim bmpMain As New Bitmap(picHead.Image.Width - 13, picHead.Image.Height - 13)
+            newBitmap(bmpV, 13, picHead.Image.Height - 13)
+            newBitmap(bmpH, picHead.Image.Width - 13, 13)
+            newBitmap(bmpMain, picHead.Image.Width - 13, picHead.Image.Height - 13)
             bmpMain = bmpFont.Clone(New Rectangle(13, 13, bmpFont.Width - 13, bmpFont.Height - 13), Imaging.PixelFormat.DontCare)
             picMain.Image = bmpMain
             picMain.Width = bmpMain.Width
@@ -1050,6 +1316,7 @@ Public Class frmFont
             If endloc <= startLoc Then
                 endloc = 65536
             End If
+            startProgress(codeHeight)
             For t = 0 To codeHeight - 1
                 For l = 0 To codeWidth - 1
                     If t * codeWidth + l >= startLoc And t * codeWidth + 1 <= endloc Then
@@ -1102,7 +1369,9 @@ Public Class frmFont
                         'picMain.Refresh()
                     End If
                 Next
+                goProgress(t + 1)
             Next
+            endProgress()
             picMain.Refresh()
             printHead()
             updateInfoData()
@@ -1114,13 +1383,107 @@ Public Class frmFont
             Exit Sub
         End Try
     End Sub
+
+    Private Sub insertNintendo8bit(st As String, ed As String)
+        Try
+            Dim FS As New System.IO.FileStream(txtImportFileName.Text, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
+            Dim Bw As New System.IO.BinaryReader(FS)
+            Dim readBs As Byte()
+            Dim bmp = New Bitmap(cellWidth, cellHeight)
+
+            FS.Seek(txtImportOffset.Text, IO.SeekOrigin.Begin)
+            Dim cx(4) As Color
+            Dim c As Integer
+            If chkInverse.Checked = False Then
+                cx(3) = Color.Black
+                cx(2) = Color.DarkGray
+                cx(1) = Color.Gray
+                cx(0) = Color.White
+            Else
+                cx(3) = Color.White
+                cx(2) = Color.Gray
+                cx(1) = Color.DarkGray
+                cx(0) = Color.Black
+            End If
+            printHead()
+            Dim grpMain As Graphics = Graphics.FromImage(picMain.Image)
+            Dim startLoc = code2loc(st)
+            Dim endloc = code2loc(ed)
+            If endloc <= startLoc Then
+                endloc = 65536
+            End If
+            startProgress(codeHeight)
+            For t = 0 To codeHeight - 1
+                For l = 0 To codeWidth - 1
+                    readBs = Bw.ReadBytes(cellHeight * 2)
+                    If readBs.Length < 0 Then
+                        codeHeight = t + 1
+                        codeHighRange(1) = codeHeight - 1
+                        Dim bmpOldMain As Bitmap = picMain.Image
+                        Dim h As Integer = (t + 1) * (Height + 1)
+                        Dim bmpNew As Bitmap = New Bitmap(bmpOldMain.Width, h)
+                        bmpNew = bmpOldMain.Clone(New Rectangle(0, 0, bmpNew.Width, bmpNew.Height), Imaging.PixelFormat.DontCare)
+                        picMain.Image = bmpNew
+                        bmpOldMain.Dispose()
+                        picMain.Height = h
+                        picMain.Refresh()
+                        Dim bmpOldV As Bitmap = picV.Image
+                        Dim bmpNewV As Bitmap = New Bitmap(bmpOldV.Width, h)
+                        bmpNewV = bmpOldV.Clone(New Rectangle(0, 0, bmpNewV.Width, bmpNewV.Height), Imaging.PixelFormat.DontCare)
+                        picV.Image = bmpNewV
+                        picV.Height = h
+                        bmpOldV.Dispose()
+                        picV.Refresh()
+                        printHead()
+                        picMain.Refresh()
+                        FS.Close()
+                        Exit Sub
+                    End If
+                    For j = 0 To 7
+                        For i = 0 To 7
+                            If (j + Int(i / 8)) < readBs.Length Then
+                                c = (readBs(j + Int(i / 8)) >> (7 - i)) Mod 2
+                                c = (c << 1) + ((readBs(j + 8 + Int(i / 8)) >> (7 - i)) Mod 2)
+                                If chkBigEndding.Checked Then
+                                    bmp.SetPixel(7 - i, j, cx(c))
+                                Else
+                                    bmp.SetPixel(i, j, cx(c))
+                                End If
+                            End If
+                        Next
+                    Next
+                    grpMain.DrawImage(bmp, l * (cellWidth + 1), t * (cellHeight + 1))
+                    'picMain.Refresh()
+                Next
+                goProgress(t + 1)
+            Next
+            endProgress()
+            picMain.Refresh()
+            printHead()
+            updateInfoData()
+            updateActiveData()
+            FS.Close()
+        Catch ex2 As Exception
+            MessageBox.Show("Error on open RAW file : " & vbCrLf & ex2.Message & vbCrLf & ex2.StackTrace)
+            picMain.Refresh()
+            Exit Sub
+        End Try
+    End Sub
+
     Private Sub importRAW(width As Integer, height As Integer, sizeW As Integer, sizeH As Integer, cp As String, st As String, ed As String)
 
-        NewFont(cp)
+        NewFont(cp, sizeW, sizeH)
         '            codeLowRange = {0, sizeW - 1}
         '           codeHighRange = {0, sizeH - 1}
         createArray(codePage, width, height)
         insertRAW(st, ed)
+
+    End Sub
+
+    Private Sub importNintendo8bit(sizeW As Integer, sizeH As Integer, cp As String, st As String, ed As String)
+        NewFont(cp, sizeW, sizeH)
+        createArray(codePage, 8, 8)
+        insertNintendo8bit(st, ed)
     End Sub
 
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
@@ -1129,6 +1492,8 @@ Public Class frmFont
                 importFontPNG()
             Case ".HZCG6"
                 'importHZCG6()
+            Case "Nintendo-8Bit"
+                importNintendo8bit(txtImportSizeW.Text, txtImportSizeH.Text, cboImportCodepage.Text, txtInsertStart.Text, txtInsertEnd.Text)
             Case Else
                 importRAW(txtImportWidth.Text, txtImportHeight.Text, txtImportSizeW.Text, txtImportSizeH.Text, cboImportCodepage.Text, txtInsertStart.Text, txtInsertEnd.Text)
         End Select
@@ -1136,6 +1501,7 @@ Public Class frmFont
         resizeAll()
         updateInfoData()
         updateActiveData()
+        RedrawEditor()
     End Sub
 
     Private Sub SelectChar(newx As Integer, newy As Integer)
@@ -1164,11 +1530,24 @@ Public Class frmFont
         If (cellHeight <= 0) Then
             Exit Sub
         End If
-        If e.X < 0 Or e.Y < 0 Or e.X >= picMain.Width Or e.Y >= picMain.Height Then
+        If e.X < 0 Or e.Y < 0 Or e.X >= picMain.Width * zoomInOut Or e.Y >= picMain.Height * zoomInOut Then
             Exit Sub
         End If
         btnCopyCharImage.Select()
-        SelectChar(Int((e.X) / (cellWidth + 1)), Int((e.Y) / (cellHeight + 1)))
+        If isShiftPress = True Then
+            Dim maxloc As Integer
+            Dim minloc As Integer
+            maxloc = currCellX + currCellY * codeWidth
+            minloc = Int((e.X) / (cellWidth + 1)) + Int((e.Y) / (cellHeight + 1)) * codeWidth
+            If maxloc > minloc Then
+                txtMoveStart.Text = loc2code(Int((e.X) / (cellWidth + 1)), Int((e.Y) / (cellHeight + 1)))
+                txtMoveEnd.Text = loc2code(currCellX, currCellY)
+            Else
+                txtMoveStart.Text = loc2code(currCellX, currCellY)
+                txtMoveEnd.Text = loc2code(Int((e.X) / (cellWidth + 1)), Int((e.Y) / (cellHeight + 1)))
+            End If
+        End If
+        SelectChar(Int((e.X) / (cellWidth + 1) / zoomInOut), Int((e.Y) / (cellHeight + 1) / zoomInOut))
     End Sub
 
     Private Sub picEditor_Resize(sender As Object, e As EventArgs) Handles picEdit.Resize
@@ -1243,7 +1622,6 @@ Public Class frmFont
 
     Private Sub frmBMPFont_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         initGraphicResource()
-        resizeAll()
         cboCodepage.SelectedIndex = 0
         cboSaveFileType.SelectedIndex = 0
         cboImportType.SelectedIndex = 0
@@ -1251,60 +1629,428 @@ Public Class frmFont
         getFontList()
         txtSaveImagePath.Text = Application.StartupPath
         Me.KeyPreview = True
+        'resizeAll()
     End Sub
 
+    Private Sub resizeObjByObj(obj As Object, objParent As Object, alignType As Integer,
+                          Optional objNorth As Object = vbNull, Optional objSouth As Object = vbNull,
+                          Optional objEast As Object = vbNull, Optional objWest As Object = vbNull,
+                          Optional gap As Integer = 2)
+        If alignType & AnchorStyles.Bottom <> 0 Then
+            obj.Top = objParent.Height - obj.Height - gap
+        End If
+        If alignType & AnchorStyles.Right <> 0 Then
+            obj.Left = objParent.Width - obj.Width - gap
+        End If
+    End Sub
+
+    Private Function resizeObj(obj As Object, Optional l As Integer = -1, Optional t As Integer = -1, Optional w As Integer = -1, Optional h As Integer = -1) As Integer
+        If IsNothing(obj) Then
+            resizeObj = 0
+            Exit Function
+        End If
+        If l <> -1 Then
+            obj.left = l
+        End If
+        If t <> -1 Then
+            obj.top = t
+        End If
+        If w <> -1 Then
+            obj.width = w
+        End If
+        If h <> -1 Then
+            obj.height = h
+        End If
+        resizeObj = obj.width
+    End Function
+
+    Private Sub addObj(ByRef x As Integer, ByRef y As Integer, max As Integer, obj As Object, anchor As Integer)
+        ' AnchorStyles.Left: default
+        ' AnchorStyles.Right: to line end
+
+    End Sub
+
+    Private Function tabsize(i As Integer, t As Integer) As Integer
+        tabsize = Int((i + t - 1) / t) * t
+        'tabsize = i
+    End Function
+
+    Private Sub resizeLineData(objTitle As Object, objItems() As Object,
+                               left As Integer, ByRef y As Integer, width As Integer,
+                               linespacing As Integer, ind As Integer)
+        Dim x, remain, i As Integer
+        Dim items, maxitemwidth As Integer
+
+        items = 0
+        maxitemwidth = 0
+
+        x = left
+        x += resizeObj(objTitle, x, y + 4, -1, -1)
+        remain = width - objTitle.Width
+        For Each item In objItems
+            If InStr(item.Name, "lbl") > 0 Then
+                remain -= item.Width
+                items += 1
+                If maxitemwidth < item.Width Then
+                    maxitemwidth = item.Width
+                End If
+            End If
+        Next
+        If (remain > 30 * items) Then
+            For i = 0 To items - 1
+                x += resizeObj(objItems(i * 2), x, y + 4)
+                x += resizeObj(objItems(i * 2 + 1), x, y, remain / items)
+            Next
+            y += linespacing
+        Else
+            remain = width - maxitemwidth - objTitle.Width
+            If (remain > 30) Then
+                For i = 0 To items - 1
+                    x = left + objTitle.Width
+                    x += resizeObj(objItems(i * 2), x, y + 4)
+                    resizeObj(objItems(i * 2 + 1), x, y, width - objTitle.Width - objItems(i * 2).Width)
+                    y += linespacing
+                Next
+            Else
+                For i = 0 To items - 1
+                    y += linespacing
+                    x = left + ind
+                    x += resizeObj(objItems(i * 2), x, y + 4, -1, -1)
+                    remain = width - objItems(i * 2).Width - ind
+                    If remain < 30 Then
+                        y += linespacing
+                        x = left + ind
+                        remain = width - ind
+                    End If
+                    resizeObj(objItems(i * 2 + 1), x, y, remain)
+                Next
+                y += linespacing
+            End If
+        End If
+    End Sub
+
+    Private Function getWidth(obj As Object) As Integer
+        If IsNothing(obj) Then
+            getWidth = 0
+        Else
+            getWidth = obj.Width
+        End If
+    End Function
+
+    Private Sub resizeLineSelect(objTitle As Object, objSelect As Object,
+                                 left As Integer, ByRef y As Integer, width As Integer,
+                                 linespacing As Integer, ind As Integer)
+        Dim x, remain As Integer
+        x = left
+        x += resizeObj(objTitle, x, y + 4)
+        remain = width - objTitle.Width
+        If remain <= 90 Then
+            x = left + ind
+            y += linespacing
+            remain = width - ind
+        End If
+        resizeObj(objSelect, x, y, remain)
+        y += linespacing
+    End Sub
+
+    Private Sub resizeLineSelect(objTitle As Object, objSelect As Object, objCommand As Object,
+                                 left As Integer, ByRef y As Integer, width As Integer,
+                                 linespacing As Integer, ind As Integer)
+        Dim x, i, remain As Integer
+        x = left
+        x += resizeObj(objTitle, x, y + 4)
+        remain = width - objTitle.Width
+        remain -= objCommand.Width
+        If remain <= 90 Then
+            x = left + ind
+            y += linespacing
+            remain = width - ind - objCommand.Width
+            If remain <= 90 Then
+                remain = width - ind
+                resizeObj(objSelect, x, y, remain)
+                y += linespacing
+                x = left + ind
+                x += resizeObj(objCommand, x, y)
+            Else
+                x += resizeObj(objSelect, x, y, remain)
+                x += resizeObj(objCommand, x, y)
+            End If
+        Else
+            x += resizeObj(objSelect, x, y, remain)
+            x += resizeObj(objCommand, x, y)
+        End If
+        y += linespacing
+    End Sub
+    Private Sub resizeLineSelect(objTitle As Object, objSelect As Object, objCommand() As Object,
+                                 left As Integer, ByRef y As Integer, width As Integer,
+                                 linespacing As Integer, ind As Integer)
+        Dim x, i, remain, cmdwid As Integer
+        x = left
+        x += resizeObj(objTitle, x, y + 4)
+        remain = width - objTitle.Width
+        cmdwid = 0
+        For i = 0 To objCommand.Length - 1
+            remain -= objCommand(i).Width
+            cmdwid += objCommand(i).Width
+        Next
+        If remain <= 30 Then
+            remain = width - ind - cmdwid
+            If remain <= 30 Then
+                x = left + ind
+                y += linespacing
+                remain = width - ind
+                resizeObj(objSelect, x, y, remain)
+                y += linespacing
+                x = left + ind
+                If width - ind > cmdwid Then
+                    For i = 0 To objCommand.Length - 1
+                        x += resizeObj(objCommand(i), x, y)
+                    Next
+                Else
+                    For i = 0 To objCommand.Length - 1
+                        resizeObj(objCommand(i), x, y)
+                        x = left + ind
+                        y += linespacing
+                    Next
+                    y -= linespacing
+                End If
+            Else
+                resizeObj(objSelect, x, y, width - objTitle.Width)
+                x = left + objTitle.Width
+                y += linespacing
+                For i = 0 To objCommand.Length - 1
+                    x += resizeObj(objCommand(i), x, y)
+                Next
+            End If
+        Else
+            x += resizeObj(objSelect, x, y, remain)
+            For i = 0 To objCommand.Length - 1
+                x += resizeObj(objCommand(i), x, y)
+            Next
+        End If
+        y += linespacing
+    End Sub
+
+    Private Sub resizeLineCommand(objCommands() As Object,
+                                 left As Integer, ByRef y As Integer, width As Integer,
+                                 linespacing As Integer, ind As Integer)
+        Dim x, i, remain As Integer
+
+        x = left + ind
+        remain = width - ind
+        If remain / objCommands.Length > 90 Then
+            For i = 0 To objCommands.Length - 1
+                x += resizeObj(objCommands(i), x, y, remain / objCommands.Length)
+            Next
+            y += linespacing
+        Else
+            If remain / 3 > 60 Then
+                For i = 0 To objCommands.Length - 1
+                    x += resizeObj(objCommands(i), x, y, remain / 3)
+                    If i Mod 3 = 2 Then
+                        x = left + ind
+                        y += linespacing
+                    End If
+                Next
+            ElseIf remain / 2 > 60 Then
+                For i = 0 To objCommands.Length - 1
+                    x += resizeObj(objCommands(i), x, y, remain / 2)
+                    If i Mod 2 = 1 Then
+                        x = left + ind
+                        y += linespacing
+                    End If
+                Next
+            Else
+                For i = 0 To objCommands.Length - 1
+                    resizeObj(objCommands(i), x, y, remain)
+                    x = left + ind
+                    y += linespacing
+                Next
+            End If
+        End If
+    End Sub
+
+    Private Sub resizeLineNormal(obj() As Object,
+                                 left As Integer, ByRef y As Integer, width As Integer,
+                                 linespacing As Integer, ind As Integer)
+        Dim x, i, remain As Integer
+
+        x = left
+        remain = width - x
+        For i = 0 To obj.Length - 1
+            remain -= obj(i).Width
+        Next
+        If remain > 0 Then
+            For i = 0 To obj.Length - 1
+                x += resizeObj(obj(i), x, y)
+            Next
+            y += linespacing
+        Else
+            For i = 0 To obj.Length - 1
+                resizeObj(obj(i), x, y)
+                y += linespacing
+            Next
+        End If
+    End Sub
+
+    Private Sub resizeLineCommand(objCommands() As Object,
+                                 left As Integer, ByRef y As Integer, width As Integer)
+        Dim x, i As Integer
+
+        x = left
+        For i = 0 To objCommands.Length - 1
+            x += resizeObj(objCommands(i), x, y, width / objCommands.Length)
+        Next
+    End Sub
+
+
     Private Sub resizeTab()
-        'Dim tab_maxwidth
-        'create
-        'tab_maxwidth = tagCreate.Size.Width - picEdit.Left
-        'cboCodepage.Width = tab_maxwidth - cboCodepage.Left
-        'btnCreate.Width = tab_maxwidth - btnCreate.Left
-        'txtFontName.Width = tab_maxwidth - txtFontName.Left
-        'btnInitCharactors.Width = tab_maxwidth - btnInitCharactors.Left
-        ' open
-        'tab_maxwidth = tagOpen.Size.Width - picEdit.Left
-        'txtImportFileName.Width = tab_maxwidth - txtImportFileName.Left
-        'cboImportType.Width = tab_maxwidth - cboImportType.Left
-        'btnImport.Width = tab_maxwidth - btnImport.Left
-        ' save
-        'tab_maxwidth = tagSave.Size.Width - picEdit.Left
-        'txtSaveImagePath.Width = tab_maxwidth - txtSaveImagePath.Left
-        'txtSaveImage.Width = tab_maxwidth - txtSaveImage.Left
-        'cboSaveFileType.Width = tab_maxwidth - cboSaveFileType.Left
-        'btnSave.Width = tab_maxwidth - btnSave.Left
+        Try
+            Dim x, y As Integer
+            If IsNothing(tabControl.SelectedTab) Then
+                Exit Sub
+            End If
+            Dim margin As Integer = 2
+            Dim gap As Integer = 0
+            Dim tab As Integer = 1
+            Dim ind As Integer = 8
+            Dim linespacing As Integer = 23
+            Dim max = tabControl.SelectedTab.Width - gap * 2 - 20
+
+            max = tabControl.SelectedTab.Width - margin * 2 - 20
+            y = 0
+            If tabControl.SelectedTab.Text = "Create" Then
+                resizeLineData(lblNewCharsize, {lblNewCharsizeWidth, txtNewWidth, lblNewCharsizeHeight, txtNewHeight, lblNewBaseline, txtNewBaseline},
+                          margin, y, max, linespacing, ind)
+                resizeLineSelect(lblNewCodepage, cboCodepage,
+                          margin, y, max, linespacing, ind)
+                resizeLineData(lblNewCodesize, {lblNewCodesizeCol, txtNewSizeW, lblNewCodesizeRow, txtNewSizeH},
+                          margin, y, max, linespacing, ind)
+                resizeLineCommand({btnCreate},
+                          margin, y, max, linespacing, ind)
+                resizeLineSelect(lblNewFont, txtFontName,
+                          margin, y, max, linespacing, ind)
+                resizeLineNormal({chkMax, chkBlack},
+                          txtFontName.Left, y, max, linespacing, ind)
+                resizeLineData(lblNewFontOffset, {lblNewFontOffsetX, txtCharOffsetX, lblNewFontOffsetY, txtCharOffsetY, lblNewFontSize, txtCharSize},
+                          margin, y, max, linespacing, ind)
+                resizeLineCommand({btnInitCharactors},
+                      margin, y, max, linespacing, ind)
+            End If
+            If tabControl.SelectedTab.Text = "Open" Then
+                resizeLineSelect(lblOpenFile, txtImportFileName, btnOpenFile,
+                          margin, y, max, linespacing, ind)
+                resizeLineSelect(lblOpenType, cboImportType,
+                          margin, y, max, linespacing, ind)
+                resizeLineData(lblOpenCharsize, {lblOpenCharsizeWidth, txtImportWidth, lblOpenCharsizeHeight, txtImportHeight},
+                          margin, y, max, linespacing, ind)
+                resizeLineSelect(lblOpenCodepage, cboImportCodepage,
+                          margin, y, max, linespacing, ind)
+                resizeLineData(lblOpenCodesize, {lblOpenCodesizeLow, txtImportSizeW, lblOpenCodesizeHigh, txtImportSizeH},
+                          margin, y, max, linespacing, ind)
+                resizeLineSelect(lblOpenOffset, txtImportOffset, {chkInverse, chkBigEndding},
+                          margin, y, max, linespacing, ind)
+                '                resizeLineNormal({chkInverse, chkBigEndding},
+                '               lblOpenOffset.Width, y, max, linespacing, ind)
+                resizeLineData(lblOpenCodelocate, {lblCodeLocateStart, txtInsertStart, lblCodeLocateEnd, txtInsertEnd},
+                          margin, y, max, linespacing, ind)
+                resizeLineCommand({btnImport, btnInsert, btnOpenSave},
+                          margin, y, max, linespacing, ind)
+            End If
+            If tabControl.SelectedTab.Text = "Save" Then
+                resizeLineSelect(lblSavePath, txtSaveImagePath, btnOpenSaveimagepath,
+                          margin, y, max, linespacing, ind)
+                resizeLineSelect(lblSaveFile, txtSaveImage,
+                          margin, y, max, linespacing, ind)
+                resizeLineSelect(lblSaveType, cboSaveFileType,
+                          margin, y, max, linespacing, ind)
+                resizeLineData(lblSaveCoderange, {lblSaveCoderangeFrom, txtCodeRangeStart, lblSaveCoderangeTo, txtCodeRangeEnd},
+                          margin, y, max, linespacing, ind)
+                resizeLineCommand({btnSave, btnOpenFolder},
+                          margin, y, max, linespacing, ind)
+            End If
+            If tabControl.SelectedTab.Text = "Edit" Then
+                resizeLineSelect(lblEditScale, txtScale, btnScale,
+                          margin, y, max, linespacing, ind)
+                resizeLineCommand({btnDrawLines, btnInverseColor, btnToBlackWhite},
+                          margin, y, max, linespacing, ind)
+                '                resizeLineCommand({btnToBlackWhite},
+                '               margin, y, max, linespacing, ind)
+                resizeLineData(lblCharacteradjust, {lblCharacteradjustX, txtMoveX, lblCharacteradjustY, txtMoveY},
+                          margin, y, max, linespacing, ind)
+                resizeLineCommand({btnCharacterAdjust},
+                          margin, y, max, linespacing, ind)
+                resizeLineData(lblEditMove, {lblEditMoveFrom, txtMoveStart, lblEditMoveEnd, txtMoveEnd, lblEditMoveTo, txtMoveTo},
+                          margin, y, max, linespacing, ind)
+                resizeLineCommand({btnEditClean, btnMoveCode, btnCopyCode, btnExchange},
+                          margin, y, max, linespacing, ind)
+            End If
+
+            If y + linespacing + tabControl.ItemSize.Height > tabControl.Height Then
+                tabControl.SelectedTab.AutoScroll = True
+                'tabControl.SelectedTab.AutoScrollMinSize.Width = 8
+                'tabControl.SelectedTab.SetAutoScrollMargin(8, 8)
+            Else
+                tabControl.SelectedTab.AutoScroll = False
+            End If
+        Catch ex As Exception
+        End Try
+    End Sub
+
+    Private Sub resizeNSEW(x As Integer, y As Integer, N As Object, S As Object, E As Object, W As Object)
+        resizeObj(N, x - N.Width / 2, y - 12 - N.Height / 2, -1, -1)
+        resizeObj(S, x - S.Width / 2, y + 12 - S.Height / 2, -1, -1)
+        resizeObj(E, x + N.Width / 2 - 1, y - E.Height / 2, -1, -1)
+        resizeObj(W, x - N.Width / 2 - W.Width + 1, y - W.Height / 2, -1, -1)
     End Sub
 
     Private Sub resizeAll()
-        tabControl.Width = split.Panel2.Width
+        tabControl.Width = split.Panel2.Width - 2
 
-        '        picHead.Left = 0
-        '       picHead.Top = 0
-        '      pnlV.Top = 13
-        '     pnlV.Width = 13
-        '    picV.Left = 0
-        '   pnlH.Left = 13
-        '  pnlH.Height = 13
+        resizeObj(picHead, 0, 0, 13 * zoomInOut, 13 * zoomInOut)
+        resizeObj(pnlMain, 13 * zoomInOut, 13 * zoomInOut, split.Panel1.Width - 13 * zoomInOut, split.Panel1.Height - 13 * zoomInOut)
+        If IsNothing(bmpMain) = False Then
+            resizeObj(picMain, -1, -1, bmpMain.Width * zoomInOut, bmpMain.Height * zoomInOut)
+        End If
+        resizeObj(pnlH, 13 * zoomInOut, 0, pnlMain.Width, 13 * zoomInOut)
+        resizeObj(picH, -1, -1, picH.Width * zoomInOut, picH.Height * zoomInOut)
+        resizeObj(pnlV, 0, 13 * zoomInOut, 13 * zoomInOut, pnlMain.Height)
+        resizeObj(picV, -1, -1, picV.Width * zoomInOut, picV.Height * zoomInOut)
+        ' picV.Left = 0
         ' picH.Top = 0
-        'pnlMain.Width = split.Panel1.Width - pnlMain.Left
-        'pnlMain.Height = split.Panel1.Height - pnlMain.Top
-        'picEdit.Width = split.Panel2.Width - 2 * picEdit.Left
-        'picEdit.Height = split.Panel2.Height - picEdit.Top - 2 * picEdit.Left - chkGrid.Height
-        'chkGrid.Top = split.Panel2.Height - chkGrid.Height
-        'chkRound.Top = chkGrid.Top
-        'chkGap.Top = chkGrid.Top
         RedrawEditor()
-        'lblBackColor.Left = split.Panel2.Width - lblBackColor.Width
-        'lblBackColor.Top = split.Panel2.Height - lblBackColor.Height
-        'lblForeColor.Left = lblBackColor.Left - lblForeColor.Width
-        'lblForeColor.Top = lblBackColor.Top
+        resizeObj(picEdit, -1, -1, split.Panel2.Width - 2 * picEdit.Left, split.Panel2.Height - picEdit.Top - 2 * picEdit.Left - chkGrid.Height)
+        resizeObj(chkGrid, -1, split.Panel2.Height - chkGrid.Height, -1, -1)
+        resizeObj(chkRound, -1, split.Panel2.Height - chkGrid.Height, -1, -1)
+        resizeObj(chkGap, -1, split.Panel2.Height - chkGrid.Height, -1, -1)
+        resizeObj(lblBackColor, split.Panel2.Width - lblBackColor.Width, split.Panel2.Height - lblBackColor.Height, -1, -1)
+        resizeObj(lblForeColor, lblBackColor.Left - lblForeColor.Width, split.Panel2.Height - lblBackColor.Height, -1, -1)
+        resizeObj(progressBar, tabControl.Left, tabControl.Height, tabControl.Width - 4, 8)
+
+        resizeObj(cboCopyType, tabControl.Width - cboCopyType.Width - 2, tabControl.Height + 10)
+        Dim y As Integer
+        y = tabControl.Height + 30
+        resizeLineCommand({btnCopyCharImage, btnPasteImage},
+                          tabControl.Width - cboCopyType.Width - 2, y, cboCopyType.Width)
+        y = tabControl.Height + 52
+        resizeLineCommand({btnEditorInverse},
+                          tabControl.Width - cboCopyType.Width - 2, y, cboCopyType.Width)
+        resizeNSEW(tabControl.Width - cboCopyType.Width + btnEditorLeft.Width + btnEditorUp.Width / 2, tabControl.Height + 100, btnEditorUp, btnEditorDown, btnEditorRight, btnEditorLeft)
+        resizeNSEW(tabControl.Width - 2 - btnEditorRRight.Width - btnEditorRUp.Width / 2, tabControl.Height + 100, btnEditorRUp, btnEditorRDown, btnEditorRRight, btnEditorRLeft)
+
         resizeTab()
+
         'edit
         'btnCopyCharImage.Width = split.Panel2.Width - btnCopyCharImage.Left
         'btnPasteImage.Width = split.Panel2.Width - btnPasteImage.Left
     End Sub
 
     Private Sub frmBMPFont_Resize(sender As Object, e As EventArgs) Handles Me.Resize
+        'If isResizing = False Then
+        'isResizing = True
         resizeAll()
+        '    isResizing = False
+        'End If
     End Sub
 
     Private Function bmp2bintext(bmp)
@@ -1428,8 +2174,8 @@ Public Class frmFont
 
         grpMain.DrawImage(bmpClip, currCellX * (cellWidth + 1), currCellY * (cellHeight + 1), cellWidth, cellHeight)
         picMain.Refresh()
-
         resizeAll()
+        RedrawEditor()
     End Sub
 
     Private Sub drawEditorDot(grp As Graphics, x As Integer, y As Integer, ox As Integer, oy As Integer, w As Integer, h As Integer, c As Color)
@@ -1531,7 +2277,9 @@ Public Class frmFont
     End Sub
 
     Private Sub SplitContainer1_Resize(sender As Object, e As EventArgs) Handles split.Resize
+        'If isResizing = False Then
         resizeAll()
+        'End If
     End Sub
 
     Private Sub btnScale_Click(sender As Object, e As EventArgs) Handles btnScale.Click
@@ -1559,18 +2307,21 @@ Public Class frmFont
         createArray(codePage, rectNew.Width, rectNew.Height)
         Dim grpNew = Graphics.FromImage(picMain.Image)
         Dim grpOld = Graphics.FromImage(bmp)
-
-        For i = 0 To codeWidth - 1
-            For j = 0 To codeHeight - 1
+        startProgress(codeHeight)
+        For j = 0 To codeHeight - 1
+            For i = 0 To codeWidth - 1
                 rectNew.X = i * (rectNew.Width + 1)
                 rectNew.Y = j * (rectNew.Height + 1)
                 rectOld.X = i * (rectOld.Width + 1)
                 rectOld.Y = j * (rectOld.Width + 1)
                 grpNew.DrawImage(bmp, rectNew, rectOld, GraphicsUnit.Pixel)
             Next
+            goProgress(j + 1)
         Next
+        endProgress()
         bmp.Dispose()
         picMain.Refresh()
+        RedrawEditor()
     End Sub
 
     Private Sub frmBMPFont_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
@@ -1583,6 +2334,9 @@ Public Class frmFont
         If e.KeyCode = Keys.ShiftKey Then
             isShiftPress = True
             picEdit.Cursor = Cursors.Hand
+        End If
+        If e.KeyCode = Keys.ControlKey Then
+            isCtrlPress = True
         End If
     End Sub
 
@@ -1606,6 +2360,7 @@ Public Class frmFont
         Dim bmp As Bitmap = picMain.Image
         Dim c As Color
         Dim d As Color
+        startProgress(codeHeight)
         For j = 0 To codeHeight - 1
             For i = 0 To codeWidth - 1
                 For n = 0 To cellHeight - 1
@@ -1616,7 +2371,9 @@ Public Class frmFont
                     Next
                 Next
             Next
+            goProgress(j + 1)
         Next
+        endProgress()
         picMain.Refresh()
         RedrawEditor()
     End Sub
@@ -1628,6 +2385,8 @@ Public Class frmFont
         Dim bmp As Bitmap = picMain.Image
         Dim c As Color
         Dim d As Color
+        startProgress(codeHeight)
+
         For j = 0 To codeHeight - 1
             For i = 0 To codeWidth - 1
                 For n = 0 To cellHeight - 1
@@ -1642,7 +2401,9 @@ Public Class frmFont
                     Next
                 Next
             Next
+            goProgress(j + 1)
         Next
+        endProgress()
         picMain.Refresh()
         RedrawEditor()
     End Sub
@@ -1670,6 +2431,9 @@ Public Class frmFont
         If e.KeyCode = Keys.ShiftKey Then
             isShiftPress = False
             picEdit.Cursor = Cursors.Cross
+        End If
+        If e.KeyCode = Keys.ControlKey Then
+            isCtrlPress = False
         End If
     End Sub
 
@@ -1966,10 +2730,12 @@ Public Class frmFont
 
     Private Sub btnInsert_Click(sender As Object, e As EventArgs) Handles btnInsert.Click
         insertRAW(txtInsertStart.Text, txtInsertEnd.Text)
+        RedrawEditor()
     End Sub
 
-    Private Sub btnImportClean_Click(sender As Object, e As EventArgs) Handles btnImportClean.Click
+    Private Sub btnImportClean_Click(sender As Object, e As EventArgs) Handles btnEditClean.Click
         cleanArea(txtMoveStart.Text, txtMoveEnd.Text)
+        RedrawEditor()
     End Sub
 
     Private Function loc2x(loc As Integer) As Integer
@@ -1980,7 +2746,7 @@ Public Class frmFont
         loc2y = Int(loc / codeWidth)
     End Function
 
-    Private Sub CopyCell(locSource As Integer, locDest As Integer, isCopy As Boolean)
+    Private Sub CopyCell(locSource As Integer, locDest As Integer, isCopyMoveExchange As Integer)
         Dim max = codeWidth * codeHeight - 1
         If locSource > max Or locSource < 0 Then
             Exit Sub
@@ -1992,18 +2758,40 @@ Public Class frmFont
             Exit Sub
         End If
         Dim bmp As Bitmap = picMain.Image
+        Dim bmpTemp As New Bitmap(cellWidth, cellHeight)
         Dim grp As Graphics = Graphics.FromImage(bmp)
+        Dim grpTemp As Graphics = Graphics.FromImage(bmpTemp)
         Dim dx = loc2x(locDest) * (cellWidth + 1)
         Dim dy = loc2y(locDest) * (cellHeight + 1)
         Dim sx = loc2x(locSource) * (cellWidth + 1)
         Dim sy = loc2y(locSource) * (cellHeight + 1)
-        grp.DrawImage(bmp, New Rectangle(dx, dy, cellWidth, cellHeight), New Rectangle(sx, sy, cellWidth, cellHeight), GraphicsUnit.Pixel)
-        If isCopy = False Then
-            grp.FillRectangle(New SolidBrush(Color.White), New Rectangle(sx, sy, cellWidth, cellHeight))
+        If isCopyMoveExchange = 2 Then
+            grpTemp.DrawImage(bmp, New Rectangle(0, 0, cellWidth, cellHeight), New Rectangle(dx, dy, cellWidth, cellHeight), GraphicsUnit.Pixel)
         End If
+        grp.DrawImage(bmp, New Rectangle(dx, dy, cellWidth, cellHeight), New Rectangle(sx, sy, cellWidth, cellHeight), GraphicsUnit.Pixel)
+        'grp.DrawImageUnscaled()
+        If isCopyMoveExchange = 1 Then 'move
+            grp.FillRectangle(New SolidBrush(Color.White), New Rectangle(sx, sy, cellWidth, cellHeight))
+        ElseIf isCopyMoveExchange = 2 Then 'exchange
+            grp.DrawImage(bmpTemp, New Rectangle(sx, sy, cellWidth, cellHeight), New Rectangle(0, 0, cellWidth, cellHeight), GraphicsUnit.Pixel)
+        End If
+
+    End Sub
+    Private Sub startProgress(m As Integer)
+        progressBar.Maximum = m
+        progressBar.Visible = True
+        progressBar.Value = 0
     End Sub
 
-    Private Sub CopyCells(codeStart As String, codeEnd As String, codeTo As String, isCopy As Boolean)
+    Private Sub goProgress(v As Integer)
+        progressBar.Value = v
+    End Sub
+
+    Private Sub endProgress()
+        progressBar.Visible = False
+    End Sub
+
+    Private Sub CopyCells(codeStart As String, codeEnd As String, codeTo As String, isCopyMoveExchange As Integer)
         Dim cdStart = code2loc(codeStart)
         Dim cdEnd = code2loc(codeEnd)
         Dim cdTo = code2loc(codeTo)
@@ -2012,24 +2800,31 @@ Public Class frmFont
             Exit Sub
         End If
         Dim i As Integer
+        startProgress(cdSize)
         If cdTo > cdEnd Or cdTo < cdStart Then
             For i = 0 To cdSize - 1
-                CopyCell(i + cdStart, i + cdTo, isCopy)
+                CopyCell(i + cdStart, i + cdTo, isCopyMoveExchange)
+                goProgress(i + 1)
+                Application.DoEvents()
             Next
         ElseIf cdTo <= cdEnd And cdTo > cdStart Then
             For i = cdSize - 1 To 0 Step -1
-                CopyCell(i + cdStart, i + cdTo, isCopy)
+                CopyCell(i + cdStart, i + cdTo, isCopyMoveExchange)
+                goProgress(cdSize - i)
             Next
         End If
+        endProgress()
         picMain.Refresh()
     End Sub
 
     Private Sub btnMoveCode_Click(sender As Object, e As EventArgs) Handles btnMoveCode.Click
-        CopyCells(txtMoveStart.Text, txtMoveEnd.Text, txtMoveTo.Text, False)
+        CopyCells(txtMoveStart.Text, txtMoveEnd.Text, txtMoveTo.Text, 1)
+        RedrawEditor()
     End Sub
 
     Private Sub btnCopyCode_Click(sender As Object, e As EventArgs) Handles btnCopyCode.Click
-        CopyCells(txtMoveStart.Text, txtMoveEnd.Text, txtMoveTo.Text, True)
+        CopyCells(txtMoveStart.Text, txtMoveEnd.Text, txtMoveTo.Text, 0)
+        RedrawEditor()
     End Sub
 
     Private Sub btnEditorInverse_Click(sender As Object, e As EventArgs) Handles btnEditorInverse.Click
@@ -2060,7 +2855,49 @@ Public Class frmFont
         savePNG()
     End Sub
 
+    Private Sub picMain_MouseDoubleClick(sender As Object, e As MouseEventArgs) Handles picMain.MouseDoubleClick
+        txtMoveTo.Text = loc2code(Int((e.X) / (cellWidth + 1)), Int((e.Y) / (cellHeight + 1)))
+        picMain_MouseClick(sender, e)
+    End Sub
+
+    Private Sub btnDrawLines_Click(sender As Object, e As EventArgs) Handles btnDrawLines.Click
+        drawHeadAndLine()
+        RedrawEditor()
+    End Sub
+
+    Private Sub hsbThresholdBW_Scroll(sender As Object, e As ScrollEventArgs) Handles hsbThresholdBW.Scroll
+        lblThresholdBW.BackColor = Color.FromArgb(255 << 24 + hsbThresholdBW.Value << 16 + hsbThresholdBW.Value << 8 + hsbThresholdBW.Value)
+    End Sub
+
+    Private Sub split_SplitterMoved(sender As Object, e As SplitterEventArgs) Handles split.SplitterMoved
+        'If isResizing = False Then
+        resizeAll()
+        'End If
+    End Sub
+    Private Sub btnExchange_Click(sender As Object, e As EventArgs) Handles btnExchange.Click
+        CopyCells(txtMoveStart.Text, txtMoveEnd.Text, txtMoveTo.Text, 2)
+    End Sub
+
     Private Sub picMain_Click(sender As Object, e As EventArgs) Handles picMain.Click
 
+    End Sub
+
+    Private Sub picMain_MouseWheel(sender As Object, e As MouseEventArgs) Handles picMain.MouseWheel
+        If isCtrlPress Then
+            If e.Delta > 0 Then
+                zoomInOut += 1
+                If zoomInOut > 8 Then
+                    zoomInOut = 8
+                End If
+                resizeAll()
+            End If
+            If e.Delta < 0 Then
+                zoomInOut -= 1
+                If zoomInOut < 0 Then
+                    zoomInOut = 0
+                End If
+                resizeAll()
+            End If
+        End If
     End Sub
 End Class

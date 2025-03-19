@@ -1,4 +1,8 @@
-﻿Public Class clsCharset
+﻿Public Class clsFont
+    ' Font: codepage, code array para, cell para
+    '      create a font, set paras
+    '      is in Coderange
+
     Public codepage As Integer = 0
     Public codepageSubset As Integer
 
@@ -11,6 +15,20 @@
     Public codeHeight As Integer = 0
     Public cellWidth As Integer = 0
     Public cellHeight As Integer = 0
+
+    Private Function hexstr(n, sz) As String
+        hexstr = Strings.Right("0000000" & Hex(n), sz)
+    End Function
+
+    Public Function loc2code(x, y) As String
+        Dim l As Integer
+        If codeLength >= 2 Then
+            l = 2
+        Else
+            l = 1
+        End If
+        loc2code = hexstr(codeHigh(y), l) & hexstr(codeLow(x), l)
+    End Function
 
     Public Sub create(cp As Integer, subset As String)
         Dim codeHighRange() As Integer
